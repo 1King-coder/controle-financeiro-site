@@ -1,26 +1,21 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Routes from './routes';
+import { Router } from 'react-router-dom';
+import history from './services/history';
+import GlobalStyles from './styles/GlobalStyles';
+import Header from './components/Header';
+import { ToastContainer } from 'react-toastify';
 
-function App() {
+function App(): JSX.Element {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router history={history}>
+      <Header />
+      <GlobalStyles />
+      <ToastContainer autoClose={3000} className={'toast-container'}/>
+      <Routes />
+    </Router>
   );
+    
 }
 
 export default App;
