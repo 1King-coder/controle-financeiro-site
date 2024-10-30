@@ -44,9 +44,10 @@ export default createGlobalStyle`
 `
 
 export const Container = styled.section`
-  width: 360px;
+  width: 70%;
+  height: 60%;
   background-color: #fff;
-  margin: 30px auto;
+  margin: 50px auto;
   padding: 30px;
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
