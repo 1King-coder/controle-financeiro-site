@@ -17,6 +17,13 @@ export default createGlobalStyle`
 
   html, body, #root {
     height: 100%;
+    
+  }
+
+  .AppWrapper {
+    display: flex;
+    flex-direction:ltr;
+    height: 100%;
   }
 
   button {
@@ -44,10 +51,10 @@ export default createGlobalStyle`
 `
 
 export const Container = styled.section`
-  width: 70%;
-  height: 60%;
+  width: 90%;
+  height: 80%;
   background-color: #fff;
-  margin: 50px auto;
+  margin: 10px auto;
   padding: 30px;
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

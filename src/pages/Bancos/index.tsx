@@ -5,51 +5,57 @@ import { Banco } from "../../types/Banco";
 import { Container } from "../../styles/GlobalStyles";
 import {Chart} from "react-google-charts";
 
-export default function Bancos(): JSX.Element {
-  
+function BancosDonutChart(): JSX.Element {
   const [bancos, setBancos] = React.useState([]);
 
   React.useEffect(() => {
     async function getBancos() {
-      const response = await axios.get("/bancos");
+      const response = await axios.get("/bancos/saldo-por-direcionamento");
       
       setBancos(response.data);
     }
     
     getBancos();
   }, []);
-  const dados = [["Banco", "Saldo", { role: "style" }]];
+  // const dados = [["Banco", "Saldo"]];
+  
+  // bancos.forEach((banco: Banco) => {
+  //   // @ts-ignore
+  //   dados.push([banco.nome, banco.saldo]);
+  // })
 
-  bancos.forEach((banco: Banco) => {
-    // @ts-ignore
-    dados.push([banco.nome, banco.saldo, (function getRandomColor(): string { return '#'+Array(6).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join(''); })()]);
-  })
+  
 
   const options = {
     title: "Bancos",
-    hAxis: {
-      title: "Saldo",
-      format: "currency",
-    },
-    vAxis: {
-      title: "Bancos",
-    },
-    animation: { duration: 500, easing: "linear"},
-    legend: { position: "bottom"},
+    pieHole: 0.4,
+    is3D: false,
   }
+
+  return (
+    <div>
+    
+    </div>
+    // <Chart
+    // chartType="PieChart"
+    // width="100%"
+    // height="50%"
+    // data={dados}
+    // options={options}
+    // />
+  )
+}
+
+export default function Bancos(): JSX.Element {
+  
+
 
 
 
   return (
     <Container>
       <Title>Bancos</Title>
-      <Chart
-        chartType="ColumnChart"
-        width="100%"
-        height="100%"
-        data={dados}
-        options={options}
-      />
+      <BancosDonutChart/>
       
     </Container>
   );
