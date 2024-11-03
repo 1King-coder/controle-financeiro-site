@@ -1,6 +1,8 @@
 import React from "react";
 import { FaHome } from "react-icons/fa";
 import { CiAlignLeft } from "react-icons/ci";
+import { GrDirections } from "react-icons/gr";
+import { BsBank2 } from "react-icons/bs";
 import { Nav, Box } from "./styled";
 import { Link } from "react-router-dom";
 import * as colors from "../../config/colors";
@@ -15,7 +17,12 @@ export default function Header(): JSX.Element {
       </Link>
       <Link to="/bancos">
         <Box>
-          <CiAlignLeft size={24} color={colors.secondaryColor}/>
+          <BsBank2 size={24} color={colors.secondaryColor}/>
+        </Box>
+      </Link>
+      <Link to="/direcionamentos">
+        <Box>
+          <GrDirections size={24} color={colors.secondaryColor}/>
         </Box>
       </Link>
     </Nav>
