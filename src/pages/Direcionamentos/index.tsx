@@ -4,9 +4,7 @@ import axios from "../../services/axios";
 import { Direcionamento, SaldoDirecionamentoPorBanco } from "../../types/Direcionamento";
 import { Card, CardTitle, Container, FullLineCard, FullLineCardTitle, OptionBtn, ScrollableDiv } from "../../styles/GlobalStyles";
 import {Chart} from "react-google-charts";
-import { backgroundColor, secondaryColor, tertiaryColor } from "../../config/colors";
-import { title } from "process";
-import { table } from "console";
+
 
 class GetDirecionamentosDataFuncions {
 
