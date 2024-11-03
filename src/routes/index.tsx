@@ -3,6 +3,7 @@ import { Switch, Route} from "react-router-dom";
 import Home from "../pages/Home";
 import Bancos from "../pages/Bancos";
 import Page404 from "../pages/page404";
+import Direcionamentos from "../pages/Direcionamentos";
 
 export default function Routes(): JSX.Element {
 
@@ -10,6 +11,7 @@ export default function Routes(): JSX.Element {
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/bancos" component={Bancos} />
+        <Route exact path="/direcionamentos" component={Direcionamentos} />
         <Route path="*" component={Page404} />
       </Switch>
   );
