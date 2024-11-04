@@ -3,6 +3,7 @@ import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import  { MenuItemStyles } from "../../types/MenuItemStyles";
 import { FaHome, FaGlobe, FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { BsBank2 } from "react-icons/bs";
 import { GrDirections } from "react-icons/gr";
 import * as colors from "../../config/colors";
@@ -45,6 +46,7 @@ export default function SideBar(): JSX.Element {
         <SubMenu label="Visão Geral" icon={<FaGlobe size={24} />}>
           <MenuItem component={<Link to="/bancos" />} suffix={<BsBank2 size={24} />}>Bancos</MenuItem>
           <MenuItem component={<Link to="/direcionamentos" />} suffix={<GrDirections size={24} />}>Direcionamentos</MenuItem>
+          <MenuItem component={<Link to="/gastos-gerais" />} suffix={<FaMoneyBillTransfer size={24} />}>Gastos Gerais</MenuItem>
         </SubMenu>
       </Menu>
 
