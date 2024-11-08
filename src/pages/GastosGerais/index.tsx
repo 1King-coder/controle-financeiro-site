@@ -63,6 +63,8 @@ export function GastosGerais(): JSX.Element {
         listGastosByWeekDay[dataGasto.getDay()].push(gastoGeral);
       })
 
+      console.log(listGastosByWeekDay);
+
       setGastosByWeekDay(listGastosByWeekDay);
     });
   }, []);
@@ -91,63 +93,49 @@ export function GastosGerais(): JSX.Element {
       <div>
         {
           optionSelectedId === 1 ? (
-            <div>
+            <div style={{marginTop: "2rem"}}>
 
               <SubTitle1>Hoje é {dayOfTheWeek.withFeira[new Date().getDay()]} - {new Date().toLocaleDateString()}</SubTitle1>
-              <div style={{display:"flex", width: "100%", height: "100%"}}>
+              <div style={{display:"flex", width: "100%", height: "100%", justifyContent: "center"}}>
+                {
+                  gastosByWeekDay.map((gastosInWeekDay: GastoGeral[], index: number) => {
+                    return (
+                      <WeekDayGastosDiv>
+                        <SubTitle2>{dayOfTheWeek.withFeira[index]}</SubTitle2>
+                        {
+                          gastosInWeekDay.map((gastoGeral: GastoGeral) => {
+                            const splitedDate = gastoGeral.created_at.split("/");
+                            const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) + 1,  Number(splitedDate[0]));
+                            return (
+                              <>          
+                                    <Popover content={
+                                      <div className="gastos-gerais-popover-content">
+                                        <div className="gastos-gerais-popover-title-div">
+                                          <h3 className="gastos-gerais-popover-title">Dados do Gasto </h3>
+                                        </div>
+                                        <div style={{width: "100%", padding: "10px", height: "100%", backgroundColor: colors.tertiaryColor}}>
+                                          <p style={{textAlign: "center"}}>{gastoGeral.id_banco}</p>
+                                          <p style={{textAlign: "center"}}>{gastoGeral.id_direcionamento}</p>
+                                          <p style={{textAlign: "center"}}>{gastoGeral.tipo_gasto}</p>
+                                          <p style={{textAlign: "center"}}>{gastoGeral.descricao}</p>
+                                          <p style={{textAlign: "center"}}>{gastoGeral.created_at}</p>
+                                          <p style={{textAlign: "center"}}>{gastoGeral.valor}</p>
+                                        </div>
+                                      </div>
+                                    } placement="right" trigger="hover">
+                                      <Button style={{width: "100%"}}>{gastoGeral.descricao}</Button>
+                                    </Popover>
+                                  </>
+                            )
+                          })
+                        }
+                        
+                      </WeekDayGastosDiv>
+                    )
+                  })
+                }
                 <WeekDayGastosDiv>
                 <SubTitle2>Segunda-feira</SubTitle2>
-                  {
-                    gastosByWeekDay[0].map((gastoGeral: GastoGeral) => {
-                      const splitedDate = gastoGeral.created_at.split("/");
-                      const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) + 1,  Number(splitedDate[0]));
-                      
-                      return (
-                        <>
-                          <Popover content={
-                            <div style={{
-                              width: "100%", 
-                              padding: "10px", 
-                              height: "100%", 
-                              backgroundColor: colors.tertiaryColor, 
-                              filter: "drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))",
-                              borderRadius: "20px"
-                              }}>
-                              <div style={{
-                                width: "100%",
-                                height: "100%", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                backgroundColor: colors.primaryColor, 
-                                filter: "drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))",
-                                borderRadius: "20px"
-                                }}>
-                                <h3 style={{
-                                  color: colors.secondaryColor,
-                                  textAlign: "center", 
-                                  fontSize: "14px", 
-                                  padding: "10px",
-                                  fontWeight: "bold"
-                                  }}>Dados do Gasto </h3>
-                              </div>
-                              <div style={{width: "100%", padding: "10px", height: "100%", backgroundColor: colors.tertiaryColor}}>
-                                <p style={{textAlign: "center"}}>{gastoGeral.id_banco}</p>
-                                <p style={{textAlign: "center"}}>{gastoGeral.id_direcionamento}</p>
-                                <p style={{textAlign: "center"}}>{gastoGeral.tipo_gasto}</p>
-                                <p style={{textAlign: "center"}}>{gastoGeral.descricao}</p>
-                                <p style={{textAlign: "center"}}>{gastoGeral.created_at}</p>
-                                <p style={{textAlign: "center"}}>{gastoGeral.valor}</p>
-                              </div>
-                            </div>
-                          } placement="right" trigger="hover">
-                            <Button style={{width: "100%"}}>{gastoGeral.descricao}</Button>
-                          </Popover>
-                        </>
-                      )
-                      
-                    })
-                    
-                  }
                 </WeekDayGastosDiv>
               </div>
             </div>
