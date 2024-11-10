@@ -81,6 +81,7 @@ export default createGlobalStyle`
     background-color: ${primaryColor}; 
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
     border-radius: 20px;
+    margin-bottom: 10px;
   }
 
   .gastos-gerais-popover-title {
@@ -89,6 +90,45 @@ export default createGlobalStyle`
     font-size: 14px; 
     padding: 10px;
     font-weight: bold;
+  }
+
+  .gastos-gerais-popover-edit-delete-btns-div {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    flex-direction: row;
+  }
+
+  .gastos-gerais-popover-btn {
+    width: 100%;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    background-color: ${tertiaryColor};
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding: 10px auto;
+  }
+
+  .gastos-gerais-popover-table {
+    width: 100%;
+    height: 100%;
+    background-color: ${tertiaryColor};
+    border-radius: 4px;
+    border: 3px solid ${primaryColor};
+  }
+
+  .gastos-gerais-popover-table-label-cell {
+    text-align: right;
+    font-weight: bold;
+
+  }
+
+  .gastos-gerais-popover-table-data-cell {
+    text-align: center;
   }
 `
 
