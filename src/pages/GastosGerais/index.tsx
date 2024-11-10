@@ -17,6 +17,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import WeekPicker from "../../components/WeekPicker";
+import { WeekDayPopoverCard } from "../../components/WeekDayPopoverCard";
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(): Promise<GastoGeral[]> {
     const response = await axios.get("/gastos_gerais");
@@ -218,59 +219,7 @@ export function GastosGerais(): JSX.Element {
                 {
                   gastosByActualWeekDay.map((gastosInWeekDay: GastoGeral[], index: number) => {
                     return (
-                      <WeekDayGastosDiv key={index}>
-                        <SubTitle2>{dayOfTheWeek.withFeira[index]}</SubTitle2>
-                        {
-                          gastosInWeekDay.map((gastoGeral: GastoGeral) => {
-                            const splitedDate = gastoGeral.created_at.split("/");
-                            const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) + 1,  Number(splitedDate[0]));
-                            return (
-                              <>          
-                                <Popover content={
-                                  <div className="gastos-gerais-popover-content">
-                                    <div className="gastos-gerais-popover-title-div">
-                                      <h3 className="gastos-gerais-popover-title">Dados do Gasto</h3>
-                                    </div>
-                                    <table className="gastos-gerais-popover-table">
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Banco:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{bancos[gastoGeral.id_banco]}</td>
-                                      </tr>
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Direcionamento:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{direcionamentos[gastoGeral.id_direcionamento]}</td>
-                                      </tr>
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Descrição:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{gastoGeral.descricao}</td>
-                                      </tr>
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Valor:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{`R$ ${gastoGeral.valor}`}</td>
-                                      </tr>
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Data:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{gastoDate.toLocaleDateString()}</td>
-                                      </tr>
-                                    </table>
-                                    <div className="gastos-gerais-popover-edit-delete-btns-div">
-                                      <Link to={`/gastos-gerais/${gastoGeral.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex", marginRight: "10px"}}>
-                                        <FaEdit size={20} color={colors.secondaryColor}/>
-                                      </Link>
-                                      <Link to={`/gastos-gerais/${gastoGeral.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex"}}>
-                                        <MdDelete size={20} color={colors.dangerColor}/>
-                                      </Link>
-                                    </div>
-                                  </div>
-                                } placement="right" trigger="hover" >
-                                  <Button className="gastos-gerais-popover-btn">{gastoGeral.descricao}</Button>
-                                </Popover>
-                              </>
-                            )
-                          })
-                        }
-                        
-                      </WeekDayGastosDiv>
+                      <WeekDayPopoverCard key={index} bancos={bancos} direcionamentos={direcionamentos} itemInWeekDay={gastosInWeekDay} index={index} />
                     )
                   })
                 }
@@ -288,59 +237,7 @@ export function GastosGerais(): JSX.Element {
                 {
                   gastosByWeekDay.map((gastosInWeekDay: GastoGeral[], index: number) => {
                     return (
-                      <WeekDayGastosDiv key={index}>
-                        <SubTitle2>{dayOfTheWeek.withFeira[index]}</SubTitle2>
-                        {
-                          gastosInWeekDay.map((gastoGeral: GastoGeral) => {
-                            const splitedDate = gastoGeral.created_at.split("/");
-                            const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) + 1,  Number(splitedDate[0]));
-                            return (
-                              <>          
-                                <Popover content={
-                                  <div className="gastos-gerais-popover-content">
-                                    <div className="gastos-gerais-popover-title-div">
-                                      <h3 className="gastos-gerais-popover-title">Dados do Gasto</h3>
-                                    </div>
-                                    <table className="gastos-gerais-popover-table">
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Banco:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{bancos[gastoGeral.id_banco]}</td>
-                                      </tr>
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Direcionamento:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{direcionamentos[gastoGeral.id_direcionamento]}</td>
-                                      </tr>
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Descrição:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{gastoGeral.descricao}</td>
-                                      </tr>
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Valor:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{`R$ ${gastoGeral.valor}`}</td>
-                                      </tr>
-                                      <tr>
-                                        <td className="gastos-gerais-popover-table-label-cell">Data:</td>
-                                        <td className="gastos-gerais-popover-table-data-cell">{gastoDate.toLocaleDateString()}</td>
-                                      </tr>
-                                    </table>
-                                    <div className="gastos-gerais-popover-edit-delete-btns-div">
-                                      <Link to={`/gastos-gerais/${gastoGeral.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex", marginRight: "10px"}}>
-                                        <FaEdit size={20} color={colors.secondaryColor}/>
-                                      </Link>
-                                      <Link to={`/gastos-gerais/${gastoGeral.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex"}}>
-                                        <MdDelete size={20} color={colors.dangerColor}/>
-                                      </Link>
-                                    </div>
-                                  </div>
-                                } placement="right" trigger="hover" >
-                                  <Button className="gastos-gerais-popover-btn">{gastoGeral.descricao}</Button>
-                                </Popover>
-                              </>
-                            )
-                          })
-                        }
-                        
-                      </WeekDayGastosDiv>
+                      <WeekDayPopoverCard key={index} bancos={bancos} direcionamentos={direcionamentos} itemInWeekDay={gastosInWeekDay} index={index} />
                     )
                   })
                 }
