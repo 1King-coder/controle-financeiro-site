@@ -12,11 +12,11 @@ import { MdDelete } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { Banco } from "../../types/Banco";
 import { Direcionamento } from "../../types/Direcionamento";
-import {  LocalizationProvider } from "@mui/x-date-pickers";
+import {  LocalizationProvider, MonthCalendar } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
-
+import WeekPicker from "../../components/WeekPicker";
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(): Promise<GastoGeral[]> {
     const response = await axios.get("/gastos_gerais");
@@ -55,7 +55,8 @@ class GetGastosGeraisDataFuncions {
   
         if (dataGasto.getMonth() === date.getMonth() && dataGasto.getFullYear() === date.getFullYear()) {
           return gastoGeral;
-        } 
+        }
+
         return null;
       });
       
@@ -83,15 +84,39 @@ function getSemanaAtual (today: Date): Date[] {
 
 export function GastosGerais(): JSX.Element {
   const [gastosGerais, setGastosGerais] = React.useState<GastoGeral[]>([]);
-  const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(1);
+  const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(2);
   const [gastosByActualWeekDay, setgastosByActualWeekDay] = React.useState(Array<GastoGeral[]>([]));
   const [gastosByWeekDay, setgastosByWeekDay] = React.useState(Array<GastoGeral[]>([]));
   const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
   const [direcionamentos, setDirecionamentos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(dayjs());
+  const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
+  const [gastosByMonth, setGastosByMonth]: [{ [key: string]: GastoGeral[] }, any] = React.useState({});
 
-  React.useEffect(() => {
+  React.useEffect(() => { 
+    GetGastosGeraisDataFuncions.getGastosGeraisFilterByMonthInterval(selectedMonthDate.toDate()).then((data: GastoGeral[]) => {
+      const listgastosByDayOfTheMonth: { [key: string]: GastoGeral[] } = {};
+
+
+      data.forEach((gastoGeral: GastoGeral) => {
+        if (listgastosByDayOfTheMonth.hasOwnProperty(gastoGeral.created_at)) {
+          listgastosByDayOfTheMonth[gastoGeral.created_at] = [];
+          listgastosByDayOfTheMonth[gastoGeral.created_at].push(gastoGeral)
+        } else {
+          listgastosByDayOfTheMonth[gastoGeral.created_at].push(gastoGeral);
+        }
+        
+      })
+      setGastosByMonth(listgastosByDayOfTheMonth);
+
+    })
+  }, [selectedMonthDate])
+
+  React.useEffect(() => { 
     const semanaSelecionada = getSemanaAtual(startWeekDayDate.toDate());
+
+    
+
     GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(semanaSelecionada[0], semanaSelecionada[1]).then((data: GastoGeral[]) => {
       setGastosGerais(data);
       const listgastosByWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
@@ -104,6 +129,10 @@ export function GastosGerais(): JSX.Element {
       setgastosByWeekDay(listgastosByWeekDay);
 
     })
+  }, [startWeekDayDate])
+
+  React.useEffect(() => {
+    
     const semanaAtual = getSemanaAtual(new Date());
 
     GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(semanaAtual[0], semanaAtual[1]).then((data: GastoGeral[]) => {
@@ -151,7 +180,7 @@ export function GastosGerais(): JSX.Element {
     getDirecionamentos();
 
     });
-  }, [startWeekDayDate]);
+  }, []);
 
 
 
@@ -189,7 +218,7 @@ export function GastosGerais(): JSX.Element {
                 {
                   gastosByActualWeekDay.map((gastosInWeekDay: GastoGeral[], index: number) => {
                     return (
-                      <WeekDayGastosDiv>
+                      <WeekDayGastosDiv key={index}>
                         <SubTitle2>{dayOfTheWeek.withFeira[index]}</SubTitle2>
                         {
                           gastosInWeekDay.map((gastoGeral: GastoGeral) => {
@@ -250,9 +279,7 @@ export function GastosGerais(): JSX.Element {
               <SubTitle1>Semana Selecionada: {getSemanaAtual(startWeekDayDate.toDate())[0].toLocaleDateString()} - {getSemanaAtual(startWeekDayDate.toDate())[1].toLocaleDateString()} </SubTitle1>
               <div style={{display:"flex", width: "100%", height: "100%", justifyContent: "center"}}>
                 <div style={{marginRight: "2rem"}}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker format="DD/MM/YYYY" label="Selecione um dia de uma semana" value={startWeekDayDate} onChange={(newValue) => setStartWeekDayDate(newValue)}/>
-                  </LocalizationProvider>
+                  <WeekPicker value={startWeekDayDate} onChange={(newValue:any) => setStartWeekDayDate(newValue)}/>
                 </div>
 
               </div>
@@ -261,7 +288,7 @@ export function GastosGerais(): JSX.Element {
                 {
                   gastosByWeekDay.map((gastosInWeekDay: GastoGeral[], index: number) => {
                     return (
-                      <WeekDayGastosDiv>
+                      <WeekDayGastosDiv key={index}>
                         <SubTitle2>{dayOfTheWeek.withFeira[index]}</SubTitle2>
                         {
                           gastosInWeekDay.map((gastoGeral: GastoGeral) => {
@@ -321,17 +348,16 @@ export function GastosGerais(): JSX.Element {
               </div>
             </div>
           ) : optionSelectedId === 2 ? (
-            <div>
-              <SubTitle1>Estamos no mês de {months[new Date().getMonth()]} de {new Date().getFullYear()}</SubTitle1>
-              <Chart
-                chartType="LineChart"
-                width="100%"
-                height="400px"
-                data={[
-                  ["Data", "Gastos Gerais"],
-                  ...gastosGerais.map((gastoGeral: GastoGeral) => [gastoGeral.created_at, gastoGeral.valor])
-                ]}
-              />
+            <div style={{display:"flex", flexDirection: "column", width: "100%", height: "100%", justifyContent: "center"}}>
+              <SubTitle1>Você selecionou o mês de {months[selectedMonthDate.toDate().getMonth()]} de {new Date().getFullYear()}</SubTitle1>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <MonthCalendar value={selectedMonthDate} onChange={(newValue) => setSelectedMonthDate(newValue)}/>
+              </LocalizationProvider>
+              <div>
+                
+                    
+              </div>
+
             </div>
           ) : null
         }

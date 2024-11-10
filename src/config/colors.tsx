@@ -1,6 +1,7 @@
 
 
 export const primaryColor = '#520c9c';
+export const lightPrimartyColor = '#633297';
 export const secondaryColor = '#fcad03';
 export const successColor = '#5122a8';
 export const warningColor = '#ed7300';
