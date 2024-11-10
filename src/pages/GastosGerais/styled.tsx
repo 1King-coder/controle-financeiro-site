@@ -21,6 +21,7 @@ export const SubTitle1 = styled.h2`
   background-color: ${colors.primaryColor};
   padding: 10px;
   width: 100%;
+  margin-top: 3rem;
 `
 
 export const SubTitle2 = styled.h3`
@@ -32,17 +33,21 @@ export const SubTitle2 = styled.h3`
   background-color: ${colors.primaryColor};
   padding: 10px;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 0.1rem;
 `
 
 export const WeekDayGastosDiv = styled.div`
-  display: block;
+  display: inline-block;  
   width: 10rem;
-  height: 10rem;
+  height: 15rem;
+  overflow-y: scroll;
   margin: 10px;
   margin-top: 20px;
   border-radius: 10px;
   background-color: ${colors.primaryColor};
+  padding: 10px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `
 
 export const TimeIntervalOptionsDiv = styled.div`
