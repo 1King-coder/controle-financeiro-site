@@ -85,6 +85,7 @@ export default function WeekPicker(props: any): JSX.Element {
         onChange={props.onChange}
         format='DD/MM/YYYY'
         showDaysOutsideCurrentMonth
+        fixedWeekNumber={6}
         slots={{ day: Day }}
         slotProps={{
           day: (ownerState) =>
