@@ -1,23 +1,22 @@
 import React from "react";
-import { Title, TimeIntervalOptionsDiv, SubTitle1, WeekDayGastosDiv, SubTitle2 } from "./styled";
+import { Title, TimeIntervalOptionsDiv, SubTitle1, DataGridBox} from "./styled";
 import axios from "../../services/axios";
 import { GastoGeral } from "../../types/GastoGeral";
 import Chart from "react-google-charts";
 import { OptionBtn } from "../../styles/GlobalStyles";
 import { dayOfTheWeek, months } from "../../config/dates";
-import { Button, Popover } from "flowbite-react";
 import * as colors from "../../config/colors";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { Link } from "react-router-dom";
 import { Banco } from "../../types/Banco";
 import { Direcionamento } from "../../types/Direcionamento";
 import {  LocalizationProvider, MonthCalendar } from "@mui/x-date-pickers";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import WeekPicker from "../../components/WeekPicker";
 import { WeekDayPopoverCard } from "../../components/WeekDayPopoverCard";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
+import { FaToolbox } from "react-icons/fa";
+import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
+
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(): Promise<GastoGeral[]> {
     const response = await axios.get("/gastos_gerais");
@@ -31,7 +30,7 @@ class GetGastosGeraisDataFuncions {
       const filteredData = data.filter( (gastoGeral: GastoGeral) => {
 
         const dateSplited = gastoGeral.created_at.split("/");
-        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) + 1,  Number(dateSplited[0]));
+        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataGasto >= dateStart && dataGasto <= dateEnd) {
           return gastoGeral;
@@ -52,9 +51,9 @@ class GetGastosGeraisDataFuncions {
       const filteredData = data.filter( (gastoGeral: GastoGeral) => {
 
         const dateSplited = gastoGeral.created_at.split("/");
-        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) + 1,  Number(dateSplited[0]));
+        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
-        if (dataGasto.getMonth() === date.getMonth() && dataGasto.getFullYear() === date.getFullYear()) {
+        if (dataGasto.getMonth() === date.getMonth()) {
           return gastoGeral;
         }
 
@@ -92,23 +91,11 @@ export function GastosGerais(): JSX.Element {
   const [direcionamentos, setDirecionamentos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(dayjs());
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
-  const [gastosByMonth, setGastosByMonth]: [{ [key: string]: GastoGeral[] }, any] = React.useState({});
+  const [gastosByMonth, setGastosByMonth]: [GastoGeral[], any] = React.useState([]);
 
   React.useEffect(() => { 
     GetGastosGeraisDataFuncions.getGastosGeraisFilterByMonthInterval(selectedMonthDate.toDate()).then((data: GastoGeral[]) => {
-      const listgastosByDayOfTheMonth: { [key: string]: GastoGeral[] } = {};
-
-
-      data.forEach((gastoGeral: GastoGeral) => {
-        if (listgastosByDayOfTheMonth.hasOwnProperty(gastoGeral.created_at)) {
-          listgastosByDayOfTheMonth[gastoGeral.created_at] = [];
-          listgastosByDayOfTheMonth[gastoGeral.created_at].push(gastoGeral)
-        } else {
-          listgastosByDayOfTheMonth[gastoGeral.created_at].push(gastoGeral);
-        }
-        
-      })
-      setGastosByMonth(listgastosByDayOfTheMonth);
+      setGastosByMonth(data);
 
     })
   }, [selectedMonthDate])
@@ -123,7 +110,7 @@ export function GastosGerais(): JSX.Element {
       const listgastosByWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
       data.forEach((gastoGeral: GastoGeral) => {
         const dateSplited = gastoGeral.created_at.split("/");
-        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) + 1,  Number(dateSplited[0]));
+        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listgastosByWeekDay[dataGasto.getDay()].push(gastoGeral);
       })
@@ -141,7 +128,7 @@ export function GastosGerais(): JSX.Element {
       const listgastosByActualWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
       data.forEach((gastoGeral: GastoGeral) => {
         const dateSplited = gastoGeral.created_at.split("/");
-        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) + 1,  Number(dateSplited[0]));
+        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listgastosByActualWeekDay[dataGasto.getDay()].push(gastoGeral);
       })
@@ -223,7 +210,6 @@ export function GastosGerais(): JSX.Element {
                     )
                   })
                 }
-
               </div>
               <SubTitle1>Semana Selecionada: {getSemanaAtual(startWeekDayDate.toDate())[0].toLocaleDateString()} - {getSemanaAtual(startWeekDayDate.toDate())[1].toLocaleDateString()} </SubTitle1>
               <div style={{display:"flex", width: "100%", height: "100%", justifyContent: "center"}}>
@@ -241,19 +227,176 @@ export function GastosGerais(): JSX.Element {
                     )
                   })
                 }
-
               </div>
             </div>
           ) : optionSelectedId === 2 ? (
             <div style={{display:"flex", flexDirection: "column", width: "100%", height: "100%", justifyContent: "center"}}>
               <SubTitle1>Você selecionou o mês de {months[selectedMonthDate.toDate().getMonth()]} de {new Date().getFullYear()}</SubTitle1>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <MonthCalendar value={selectedMonthDate} onChange={(newValue) => setSelectedMonthDate(newValue)}/>
-              </LocalizationProvider>
-              <div>
-                
-                    
+              <div style={{ margin: "10px auto"}}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <MonthCalendar value={selectedMonthDate} onChange={(newValue) => setSelectedMonthDate(newValue)}/>
+                </LocalizationProvider>
               </div>
+              
+              
+                  {
+                    (() => {
+                      const rows = gastosByMonth.map((gasto: GastoGeral) => {
+                          return {
+                              id: gasto.id,
+                              id_banco: bancos[gasto.id_banco],
+                              id_direcionamento: direcionamentos[gasto.id_direcionamento],
+                              descricao: gasto.descricao,
+                              valor: gasto.valor,
+                              created_at: gasto.created_at
+                          }
+                      })
+
+                      const columns: GridColDef[] = [
+                        { field: 'id', headerName: 'ID', width: 70, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'id_banco', headerName: 'Banco', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'id_direcionamento', headerName: 'Direcionamento', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'descricao', headerName: 'Descrição', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'valor', headerName: 'Valor', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'created_at', headerName: 'Data', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                      ]
+                      type PieChartData = {
+                        id:number;
+                        value: number;
+                        label: string;
+                      }
+
+                      const groupedByDirecionamentoGastos: { [key: number]: number } = gastosByMonth.reduce(
+                        (groupedByDirecionamentoGastos: { [key: string]: number }, item: any) => {
+                          if (!groupedByDirecionamentoGastos.hasOwnProperty(item.id_direcionamento)) {
+                            groupedByDirecionamentoGastos[item.id_direcionamento] = 0;
+                          }
+
+                          groupedByDirecionamentoGastos[item.id_direcionamento] += item.valor;
+                          return groupedByDirecionamentoGastos;
+                        }, {}
+                      )
+
+                      const groupedByBancoGastos: { [key: number]: number } = gastosByMonth.reduce(
+                        (groupedByBancoGastos: { [key: string]: number }, item: any) => {
+                          if (!groupedByBancoGastos.hasOwnProperty(item.id_banco)) {
+                            groupedByBancoGastos[item.id_banco] = 0;
+                          }
+
+                          groupedByBancoGastos[item.id_banco] += item.valor;
+                          return groupedByBancoGastos;
+                        }, {}
+                      )
+
+                      const pieChartGroupedByDirecionamentoData: PieChartData[] = Object.keys(groupedByDirecionamentoGastos).map((direcionamento:string) => ({
+                        id: Number(direcionamento),
+                        value: groupedByDirecionamentoGastos[Number(direcionamento)],
+                        label: direcionamentos[Number(direcionamento)],
+                      }))
+
+                      const pieChartGroupedByBancoData: PieChartData[] = Object.keys(groupedByBancoGastos).map((Bancos:string) => ({
+                        id: Number(Bancos),
+                        value: groupedByBancoGastos[Number(Bancos)],
+                        label: bancos[Number(Bancos)],
+                      }))
+
+                      return (
+                        <>
+                          <DataGridBox>
+                            <DataGrid
+                            rows={rows}
+                            columns={columns}
+                            sx= {
+                              {
+                                boxShadow: 4,
+                                border: 2,
+                                borderColor: colors.primaryColor,
+                                '& .MuiDataGrid-cell:hover': {
+                                  color: 'primary.main',
+                                },
+                                width: "100%",
+                                height: "20rem",
+                                position: "relative",
+                                margin: "10px auto",
+                                backgroundColor: colors.tertiaryColor,
+                                fontSize: 16,
+                              }
+                            }
+                            slots={{
+                              toolbar: GridToolbar,
+                            }}
+                            slotProps={{
+                              toolbar: {
+                                showQuickFilter: true
+                              }
+                            }}
+                          />
+                          </DataGridBox>
+                          <div style={{display: "flex", justifyContent: "center", margin: "10px auto"}}>
+                            <PieChart 
+                              
+                              title="Gastos por direcionamento"
+                              series={
+                                [
+                                  {
+                                    arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
+                                    arcLabelMinAngle: 30,
+                                    data: pieChartGroupedByDirecionamentoData,
+                                    innerRadius: 90,
+                                    color: "#fff",
+                                    highlightScope: { fade: "global", highlight: "item"}
+
+                                  }
+                                ]
+                              }
+                              width={800}
+                              height={500}
+                              sx={{
+                                [`& .${pieArcLabelClasses.root}`]: {
+                                   
+                                   fontSize: "16px",
+                                   fontWeight: "bold",
+                                   color: "#fff"
+                                }
+                              }}
+                              />
+
+                            <PieChart 
+                              title="Gastos por banco"
+                              series={
+                                  [
+                                    {
+                                      arcLabel: (item) => `R$ ${item.value.toFixed(2)}`, 
+                                      data: pieChartGroupedByBancoData,
+                                      innerRadius: 90,
+                                      color: "#fff",
+                                      highlightScope: { fade: "global", highlight: "item"},
+                                      arcLabelMinAngle: 30
+                                    }
+                                  ]
+                                }
+                                width={800}
+                                height={500}
+                                sx={{
+                                  [`& .${pieArcLabelClasses.root}`]: {
+                                     
+                                     fontSize: "16px",
+                                     fontWeight: "bold",
+                                     color: "#fff"
+                                  }
+                                }}
+                                
+                              />
+                          </div>
+                          
+
+                        </>
+                        
+                      )
+                    })()
+                  }
+              
+
 
             </div>
           ) : null
