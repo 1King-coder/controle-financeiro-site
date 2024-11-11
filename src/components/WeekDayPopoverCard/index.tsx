@@ -23,7 +23,7 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
       {
         props.itemInWeekDay.map((item: GastoGeral | Deposito) => {
           const splitedDate = item.created_at.split("/");
-          const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) + 1,  Number(splitedDate[0]));
+          const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) - 1,  Number(splitedDate[0]));
           return (
             <>          
               <Popover content={
