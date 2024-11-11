@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import * as colors from "../../config/colors";
+import { DataGrid } from "@mui/x-data-grid";
 
 export const Title = styled.h1`
   color: ${colors.secondaryColor};
@@ -56,4 +57,15 @@ export const TimeIntervalOptionsDiv = styled.div`
   width: 100%;
   padding: 10px;
   justify-content: center;
+`
+
+export const DataGridBox = styled.div`
+  margin: 10px auto;
+
+  .datagrid-headers {
+    background-color: ${colors.primaryColor};
+    color: ${colors.secondaryColor};
+    font-weight: bold;
+    font-size: 16px;
+  }
 `
