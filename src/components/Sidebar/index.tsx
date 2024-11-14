@@ -8,6 +8,7 @@ import { BsBank2 } from "react-icons/bs";
 import { GrDirections } from "react-icons/gr";
 import * as colors from "../../config/colors";
 import { CollapseBtn } from "./styled";
+import { GiMoneyStack } from "react-icons/gi";
 
 export default function SideBar(): JSX.Element {
   const menuItemStyles: MenuItemStyles = {
@@ -47,6 +48,7 @@ export default function SideBar(): JSX.Element {
           <MenuItem component={<Link to="/bancos" />} suffix={<BsBank2 size={24} />}>Bancos</MenuItem>
           <MenuItem component={<Link to="/direcionamentos" />} suffix={<GrDirections size={24} />}>Direcionamentos</MenuItem>
           <MenuItem component={<Link to="/gastos-gerais" />} suffix={<FaMoneyBillTransfer size={24} />}>Gastos Gerais</MenuItem>
+          <MenuItem component={<Link to="/depositos" />} suffix={<GiMoneyStack size={24} />}>Depósitos</MenuItem>
         </SubMenu>
       </Menu>
 

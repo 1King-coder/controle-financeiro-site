@@ -2,7 +2,6 @@ import React from "react";
 import { Title, TimeIntervalOptionsDiv, SubTitle1, DataGridBox, SubTitle2} from "./styled";
 import axios from "../../services/axios";
 import { GastoGeral } from "../../types/GastoGeral";
-import Chart from "react-google-charts";
 import { Card, CardTitle, OptionBtn } from "../../styles/GlobalStyles";
 import { dayOfTheWeek, months } from "../../config/dates";
 import * as colors from "../../config/colors";
@@ -14,26 +13,26 @@ import dayjs, { Dayjs } from "dayjs";
 import WeekPicker from "../../components/WeekPicker";
 import { WeekDayPopoverCard } from "../../components/WeekDayPopoverCard";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { FaToolbox } from "react-icons/fa";
 import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
+import { Deposito } from "../../types/Deposito";
 
-class GetGastosGeraisDataFuncions {
-  static async getGastosGerais(): Promise<GastoGeral[]> {
-    const response = await axios.get("/gastos_gerais");
+class GetDepositosFunctions {
+  static async getDepositos(): Promise<Deposito[]> {
+    const response = await axios.get("/depositos");
 
     return await response.data;
   }
 
-  static async getGastosGeraisFilterByDateInterval (dateStart: Date, dateEnd: Date): Promise<GastoGeral[]> {
-    const filteredData =  GetGastosGeraisDataFuncions.getGastosGerais().then((data: GastoGeral[]) => {
+  static async getDepositosFilterByDateInterval (dateStart: Date, dateEnd: Date): Promise<Deposito[]> {
+    const filteredData =  GetDepositosFunctions.getDepositos().then((data: Deposito[]) => {
       
-      const filteredData = data.filter( (gastoGeral: GastoGeral) => {
+      const filteredData = data.filter( (deposito: Deposito) => {
 
-        const dateSplited = gastoGeral.created_at.split("/");
-        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
+        const dateSplited = deposito.created_at.split("/");
+        const dataDeposito = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
-        if (dataGasto >= dateStart && dataGasto <= dateEnd) {
-          return gastoGeral;
+        if (dataDeposito >= dateStart && dataDeposito <= dateEnd) {
+          return deposito;
         } 
         return null;
       });
@@ -45,16 +44,16 @@ class GetGastosGeraisDataFuncions {
     return filteredData;
   }
 
-  static async getGastosGeraisFilterByMonthInterval (date: Date): Promise<GastoGeral[]> {
-    const filteredData =  GetGastosGeraisDataFuncions.getGastosGerais().then((data: GastoGeral[]) => {
+  static async getDepositosFilterByMonthInterval (date: Date): Promise<Deposito[]> {
+    const filteredData =  GetDepositosFunctions.getDepositos().then((data: Deposito[]) => {
       
-      const filteredData = data.filter( (gastoGeral: GastoGeral) => {
+      const filteredData = data.filter( (deposito: Deposito) => {
 
-        const dateSplited = gastoGeral.created_at.split("/");
-        const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
+        const dateSplited = deposito.created_at.split("/");
+        const dataDeposito = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
-        if (dataGasto.getMonth() === date.getMonth()) {
-          return gastoGeral;
+        if (dataDeposito.getMonth() === date.getMonth()) {
+          return deposito;
         }
 
         return null;
@@ -67,11 +66,11 @@ class GetGastosGeraisDataFuncions {
     return filteredData;
   }
 
-  static async getGastosGeraisFilterByLastWeek(): Promise<GastoGeral[]> {
+  static async getDepositosFilterByLastWeek(): Promise<Deposito[]> {
     const dateStart = new Date();
     const dateEnd = new Date();
     dateStart.setDate(dateStart.getDate() - 7);
-    return await GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(dateStart, dateEnd);
+    return await GetDepositosFunctions.getDepositosFilterByDateInterval(dateStart, dateEnd);
   }
 }
 
@@ -82,20 +81,20 @@ function getSemanaAtual (today: Date): Date[] {
 }
 
 
-export function GastosGerais(): JSX.Element {
-  const [gastosGerais, setGastosGerais] = React.useState<GastoGeral[]>([]);
+export function Depositos(): JSX.Element {
+  const [Depositos, setDepositos] = React.useState<Deposito[]>([]);
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(2);
-  const [gastosByActualWeekDay, setgastosByActualWeekDay] = React.useState(Array<GastoGeral[]>([]));
-  const [gastosByWeekDay, setgastosByWeekDay] = React.useState(Array<GastoGeral[]>([]));
+  const [depositosByActualWeekDay, setdepositosByActualWeekDay] = React.useState(Array<Deposito[]>([]));
+  const [depositosByWeekDay, setdepositosByWeekDay] = React.useState(Array<Deposito[]>([]));
   const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
   const [direcionamentos, setDirecionamentos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(dayjs());
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
-  const [gastosByMonth, setGastosByMonth]: [GastoGeral[], any] = React.useState([]);
+  const [depositosByMonth, setdepositosByMonth]: [Deposito[], any] = React.useState([]);
 
   React.useEffect(() => { 
-    GetGastosGeraisDataFuncions.getGastosGeraisFilterByMonthInterval(selectedMonthDate.toDate()).then((data: GastoGeral[]) => {
-      setGastosByMonth(data);
+    GetDepositosFunctions.getDepositosFilterByMonthInterval(selectedMonthDate.toDate()).then((data: Deposito[]) => {
+      setdepositosByMonth(data);
 
     })
   }, [selectedMonthDate])
@@ -105,16 +104,16 @@ export function GastosGerais(): JSX.Element {
 
     
 
-    GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(semanaSelecionada[0], semanaSelecionada[1]).then((data: GastoGeral[]) => {
-      setGastosGerais(data);
-      const listgastosByWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
-      data.forEach((gastoGeral: GastoGeral) => {
-        const dateSplited = gastoGeral.created_at.split("/");
+    GetDepositosFunctions.getDepositosFilterByDateInterval(semanaSelecionada[0], semanaSelecionada[1]).then((data: Deposito[]) => {
+      setDepositos(data);
+      const listdepositosByWeekDay: Array<Deposito[]> = [[], [], [], [], [], [], []];
+      data.forEach((deposito: Deposito) => {
+        const dateSplited = deposito.created_at.split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
-        listgastosByWeekDay[dataGasto.getDay()].push(gastoGeral);
+        listdepositosByWeekDay[dataGasto.getDay()].push(deposito);
       })
-      setgastosByWeekDay(listgastosByWeekDay);
+      setdepositosByWeekDay(listdepositosByWeekDay);
 
     })
   }, [startWeekDayDate])
@@ -123,16 +122,16 @@ export function GastosGerais(): JSX.Element {
     
     const semanaAtual = getSemanaAtual(new Date());
 
-    GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(semanaAtual[0], semanaAtual[1]).then((data: GastoGeral[]) => {
-      setGastosGerais(data);
-      const listgastosByActualWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
-      data.forEach((gastoGeral: GastoGeral) => {
-        const dateSplited = gastoGeral.created_at.split("/");
+    GetDepositosFunctions.getDepositosFilterByDateInterval(semanaAtual[0], semanaAtual[1]).then((data: Deposito[]) => {
+      setDepositos(data);
+      const listdepositosByActualWeekDay: Array<Deposito[]> = [[], [], [], [], [], [], []];
+      data.forEach((deposito: Deposito) => {
+        const dateSplited = deposito.created_at.split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
-        listgastosByActualWeekDay[dataGasto.getDay()].push(gastoGeral);
+        listdepositosByActualWeekDay[dataGasto.getDay()].push(deposito);
       })
-      setgastosByActualWeekDay(listgastosByActualWeekDay);
+      setdepositosByActualWeekDay(listdepositosByActualWeekDay);
 
     async function getBancos() {
       const bancosNameById: { [key: number]: string }  = {};
@@ -183,7 +182,7 @@ export function GastosGerais(): JSX.Element {
       backgroundColor: "white",
     }}>
       
-      <Title>Gastos Gerais</Title>
+      <Title>Depósitos</Title>
       <TimeIntervalOptionsDiv>
         <OptionBtn id={1} key={1} selected={1 === optionSelectedId} onClick={() => setOptionSelectedId(1)}>
           Semanal
@@ -204,9 +203,9 @@ export function GastosGerais(): JSX.Element {
               <SubTitle1>Semana Atual: {getSemanaAtual(new Date())[0].toLocaleDateString()} - {getSemanaAtual(new Date())[1].toLocaleDateString()} </SubTitle1>
               <div style={{display:"flow", width: "100%", height: "100%", justifyContent: "center"}}>
                 {
-                  gastosByActualWeekDay.map((gastosInWeekDay: GastoGeral[], index: number) => {
+                  depositosByActualWeekDay.map((depositosInWeekDay: Deposito[], index: number) => {
                     return (
-                      <WeekDayPopoverCard itemUrlPath="gastos-gerais" key={index} bancos={bancos} direcionamentos={direcionamentos} itemInWeekDay={gastosInWeekDay} index={index} />
+                      <WeekDayPopoverCard itemUrlPath="depositos" key={index} bancos={bancos} direcionamentos={direcionamentos} itemInWeekDay={depositosInWeekDay} index={index} />
                     )
                   })
                 }
@@ -221,9 +220,9 @@ export function GastosGerais(): JSX.Element {
               <div style={{display:"flow", width: "100%", height: "100%", justifyContent: "center"}}>
               
                 {
-                  gastosByWeekDay.map((gastosInWeekDay: GastoGeral[], index: number) => {
+                  depositosByWeekDay.map((depositosInWeekDay: Deposito[], index: number) => {
                     return (
-                      <WeekDayPopoverCard itemUrlPath="gastos-gerais" key={index} bancos={bancos} direcionamentos={direcionamentos} itemInWeekDay={gastosInWeekDay} index={index} />
+                      <WeekDayPopoverCard itemUrlPath="depositos" key={index} bancos={bancos} direcionamentos={direcionamentos} itemInWeekDay={depositosInWeekDay} index={index} />
                     )
                   })
                 }
@@ -240,14 +239,14 @@ export function GastosGerais(): JSX.Element {
               </div>
                   {
                     (() => {
-                      const rows = gastosByMonth.map((gasto: GastoGeral) => {
+                      const rows = depositosByMonth.map((deposito: Deposito) => {
                           return {
-                              id: gasto.id,
-                              id_banco: bancos[gasto.id_banco],
-                              id_direcionamento: direcionamentos[gasto.id_direcionamento],
-                              descricao: gasto.descricao,
-                              valor: gasto.valor,
-                              created_at: gasto.created_at
+                              id: deposito.id,
+                              id_banco: bancos[deposito.id_banco],
+                              id_direcionamento: direcionamentos[deposito.id_direcionamento],
+                              descricao: deposito.descricao,
+                              valor: deposito.valor,
+                              created_at: deposito.created_at
                           }
                       })
 
@@ -265,7 +264,7 @@ export function GastosGerais(): JSX.Element {
                         label: string;
                       }
 
-                      const groupedByDirecionamentoGastos: { [key: number]: number } = gastosByMonth.reduce(
+                      const groupedByDirecionamentoGastos: { [key: number]: number } = depositosByMonth.reduce(
                         (groupedByDirecionamentoGastos: { [key: string]: number }, item: any) => {
                           if (!groupedByDirecionamentoGastos.hasOwnProperty(item.id_direcionamento)) {
                             groupedByDirecionamentoGastos[item.id_direcionamento] = 0;
@@ -276,7 +275,7 @@ export function GastosGerais(): JSX.Element {
                         }, {}
                       )
 
-                      const groupedByBancoGastos: { [key: number]: number } = gastosByMonth.reduce(
+                      const groupedByBancoGastos: { [key: number]: number } = depositosByMonth.reduce(
                         (groupedByBancoGastos: { [key: string]: number }, item: any) => {
                           if (!groupedByBancoGastos.hasOwnProperty(item.id_banco)) {
                             groupedByBancoGastos[item.id_banco] = 0;
@@ -299,7 +298,7 @@ export function GastosGerais(): JSX.Element {
                         label: bancos[Number(Bancos)],
                       }))
 
-                      const totalGastos = gastosByMonth.reduce((total, item) => total + item.valor, 0);
+                      const totalGastos = depositosByMonth.reduce((total, item) => total + item.valor, 0);
 
                       return (
                         <>

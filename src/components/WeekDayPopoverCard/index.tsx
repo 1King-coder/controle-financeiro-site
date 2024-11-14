@@ -14,6 +14,7 @@ type Props = {
   direcionamentos: { [key: number]: string };
   itemInWeekDay: GastoGeral[] | Deposito[];
   index: number;
+  itemUrlPath: "depositos" | "gastos-gerais";
 }
 
 export function WeekDayPopoverCard(props: Props): JSX.Element {
@@ -54,10 +55,10 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
                     </tr>
                   </table>
                   <div className="gastos-gerais-popover-edit-delete-btns-div">
-                    <Link to={`/gastos-gerais/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex", marginRight: "10px"}}>
+                    <Link to={`/${props.itemUrlPath}/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex", marginRight: "10px"}}>
                       <FaEdit size={20} color={colors.secondaryColor}/>
                     </Link>
-                    <Link to={`/gastos-gerais/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex"}}>
+                    <Link to={`/${props.itemUrlPath}/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex"}}>
                       <MdDelete size={20} color={colors.dangerColor}/>
                     </Link>
                   </div>
