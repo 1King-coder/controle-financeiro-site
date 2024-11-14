@@ -3,7 +3,7 @@ import { Title, TimeIntervalOptionsDiv, SubTitle1, DataGridBox, SubTitle2} from 
 import axios from "../../services/axios";
 import { GastoGeral } from "../../types/GastoGeral";
 import Chart from "react-google-charts";
-import { OptionBtn } from "../../styles/GlobalStyles";
+import { Card, CardTitle, OptionBtn } from "../../styles/GlobalStyles";
 import { dayOfTheWeek, months } from "../../config/dates";
 import * as colors from "../../config/colors";
 import { Banco } from "../../types/Banco";
@@ -173,17 +173,16 @@ export function GastosGerais(): JSX.Element {
 
 
   return (
-    
     <div style={{
       display: "flex",
       flexDirection: "column",
       width: "fit-content",
       height: "fit-content",
       justifyContent: "center",
+      margin: "0 auto",
       backgroundColor: "white",
     }}>
       
-
       <Title>Gastos Gerais</Title>
       <TimeIntervalOptionsDiv>
         <OptionBtn id={1} key={1} selected={1 === optionSelectedId} onClick={() => setOptionSelectedId(1)}>
@@ -300,6 +299,8 @@ export function GastosGerais(): JSX.Element {
                         label: bancos[Number(Bancos)],
                       }))
 
+                      const totalGastos = gastosByMonth.reduce((total, item) => total + item.valor, 0);
+
                       return (
                         <>
                           <DataGridBox>
@@ -332,6 +333,20 @@ export function GastosGerais(): JSX.Element {
                             }}
                           />
                           </DataGridBox>
+                          <Card>
+                            <CardTitle>Total de gastos do mês de {months[selectedMonthDate.toDate().getMonth()]}</CardTitle>
+                            <p
+                              style= {
+                                {
+                                  color: "black",
+                                  fontSize: "3rem",
+                                  fontWeight: "bold",
+                                  marginTop: "10px auto",
+                                  textAlign: "center"
+                                }
+                              }
+                            >R$ {totalGastos.toFixed(2)}</p>
+                          </Card>
                           <div style={{display: "flex", justifyContent: "center", margin: "10px auto"}}>
                             <PieChart 
                               
@@ -387,6 +402,7 @@ export function GastosGerais(): JSX.Element {
                                 }}
                               />
                           </div>
+                          
                           
 
                         </>
