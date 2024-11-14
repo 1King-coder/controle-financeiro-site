@@ -130,6 +130,12 @@ export default createGlobalStyle`
   .gastos-gerais-popover-table-data-cell {
     text-align: center;
   }
+
+  .transferencias-body-div {
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+  }
 `
 
 export const Container = styled.section`
