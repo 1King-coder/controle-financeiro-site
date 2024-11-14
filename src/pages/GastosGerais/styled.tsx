@@ -61,7 +61,7 @@ export const TimeIntervalOptionsDiv = styled.div`
 
 export const DataGridBox = styled.div`
   margin: 10px auto;
-
+  
   .datagrid-headers {
     background-color: ${colors.primaryColor};
     color: ${colors.secondaryColor};

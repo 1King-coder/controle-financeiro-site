@@ -1,5 +1,5 @@
 import React from "react";
-import { Title, TimeIntervalOptionsDiv, SubTitle1, DataGridBox} from "./styled";
+import { Title, TimeIntervalOptionsDiv, SubTitle1, DataGridBox, SubTitle2} from "./styled";
 import axios from "../../services/axios";
 import { GastoGeral } from "../../types/GastoGeral";
 import Chart from "react-google-charts";
@@ -177,8 +177,9 @@ export function GastosGerais(): JSX.Element {
     <div style={{
       display: "flex",
       flexDirection: "column",
-      width: "100%",
+      width: "fit-content",
       height: "fit-content",
+      justifyContent: "center",
       backgroundColor: "white",
     }}>
       
@@ -230,15 +231,14 @@ export function GastosGerais(): JSX.Element {
               </div>
             </div>
           ) : optionSelectedId === 2 ? (
-            <div style={{display:"flex", flexDirection: "column", width: "100%", height: "100%", justifyContent: "center"}}>
+            <div style={{display:"flex", flexDirection: "row", flexWrap: "wrap", height: "100%", justifyContent: "center"}}>
               <SubTitle1>Você selecionou o mês de {months[selectedMonthDate.toDate().getMonth()]} de {new Date().getFullYear()}</SubTitle1>
-              <div style={{ margin: "10px auto"}}>
+              <div style={{ margin: "auto"}}>
+                <SubTitle2>Selecione o mês</SubTitle2>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <MonthCalendar value={selectedMonthDate} onChange={(newValue) => setSelectedMonthDate(newValue)}/>
                 </LocalizationProvider>
               </div>
-              
-              
                   {
                     (() => {
                       const rows = gastosByMonth.map((gasto: GastoGeral) => {
@@ -257,7 +257,7 @@ export function GastosGerais(): JSX.Element {
                         { field: 'id_banco', headerName: 'Banco', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'id_direcionamento', headerName: 'Direcionamento', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'descricao', headerName: 'Descrição', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
-                        { field: 'valor', headerName: 'Valor', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'valor', headerName: 'Valor', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center', type: 'number', valueFormatter: (value: number) => `R$ ${value.toFixed(2)}` },
                         { field: 'created_at', headerName: 'Data', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                       ]
                       type PieChartData = {
@@ -385,7 +385,6 @@ export function GastosGerais(): JSX.Element {
                                      color: "#fff"
                                   }
                                 }}
-                                
                               />
                           </div>
                           
