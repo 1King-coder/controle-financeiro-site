@@ -1,6 +1,7 @@
 import styled, { createGlobalStyle } from "styled-components";
 import { backgroundColor, successColor, warningColor, dangerColor, primaryColor, secondaryColor, tertiaryColor, selectedBGColor, selectedFontColor, CardTitleColor } from "../config/colors";
 import 'react-toastify/dist/ReactToastify.css';
+import { Button, ButtonGroup } from "flowbite-react";
 
 export default createGlobalStyle`
   * {
@@ -136,7 +137,30 @@ export default createGlobalStyle`
     height: 100%;
     justify-content: center;
   }
+
 `
+
+export const StyledButtonGroup = styled(ButtonGroup)`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+`
+
+export const StyledButton = styled(Button)`
+  padding: 1.5rem;
+  font-size: 2rem;
+  background: ${props => props.selected ? selectedBGColor : primaryColor};
+  color: ${props => props.selected ? selectedFontColor : "#fff"};
+  font-weight: ${props => props.selected ? "bold" : "normal"};
+  margin: 5px;
+  border-radius: 1rem;
+  :hover {
+    opacity: 0.7;
+    color: ${secondaryColor};
+  }
+`
+
 
 export const Container = styled.section`
   width: 90%;
