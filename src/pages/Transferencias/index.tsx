@@ -1,12 +1,12 @@
 import React from "react";
 import { Title } from "./styled";
 import axios from "../../services/axios";
-import { Button, ButtonGroup } from "flowbite-react";
 import { StyledButton, StyledButtonGroup } from "../../styles/GlobalStyles";
+import { Transferencia } from "../../types/Transferencia";
 
 class getTransferencias {
 
-  static async getTransferencias(tipoTransferenciaUrlPath: string) {
+  static async getTransferencias(tipoTransferenciaUrlPath: string): Promise<Transferencia[]> {
     const res = await axios.get(tipoTransferenciaUrlPath);
     return res.data;
   }
@@ -14,7 +14,7 @@ class getTransferencias {
 }
 
 export default function Transferencias() {
-  const [transferencias, setTransferencias] = React.useState([]);
+  const [transferencias, setTransferencias]: [Transferencia[], any] = React.useState([]);
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(1);
   const [transferenciasUrlPath, setTransferenciasUrlPath]: [string, any] = React.useState("/transferencias_entre_bancos");
 
@@ -44,7 +44,7 @@ export default function Transferencias() {
         <StyledButton id={2} selected={optionSelectedId === 2} onClick={() => setOptionSelectedId(2)}>Entre Direcionamentos</StyledButton>
       </StyledButtonGroup>
       <div>
-        
+
       </div>
 
     </div>
