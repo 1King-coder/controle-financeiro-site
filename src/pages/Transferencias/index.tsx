@@ -166,7 +166,7 @@ export default function Transferencias() {
           margin: "10px auto"
         }
       }>
-        <div style={{margin: "2rem", border:"1px solid #000"}}>
+        <div style={{margin: "2rem", border:`1px solid ${colors.primaryColor}`, boxShadow: "1px rgba(0, 0, 0, 0.5)"}}>
           <SubTitle2>Selecione o mês:</SubTitle2>
           <LocalizationProvider dateAdapter={AdapterDayjs}>  
             <MonthCalendar value={selectedMonthDate} onChange={setSelectedMonthDate} className="transferencias-calendar"/>
