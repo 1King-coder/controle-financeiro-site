@@ -136,6 +136,17 @@ export default createGlobalStyle`
     width: 100%;
     height: 100%;
     justify-content: center;
+    align-items: center;
+
+  }
+
+  .transferencias-calendar {
+    margin: 1rem 1rem 34rem 1rem;
+    border: 3px solid ${primaryColor};
+    border-radius: 2rem;
+    background-color: ${tertiaryColor};
+    font-weight: bold;
+    
   }
 
 `
