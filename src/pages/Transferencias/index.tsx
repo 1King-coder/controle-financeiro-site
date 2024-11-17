@@ -10,6 +10,9 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Banco } from "../../types/Banco";
 import { Direcionamento } from "../../types/Direcionamento";
 import * as colors from "../../config/colors";
+import { Link } from "react-router-dom";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 class getTransferencias {
 
@@ -141,7 +144,13 @@ export default function Transferencias() {
           origem: transferenciasUrlPath === "/transferencias_entre_bancos" ? bancos[transferencia.id_origem] : direcionamentos[transferencia.id_origem],
           destino: transferenciasUrlPath === "/transferencias_entre_bancos" ? bancos[transferencia.id_destino] : direcionamentos[transferencia.id_destino],
           intermediario: transferenciasUrlPath === "/transferencias_entre_direcionamentos" ? bancos[transferencia.id_intermediario] : direcionamentos[transferencia.id_intermediario],
-          valor: transferencia.valor
+          valor: transferencia.valor,
+          opcoes: (
+            <div style={{ display: "flex", gap:"1rem" }}>
+              <Link to={`transferencias/edit/${transferencia.id}`}><FaEdit size={24} color={colors.secondaryColor}/></Link>
+              <Link to={`transferencias/delete/${transferencia.id}`}><MdDelete size={24} color={colors.dangerColor}/></Link>
+            </div>
+          )
         }
       })
       
@@ -186,6 +195,7 @@ export default function Transferencias() {
                   { field: "destino", headerName: "Destino", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center' },
                   { field: "intermediario", headerName: "Intermediario", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center' },
                   { field: "valor", headerName: "Valor", width: 130, valueFormatter: (value: number) => `R$ ${value.toFixed(2)}`, headerClassName: "datagrid-headers", headerAlign: 'center'},
+                  { field: "opcoes", headerName: "Opções", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center', renderCell: (params) => params.value },
                 ]}
                 sx= {
                   {
@@ -195,7 +205,7 @@ export default function Transferencias() {
                     '& .MuiDataGrid-cell:hover': {
                       color: 'primary.main',
                     },
-                    width: "45rem",
+                    width: "53rem",
                     height: "50rem",
                     position: "relative",
                     margin: "10px auto",
