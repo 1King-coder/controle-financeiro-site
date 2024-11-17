@@ -10,6 +10,9 @@ import * as colors from "../../config/colors";
 import { CollapseBtn } from "./styled";
 import { GiMoneyStack } from "react-icons/gi";
 import { BiTransfer } from "react-icons/bi";
+import { IoMdAddCircleOutline } from "react-icons/io";
+import { GiPayMoney } from "react-icons/gi";
+import { TbPigMoney } from "react-icons/tb";
 
 export default function SideBar(): JSX.Element {
   const menuItemStyles: MenuItemStyles = {
@@ -52,7 +55,15 @@ export default function SideBar(): JSX.Element {
           <MenuItem component={<Link to="/depositos" />} suffix={<GiMoneyStack size={24} />}>Depósitos</MenuItem>
           <MenuItem component={<Link to="/transferencias" />} suffix={<BiTransfer size={24} />}>Transferências</MenuItem>
         </SubMenu>
+        <SubMenu label="Adicionar" icon={<IoMdAddCircleOutline size={24} />}>
+          <MenuItem component={<Link to="/bancos/add" />} suffix={<BsBank2 size={24} />}>Banco</MenuItem>
+          <MenuItem component={<Link to="/direcionamentos/add" />} suffix={<GrDirections size={24} />}>Direcionamento</MenuItem>
+          <MenuItem component={<Link to="/gastos-gerais/add" />} suffix={<GiPayMoney size={24} />}>Gastos Gerais</MenuItem>
+          <MenuItem component={<Link to="/depositos/add" />} suffix={<TbPigMoney size={24} />}>Depósitos</MenuItem>
+          <MenuItem component={<Link to="/transferencias/add" />} suffix={<BiTransfer size={24} />}>Transferências</MenuItem>
+        </SubMenu> 
       </Menu>
+      
 
     </Sidebar>
   )
