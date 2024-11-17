@@ -263,3 +263,38 @@ export const FullLineCardTitle = styled.h1`
 
   
 `
+
+export const Title = styled.h1`
+  color: ${secondaryColor};
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 50px;
+  text-align: center;
+  background-color: ${primaryColor};
+  padding: 10px;
+  width: 100%;
+`
+
+export const SubTitle1 = styled.h2`
+  color: ${secondaryColor};
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: center;
+  background-color: ${primaryColor};
+  padding: 10px;
+  width: 100%;
+  margin-top: 3rem;
+`
+
+export const SubTitle2 = styled.h3`
+  color: ${secondaryColor};
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  background-color: ${primaryColor};
+  padding: 10px;
+  width: 100%;
+  margin-top: 0.1rem;
+`
