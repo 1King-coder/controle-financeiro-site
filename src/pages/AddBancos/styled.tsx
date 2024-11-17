@@ -40,13 +40,44 @@ export const InputBox = styled.div`
     border-radius: 0.5rem;
     border: 2px solid ${colors.primaryColor};
     background-color: ${colors.primaryColor};
-    color: ${colors.secondaryColor};
-    font-size: 1rem;
-    font-weight: bold;
+    transition: all 0.5s;
+    box-shadow: 0 5px 10px ${colors.primaryColor};
+
     width: 100%;
-    :hover {
-      opacity: 0.7;
+
+    span {
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+      color: ${colors.secondaryColor};
+      font-size: 1rem;
+      font-weight: bold;
+      transition: 0.5s;
     }
+
+    span:after {
+      content: '>>';
+      position: absolute;
+      opacity: 0;
+      top: 0;
+      right: -20px;
+      transition: 0.5s;
+    }
+
+    :hover span {
+      padding-right: 25px;
+    }
+
+    :hover span:after {
+      opacity: 1;
+      right: 0;
+    }
+
+    :active {
+      transform: translateY(4px);
+    }
+
+    
   }
 
 

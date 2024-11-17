@@ -13,7 +13,7 @@ export default function AddBancos() {
           <TextInput id="nome-banco" placeholder="Nome do banco"/>
         </InputBox>
         <InputBox>
-          <Button>Adicionar</Button>
+          <Button><span>Adicionar</span></Button>
         </InputBox>
       </form>
     </GeneralBox>
