@@ -9,7 +9,7 @@ export const GeneralBox = styled.div`
   flex-direction: column;
 
   form {
-    margin: 1rem auto;
+    margin: 1rem 1rem auto;
     background-color: ${colors.tertiaryColor};
     padding: 2rem;
     border-radius: 1rem;
@@ -17,7 +17,15 @@ export const GeneralBox = styled.div`
 
   }
 `
-
+export const DataGridBox = styled.div`
+  height: 100%;
+  .datagrid-headers {
+    background-color: ${colors.primaryColor};
+    color: ${colors.secondaryColor};
+    font-weight: bold;
+    font-size: 16px;
+  }
+`
 export const InputBox = styled.div`
   margin: 1rem auto;
   text-align: center;
