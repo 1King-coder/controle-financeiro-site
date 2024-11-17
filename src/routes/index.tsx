@@ -7,6 +7,7 @@ import Direcionamentos from "../pages/Direcionamentos";
 import { GastosGerais } from "../pages/GastosGerais";
 import { Depositos } from "../pages/Depositos";
 import Transferencias from "../pages/Transferencias";
+import AddBancos from "../pages/AddBancos";
 
 export default function Routes(): JSX.Element {
 
@@ -18,6 +19,8 @@ export default function Routes(): JSX.Element {
         <Route exact path="/gastos-gerais" component={GastosGerais} />
         <Route exact path="/depositos" component={Depositos} />
         <Route exact path="/transferencias" component={Transferencias} />
+        <Route exact path="/bancos/add" component={AddBancos} />
+
         <Route path="*" component={Page404} />
       </Switch>
   );
