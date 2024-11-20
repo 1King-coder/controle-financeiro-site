@@ -3,13 +3,13 @@ import { DataGridBox, GeneralBox, InputBox } from "./styled";
 import { SubTitle2, Title } from "../../styles/GlobalStyles";
 import { Button, Label, TextInput } from "flowbite-react";
 import axios from "../../services/axios";
-import { Banco } from "../../types/Banco";
+import { Direcionamento } from "../../types/Direcionamento";
 import { DataGrid } from "@mui/x-data-grid";
 import * as colors from "../../config/colors";
 import { toast } from "react-toastify";
 
 export default function AddDirecionamentos() {
-  const [direcionamentos, setDirecionamentos]: [Banco[], any] = React.useState([]);
+  const [direcionamentos, setDirecionamentos]: [Direcionamento[], any] = React.useState([]);
 
   React.useEffect(() => {
     async function getDirecionamentos() {
