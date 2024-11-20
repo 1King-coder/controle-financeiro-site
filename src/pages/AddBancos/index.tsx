@@ -6,6 +6,8 @@ import axios from "../../services/axios";
 import { Banco } from "../../types/Banco";
 import { DataGrid } from "@mui/x-data-grid";
 import * as colors from "../../config/colors";
+import { Toast } from "react-toastify/dist/components";
+import { toast } from "react-toastify";
 
 export default function AddBancos() {
   const [bancos, setBancos]: [Banco[], any] = React.useState([]);
@@ -21,6 +23,21 @@ export default function AddBancos() {
     }
     getBancos();
   }, [])
+
+  function handleAdicionaBanco () {
+    const inputNomeBanco = document.getElementById("nome-banco");
+    const nomeBanco = inputNomeBanco?.textContent;
+
+    nomeBanco === "" ? toast.warn("Preencha o nome do banco") : axios.post("/bancos", {
+      nome_banco: nomeBanco
+    }).then((response) => {
+      if (response.status === 200) {
+        toast.success("Banco adicionado com sucesso");
+      }
+    }).catch((error) => {
+      toast.error(error);
+    });
+  }
 
   return (
     <GeneralBox>
