@@ -26,16 +26,18 @@ export default function AddBancos() {
 
   function handleAdicionaBanco () {
     const inputNomeBanco = document.getElementById("nome-banco");
-    const nomeBanco = inputNomeBanco?.textContent;
+    //@ts-ignore
+    const nomeBanco = inputNomeBanco?.value;
 
     nomeBanco === "" ? toast.warn("Preencha o nome do banco") : axios.post("/bancos", {
       nome_banco: nomeBanco
-    }).then((response) => {
-      if (response.status === 200) {
+    }).then(async (response) => {
+      console.log(response);
+      if (response.status === 201) {
         toast.success("Banco adicionado com sucesso");
-      }
+      } 
     }).catch((error) => {
-      toast.error(error);
+      toast.error(error.response.data.detail);
     });
   }
 
@@ -54,7 +56,7 @@ export default function AddBancos() {
             <TextInput id="nome-banco" placeholder="Nome do banco"/>
           </InputBox>
           <InputBox>
-            <Button><span>Adicionar</span></Button>
+            <Button onClick={handleAdicionaBanco}><span>Adicionar</span></Button>
           </InputBox>
         </form>
         <DataGridBox>
