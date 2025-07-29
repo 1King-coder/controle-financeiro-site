@@ -11,7 +11,7 @@ import { MdDelete } from "react-icons/md";
 
 type Props = {
   bancos: { [key: number]: string };
-  direcionamentos: { [key: number]: string };
+  categorias: { [key: number]: string };
   itemInWeekDay: GastoGeral[] | Deposito[];
   index: number;
   itemUrlPath: "depositos" | "gastos-gerais";
@@ -38,8 +38,8 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
                       <td className="gastos-gerais-popover-table-data-cell">{props.bancos[item.id_banco]}</td>
                     </tr>
                     <tr>
-                      <td className="gastos-gerais-popover-table-label-cell">Direcionamento:</td>
-                      <td className="gastos-gerais-popover-table-data-cell">{props.direcionamentos[item.id_direcionamento]}</td>
+                      <td className="gastos-gerais-popover-table-label-cell">Categoria:</td>
+                      <td className="gastos-gerais-popover-table-data-cell">{props.categorias[item.id_categoria]}</td>
                     </tr>
                     <tr>
                       <td className="gastos-gerais-popover-table-label-cell">Descrição:</td>

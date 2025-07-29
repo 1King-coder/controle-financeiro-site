@@ -8,7 +8,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Banco } from "../../types/Banco";
-import { Direcionamento } from "../../types/Direcionamento";
+import { Categoria } from "../../types/Categoria";
 import * as colors from "../../config/colors";
 import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
@@ -82,7 +82,7 @@ export default function Transferencias() {
   const [transferenciasByMonth, setTransferenciasByMonth]: [Transferencia[], any] = React.useState([]);
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
   const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
-  const [direcionamentos, setDirecionamentos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
+  const [categorias, setCategorias]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
 
 
   React.useEffect(() => {
@@ -106,21 +106,21 @@ export default function Transferencias() {
     }
     getBancos();
 
-    function getDirecionamentos() {
-      const direcionamentosNameById: { [key: number]: string }  = {};
+    function getCategorias() {
+      const categoriasNameById: { [key: number]: string }  = {};
 
-      axios.get("/direcionamentos").then((response) => {
-        const data: Direcionamento[] = response.data
+      axios.get("/categorias").then((response) => {
+        const data: Categoria[] = response.data
 
-        data.forEach((direcionamento: Direcionamento) => {
-          direcionamentosNameById[direcionamento.id] = direcionamento.nome;
+        data.forEach((categoria: Categoria) => {
+          categoriasNameById[categoria.id] = categoria.nome;
         });
 
-        setDirecionamentos(direcionamentosNameById);
+        setCategorias(categoriasNameById);
 
       });
     }
-    getDirecionamentos();
+    getCategorias();
 
     
 
@@ -130,7 +130,7 @@ export default function Transferencias() {
     if (optionSelectedId === 1) {
       setTransferenciasUrlPath("/transferencias_entre_bancos");
     } else {
-      setTransferenciasUrlPath("/transferencias_entre_direcionamentos");
+      setTransferenciasUrlPath("/transferencias_entre_categorias");
     }
   }, [optionSelectedId]);
 
@@ -141,9 +141,9 @@ export default function Transferencias() {
         return {
           id: transferencia.id,
           created_at: transferencia.created_at,
-          origem: transferenciasUrlPath === "/transferencias_entre_bancos" ? bancos[transferencia.id_origem] : direcionamentos[transferencia.id_origem],
-          destino: transferenciasUrlPath === "/transferencias_entre_bancos" ? bancos[transferencia.id_destino] : direcionamentos[transferencia.id_destino],
-          intermediario: transferenciasUrlPath === "/transferencias_entre_direcionamentos" ? bancos[transferencia.id_intermediario] : direcionamentos[transferencia.id_intermediario],
+          origem: transferenciasUrlPath === "/transferencias_entre_bancos" ? bancos[transferencia.id_origem] : categorias[transferencia.id_origem],
+          destino: transferenciasUrlPath === "/transferencias_entre_bancos" ? bancos[transferencia.id_destino] : categorias[transferencia.id_destino],
+          intermediario: transferenciasUrlPath === "/transferencias_entre_categorias" ? bancos[transferencia.id_intermediario] : categorias[transferencia.id_intermediario],
           valor: transferencia.valor,
           opcoes: (
             <div style={{ display: "flex", gap:"1rem" }}>
@@ -156,7 +156,7 @@ export default function Transferencias() {
       
       setTransferenciasByMonth(namedTransferencias);
     })
-  }, [selectedMonthDate, transferenciasUrlPath, bancos, direcionamentos]);
+  }, [selectedMonthDate, transferenciasUrlPath, bancos, categorias]);
 
 
   return (
@@ -164,7 +164,7 @@ export default function Transferencias() {
       <Title>Transferencias</Title>
       <StyledButtonGroup className="transferencias-button-group">
         <StyledButton id={1} selected={optionSelectedId === 1} onClick={() => setOptionSelectedId(1)}>Entre Bancos</StyledButton>
-        <StyledButton id={2} selected={optionSelectedId === 2} onClick={() => setOptionSelectedId(2)}>Entre Direcionamentos</StyledButton>
+        <StyledButton id={2} selected={optionSelectedId === 2} onClick={() => setOptionSelectedId(2)}>Entre Categorias</StyledButton>
       </StyledButtonGroup>
       <div style={
         {

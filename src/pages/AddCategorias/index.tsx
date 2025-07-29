@@ -3,37 +3,37 @@ import { DataGridBox, GeneralBox, InputBox } from "./styled";
 import { SubTitle2, Title } from "../../styles/GlobalStyles";
 import { Button, Label, TextInput } from "flowbite-react";
 import axios from "../../services/axios";
-import { Direcionamento } from "../../types/Direcionamento";
+import { Categoria } from "../../types/Categoria";
 import { DataGrid } from "@mui/x-data-grid";
 import * as colors from "../../config/colors";
 import { toast } from "react-toastify";
 
-export default function AddDirecionamentos() {
-  const [direcionamentos, setDirecionamentos]: [Direcionamento[], any] = React.useState([]);
+export default function AddCategorias() {
+  const [categorias, setCategorias]: [Categoria[], any] = React.useState([]);
 
   React.useEffect(() => {
-    async function getDirecionamentos() {
+    async function getCategorias() {
 
-      axios.get("/direcionamentos").then((response) => {
+      axios.get("/categorias").then((response) => {
         
-        setDirecionamentos(response.data);
+        setCategorias(response.data);
       });
       
     }
-    getDirecionamentos();
+    getCategorias();
   }, [])
 
-  function handleAdicionaDirecionamento () {
-    const inputNomeDirecionamento = document.getElementById("nome-direcionamento");
+  function handleAdicionaCategoria () {
+    const inputNomeCategoria = document.getElementById("nome-categoria");
     //@ts-ignore
-    const nomeDirecionamento = inputNomeDirecionamento?.value;
+    const nomeCategoria = inputNomeCategoria?.value;
 
-    nomeDirecionamento === "" ? toast.warn("Preencha o nome do direcionamento") : axios.post("/direcionamentos", {
-      nome_direcionamento: nomeDirecionamento
+    nomeCategoria === "" ? toast.warn("Preencha o nome da categoria") : axios.post("/categorias", {
+      nome_categoria: nomeCategoria
     }).then(async (response) => {
       console.log(response);
       if (response.status === 201) {
-        toast.success("Direcionamento adicionado com sucesso");
+        toast.success("Categoria adicionada com sucesso");
       } 
     }).catch((error) => {
       toast.error(error.response.data.detail);
@@ -42,7 +42,7 @@ export default function AddDirecionamentos() {
 
   return (
     <GeneralBox>
-      <Title>Adicionar Direcionamentos</Title>
+      <Title>Adicionar Categorias</Title>
       <div style={{
         display: "flex",
         flexDirection: "row",
@@ -51,17 +51,17 @@ export default function AddDirecionamentos() {
 
         <form>
           <InputBox>
-            <Label htmlFor="nome-direcionamento" value="Nome do direcionamento"/>
-            <TextInput id="nome-direcionamento" placeholder="Nome do direcionamento"/>
+            <Label htmlFor="nome-categoria" value="Nome da categoria"/>
+            <TextInput id="nome-categoria" placeholder="Nome da categoria"/>
           </InputBox>
           <InputBox>
-            <Button onClick={handleAdicionaDirecionamento}><span>Adicionar</span></Button>
+            <Button onClick={handleAdicionaCategoria}><span>Adicionar</span></Button>
           </InputBox>
         </form>
         <DataGridBox>
-          <SubTitle2>Bancos cadastrados</SubTitle2>
+          <SubTitle2>Categorias cadastradas</SubTitle2>
           <DataGrid
-            rows={direcionamentos}
+            rows={categorias}
             columns={[
               { field: "id", headerName: "ID", width: 70, headerClassName: "datagrid-headers" },
               { field: "nome", headerName: "Nome", width: 130, headerClassName: "datagrid-headers" },

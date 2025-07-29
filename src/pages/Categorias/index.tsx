@@ -1,45 +1,45 @@
 import React from "react";
 import { Title } from "./styled";
 import axios from "../../services/axios";
-import { Direcionamento, SaldoDirecionamentoPorBanco } from "../../types/Direcionamento";
+import { Categoria, SaldoCategoriaPorBanco } from "../../types/Categoria";
 import { Card, CardTitle, Container, FullLineCard, FullLineCardTitle, OptionBtn, ScrollableDiv } from "../../styles/GlobalStyles";
 import {Chart} from "react-google-charts";
 
 
-class GetDirecionamentosDataFuncions {
+class GetCategoriasDataFuncions {
 
-  static async getSaldosDirecionamentosPorBanco(id_direcionamento: number): Promise<SaldoDirecionamentoPorBanco[]>{
-    const response = await axios.get("/direcionamentos/saldo-por-banco/" + id_direcionamento);
+  static async getSaldosCategoriasPorBanco(id_categoria: number): Promise<SaldoCategoriaPorBanco[]>{
+    const response = await axios.get("/categorias/saldo-por-banco/" + id_categoria);
     
     return response.data;
   }
   
 
-  static async getDirecionamentos(): Promise<Direcionamento[]>{
-    const response = await axios.get("/direcionamentos");
+  static async getCategorias(): Promise<Categoria[]>{
+    const response = await axios.get("/categorias");
     
     return response.data;
   }
 }
 
 
-export default function Direcionamentos(): JSX.Element {
-  const [direcionamentos, setDirecionamentos]: [Direcionamento[], any] = React.useState([{id: 1, nome: "", saldo: 0, updated_at: ""}]);
+export default function Categorias(): JSX.Element {
+  const [categorias, setCategorias]: [Categoria[], any] = React.useState([{id: 1, nome: "", saldo: 0, updated_at: ""}]);
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(1);
-  const [dadosSaldoDirecionamentoPorBanco, setDadosSaldoDirecionamentoPorBanco] = React.useState([["Banco", "saldo"]]);
-  const [NomeDirecionamentoSelected, setNomeDirecionamentoSelected] = React.useState("");
+  const [dadosSaldoCategoriaPorBanco, setDadosSaldoCategoriaPorBanco] = React.useState([["Banco", "saldo"]]);
+  const [NomeCategoriaSelected, setNomeCategoriaSelected] = React.useState("");
 
   React.useEffect(() => {
-    GetDirecionamentosDataFuncions.getDirecionamentos().then((data: Direcionamento[]) => {
-      setDirecionamentos(data);
-      GetDirecionamentosDataFuncions.getSaldosDirecionamentosPorBanco(optionSelectedId).then((data: SaldoDirecionamentoPorBanco[]) => {
-        const dados = [["Direcionamento", "Saldo"]];
-        setNomeDirecionamentoSelected(data[0].nome_direcionamento);
-        data.forEach((saldoDirecionamentoPorBanco: SaldoDirecionamentoPorBanco) => {
+    GetCategoriasDataFuncions.getCategorias().then((data: Categoria[]) => {
+      setCategorias(data);
+      GetCategoriasDataFuncions.getSaldosCategoriasPorBanco(optionSelectedId).then((data: SaldoCategoriaPorBanco[]) => {
+        const dados = [["Categoria", "Saldo"]];
+        setNomeCategoriaSelected(data[0].nome_categoria);
+        data.forEach((saldoCategoriaPorBanco: SaldoCategoriaPorBanco) => {
           // @ts-ignore
-          dados.push([saldoDirecionamentoPorBanco.nome_banco, Math.abs(saldoDirecionamentoPorBanco.saldo)]);
+          dados.push([saldoCategoriaPorBanco.nome_banco, Math.abs(saldoCategoriaPorBanco.saldo)]);
         })
-        setDadosSaldoDirecionamentoPorBanco(dados);
+        setDadosSaldoCategoriaPorBanco(dados);
       })
     })
     
@@ -52,7 +52,7 @@ export default function Direcionamentos(): JSX.Element {
   
 
   const pieChartOptions = {
-    title: `Saldo por Banco ${NomeDirecionamentoSelected}`,
+    title: `Saldo por Banco ${NomeCategoriaSelected}`,
     titleTextStyle: {
       color: "black",
       position: "center",
@@ -76,9 +76,9 @@ export default function Direcionamentos(): JSX.Element {
 
   const tableChartOptions = {
     cssClassNames: {
-      headerRow: "saldo-por-direcionamento-table-header",
-      tableRow: "saldo-por-direcionamento-table-row",
-      oddTableRow: "saldo-por-direcionamento-table-row",
+      headerRow: "saldo-por-categoria-table-header",
+      tableRow: "saldo-por-categoria-table-row",
+      oddTableRow: "saldo-por-categoria-table-row",
     }
   }
 
@@ -90,7 +90,7 @@ export default function Direcionamentos(): JSX.Element {
       height: "100%",
       backgroundColor: "white",
     }}>
-      <Title>Visão Geral de Direcionamentos</Title>
+      <Title>Visão Geral de Categorias</Title>
       <div style={
         {
           width: "100%",
@@ -103,17 +103,17 @@ export default function Direcionamentos(): JSX.Element {
 
         <ScrollableDiv>
           {
-            direcionamentos.map((direcionamento: Direcionamento) => {
+            categorias.map((categoria: Categoria) => {
               return (
-                  <OptionBtn id={direcionamento.id} key={direcionamento.id} selected={direcionamento.id === optionSelectedId} onClick={() => setOptionSelectedId(direcionamento.id)}>
-                  {direcionamento.nome}
+                  <OptionBtn id={categoria.id} key={categoria.id} selected={categoria.id === optionSelectedId} onClick={() => setOptionSelectedId(categoria.id)}>
+                  {categoria.nome}
                   </OptionBtn>
               )
             })
           }
         </ScrollableDiv>
         <Card>
-          <CardTitle>{"Saldo Total do Direcionamento " + NomeDirecionamentoSelected}</CardTitle>
+          <CardTitle>{"Saldo Total da Categoria " + NomeCategoriaSelected}</CardTitle>
           <p
             style= {
               {
@@ -124,9 +124,9 @@ export default function Direcionamentos(): JSX.Element {
                 textAlign: "center"
               }
             }
-          >{`R$ ${direcionamentos.reduce((acc, direcionamento) => {
-            if (direcionamento.id === optionSelectedId) {
-              return acc + Math.abs(direcionamento.saldo)
+          >{`R$ ${categorias.reduce((acc, categoria) => {
+            if (categoria.id === optionSelectedId) {
+              return acc + Math.abs(categoria.saldo)
               
             }
             return acc;
@@ -151,14 +151,14 @@ export default function Direcionamentos(): JSX.Element {
         chartType="PieChart"
         width="100%"
         height="100%"
-        data={dadosSaldoDirecionamentoPorBanco}
+        data={dadosSaldoCategoriaPorBanco}
         options={pieChartOptions}
         />
         <Chart
         chartType="Table"
         width="100%"
         height="100%"
-        data={dadosSaldoDirecionamentoPorBanco}
+        data={dadosSaldoCategoriaPorBanco}
         options={tableChartOptions}
         formatters={tableChartFormatters}
         />
@@ -176,8 +176,8 @@ export default function Direcionamentos(): JSX.Element {
               textAlign: "center"
             }
           }
-        >{`R$ ${direcionamentos.reduce((acc, direcionamento) => {
-          return acc + Math.abs(direcionamento.saldo)
+        >{`R$ ${categorias.reduce((acc, categoria) => {
+          return acc + Math.abs(categoria.saldo)
         }, 0)
           
           }`}</p>

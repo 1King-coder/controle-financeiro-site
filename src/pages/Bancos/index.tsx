@@ -1,7 +1,7 @@
 import React from "react";
 import { Title } from "./styled";
 import axios from "../../services/axios";
-import { Banco, BancoPorDirecionamentoPieChartProps, SaldoBancoPorDirecionamento } from "../../types/Banco";
+import { Banco, BancoPorCategoriaPieChartProps, SaldoBancoPorCategoria } from "../../types/Banco";
 import { Card, CardTitle, Container, FullLineCard, FullLineCardTitle, OptionBtn, ScrollableDiv } from "../../styles/GlobalStyles";
 import {Chart} from "react-google-charts";
 import { backgroundColor, secondaryColor, tertiaryColor } from "../../config/colors";
@@ -10,8 +10,8 @@ import { table } from "console";
 
 class GetBancosDataFuncions {
 
-  static async getSaldosBancosPorDirecionamento(id_banco: number): Promise<SaldoBancoPorDirecionamento[]>{
-    const response = await axios.get("/bancos/saldo-por-direcionamento/" + id_banco);
+  static async getSaldosBancosPorCategoria(id_banco: number): Promise<SaldoBancoPorCategoria[]>{
+    const response = await axios.get("/bancos/saldo-por-categoria/" + id_banco);
     
     return response.data;
   }
@@ -28,20 +28,20 @@ class GetBancosDataFuncions {
 export default function Bancos(): JSX.Element {
   const [bancos, setBancos]: [Banco[], any] = React.useState([{id: 1, nome: "", saldo: 0, updated_at: ""}]);
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(1);
-  const [dadosSaldoBancoPorDirecionamento, setDadosSaldoBancoPorDirecionamento] = React.useState([["Direcionamento", "saldo"]]);
+  const [dadosSaldoBancoPorCategoria, setDadosSaldoBancoPorCategoria] = React.useState([["Categoria", "saldo"]]);
   const [nomeBancoSelected, setNomeBancoSelected] = React.useState("");
 
   React.useEffect(() => {
     GetBancosDataFuncions.getBancos().then((data: Banco[]) => {
       setBancos(data);
-      GetBancosDataFuncions.getSaldosBancosPorDirecionamento(optionSelectedId).then((data: SaldoBancoPorDirecionamento[]) => {
-        const dados = [["Direcionamento", "Saldo"]];
+      GetBancosDataFuncions.getSaldosBancosPorCategoria(optionSelectedId).then((data: SaldoBancoPorCategoria[]) => {
+        const dados = [["Categoria", "Saldo"]];
         setNomeBancoSelected(data[0].nome_banco);
-        data.forEach((saldoBancoPorDirecionamento: SaldoBancoPorDirecionamento) => {
+        data.forEach((saldoBancoPorCategoria: SaldoBancoPorCategoria) => {
           // @ts-ignore
-          dados.push([saldoBancoPorDirecionamento.nome_direcionamento, Math.abs(saldoBancoPorDirecionamento.saldo)]);
+          dados.push([saldoBancoPorCategoria.nome_categoria, Math.abs(saldoBancoPorCategoria.saldo)]);
         })
-        setDadosSaldoBancoPorDirecionamento(dados);
+        setDadosSaldoBancoPorCategoria(dados);
       })
     })
     
@@ -54,7 +54,7 @@ export default function Bancos(): JSX.Element {
   
 
   const pieChartOptions = {
-    title: `Saldo por direcionamento ${nomeBancoSelected}`,
+    title: `Saldo por categoria ${nomeBancoSelected}`,
     titleTextStyle: {
       color: "black",
       position: "center",
@@ -78,9 +78,9 @@ export default function Bancos(): JSX.Element {
 
   const tableChartOptions = {
     cssClassNames: {
-      headerRow: "saldo-por-direcionamento-table-header",
-      tableRow: "saldo-por-direcionamento-table-row",
-      oddTableRow: "saldo-por-direcionamento-table-row",
+      headerRow: "saldo-por-categoria-table-header",
+      tableRow: "saldo-por-categoria-table-row",
+      oddTableRow: "saldo-por-categoria-table-row",
     }
   }
 
@@ -143,14 +143,14 @@ export default function Bancos(): JSX.Element {
         chartType="PieChart"
         width="100%"
         height="100%"
-        data={dadosSaldoBancoPorDirecionamento}
+        data={dadosSaldoBancoPorCategoria}
         options={pieChartOptions}
         />
         <Chart
         chartType="Table"
         width="100%"
         height="100%"
-        data={dadosSaldoBancoPorDirecionamento}
+        data={dadosSaldoBancoPorCategoria}
         options={tableChartOptions}
         formatters={tableChartFormatters}
         />

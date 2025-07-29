@@ -23,7 +23,7 @@ export default function Header(): JSX.Element {
           <BsBank2 size={24} color={colors.secondaryColor}/>
         </Box>
       </Link>
-      <Link to="/direcionamentos">
+      <Link to="/categorias">
         <Box>
           <GrDirections size={24} color={colors.secondaryColor}/>
         </Box>

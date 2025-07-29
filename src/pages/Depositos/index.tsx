@@ -6,7 +6,7 @@ import { Card, CardTitle, OptionBtn } from "../../styles/GlobalStyles";
 import { dayOfTheWeek, months } from "../../config/dates";
 import * as colors from "../../config/colors";
 import { Banco } from "../../types/Banco";
-import { Direcionamento } from "../../types/Direcionamento";
+import { Categoria } from "../../types/Categoria";
 import {  LocalizationProvider, MonthCalendar } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
@@ -87,7 +87,7 @@ export function Depositos(): JSX.Element {
   const [depositosByActualWeekDay, setdepositosByActualWeekDay] = React.useState(Array<Deposito[]>([]));
   const [depositosByWeekDay, setdepositosByWeekDay] = React.useState(Array<Deposito[]>([]));
   const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
-  const [direcionamentos, setDirecionamentos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
+  const [categorias, setCategorias]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(dayjs());
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
   const [depositosByMonth, setdepositosByMonth]: [Deposito[], any] = React.useState([]);
@@ -148,23 +148,23 @@ export function Depositos(): JSX.Element {
     }
     getBancos();
 
-    function getDirecionamentos() {
-      const direcionamentosNameById: { [key: number]: string }  = {};
+    function getCategorias() {
+      const categoriasNameById: { [key: number]: string }  = {};
 
-      axios.get("/direcionamentos").then((response) => {
-        const data: Direcionamento[] = response.data
+      axios.get("/categorias").then((response) => {
+        const data: Categoria[] = response.data
 
-        data.forEach((direcionamento: Direcionamento) => {
-          direcionamentosNameById[direcionamento.id] = direcionamento.nome;
+        data.forEach((categoria: Categoria) => {
+          categoriasNameById[categoria.id] = categoria.nome;
         });
 
-        setDirecionamentos(direcionamentosNameById);
+        setCategorias(categoriasNameById);
 
       });
 
       
     }
-    getDirecionamentos();
+    getCategorias();
 
     });
   }, []);
@@ -205,7 +205,7 @@ export function Depositos(): JSX.Element {
                 {
                   depositosByActualWeekDay.map((depositosInWeekDay: Deposito[], index: number) => {
                     return (
-                      <WeekDayPopoverCard itemUrlPath="depositos" key={index} bancos={bancos} direcionamentos={direcionamentos} itemInWeekDay={depositosInWeekDay} index={index} />
+                      <WeekDayPopoverCard itemUrlPath="depositos" key={index} bancos={bancos} categorias={categorias} itemInWeekDay={depositosInWeekDay} index={index} />
                     )
                   })
                 }
@@ -222,7 +222,7 @@ export function Depositos(): JSX.Element {
                 {
                   depositosByWeekDay.map((depositosInWeekDay: Deposito[], index: number) => {
                     return (
-                      <WeekDayPopoverCard itemUrlPath="depositos" key={index} bancos={bancos} direcionamentos={direcionamentos} itemInWeekDay={depositosInWeekDay} index={index} />
+                      <WeekDayPopoverCard itemUrlPath="depositos" key={index} bancos={bancos} categorias={categorias} itemInWeekDay={depositosInWeekDay} index={index} />
                     )
                   })
                 }
@@ -243,7 +243,7 @@ export function Depositos(): JSX.Element {
                           return {
                               id: deposito.id,
                               id_banco: bancos[deposito.id_banco],
-                              id_direcionamento: direcionamentos[deposito.id_direcionamento],
+                              id_categoria: categorias[deposito.id_categoria],
                               descricao: deposito.descricao,
                               valor: deposito.valor,
                               created_at: deposito.created_at
@@ -253,7 +253,7 @@ export function Depositos(): JSX.Element {
                       const columns: GridColDef[] = [
                         { field: 'id', headerName: 'ID', width: 70, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'id_banco', headerName: 'Banco', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
-                        { field: 'id_direcionamento', headerName: 'Direcionamento', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'id_categoria', headerName: 'Categoria', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'descricao', headerName: 'Descrição', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'valor', headerName: 'Valor', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center', type: 'number', valueFormatter: (value: number) => `R$ ${value.toFixed(2)}` },
                         { field: 'created_at', headerName: 'Data', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
@@ -264,14 +264,14 @@ export function Depositos(): JSX.Element {
                         label: string;
                       }
 
-                      const groupedByDirecionamentoGastos: { [key: number]: number } = depositosByMonth.reduce(
-                        (groupedByDirecionamentoGastos: { [key: string]: number }, item: any) => {
-                          if (!groupedByDirecionamentoGastos.hasOwnProperty(item.id_direcionamento)) {
-                            groupedByDirecionamentoGastos[item.id_direcionamento] = 0;
+                      const groupedByCategoriaGastos: { [key: number]: number } = depositosByMonth.reduce(
+                        (groupedByCategoriaGastos: { [key: string]: number }, item: any) => {
+                          if (!groupedByCategoriaGastos.hasOwnProperty(item.id_categoria)) {
+                            groupedByCategoriaGastos[item.id_categoria] = 0;
                           }
 
-                          groupedByDirecionamentoGastos[item.id_direcionamento] += item.valor;
-                          return groupedByDirecionamentoGastos;
+                          groupedByCategoriaGastos[item.id_categoria] += item.valor;
+                          return groupedByCategoriaGastos;
                         }, {}
                       )
 
@@ -286,10 +286,10 @@ export function Depositos(): JSX.Element {
                         }, {}
                       )
 
-                      const pieChartGroupedByDirecionamentoData: PieChartData[] = Object.keys(groupedByDirecionamentoGastos).map((direcionamento:string) => ({
-                        id: Number(direcionamento),
-                        value: groupedByDirecionamentoGastos[Number(direcionamento)],
-                        label: direcionamentos[Number(direcionamento)],
+                      const pieChartGroupedByCategoriaData: PieChartData[] = Object.keys(groupedByCategoriaGastos).map((categoria:string) => ({
+                        id: Number(categoria),
+                        value: groupedByCategoriaGastos[Number(categoria)],
+                        label: categorias[Number(categoria)],
                       }))
 
                       const pieChartGroupedByBancoData: PieChartData[] = Object.keys(groupedByBancoGastos).map((Bancos:string) => ({
@@ -349,13 +349,13 @@ export function Depositos(): JSX.Element {
                           <div style={{display: "flex", justifyContent: "center", margin: "10px auto"}}>
                             <PieChart 
                               
-                              title="Gastos por direcionamento"
+                              title="Gastos por categoria"
                               series={
                                 [
                                   {
                                     arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
                                     arcLabelMinAngle: 30,
-                                    data: pieChartGroupedByDirecionamentoData,
+                                    data: pieChartGroupedByCategoriaData,
                                     innerRadius: 90,
                                     color: "#fff",
                                     highlightScope: { fade: "global", highlight: "item"}

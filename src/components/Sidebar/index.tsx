@@ -50,14 +50,14 @@ export default function SideBar(): JSX.Element {
         <MenuItem icon={<FaHome size={24}/>} component={<Link to="/" />}>Home</MenuItem>
         <SubMenu label="Visão Geral" icon={<FaGlobe size={24} />}>
           <MenuItem component={<Link to="/bancos" />} suffix={<BsBank2 size={24} />}>Bancos</MenuItem>
-          <MenuItem component={<Link to="/direcionamentos" />} suffix={<GrDirections size={24} />}>Direcionamentos</MenuItem>
+          <MenuItem component={<Link to="/categorias" />} suffix={<GrDirections size={24} />}>Categorias</MenuItem>
           <MenuItem component={<Link to="/gastos-gerais" />} suffix={<FaMoneyBillTransfer size={24} />}>Gastos Gerais</MenuItem>
           <MenuItem component={<Link to="/depositos" />} suffix={<GiMoneyStack size={24} />}>Depósitos</MenuItem>
           <MenuItem component={<Link to="/transferencias" />} suffix={<BiTransfer size={24} />}>Transferências</MenuItem>
         </SubMenu>
         <SubMenu label="Adicionar" icon={<IoMdAddCircleOutline size={24} />}>
           <MenuItem component={<Link to="/bancos/add" />} suffix={<BsBank2 size={24} />}>Banco</MenuItem>
-          <MenuItem component={<Link to="/direcionamentos/add" />} suffix={<GrDirections size={24} />}>Direcionamento</MenuItem>
+          <MenuItem component={<Link to="/categorias/add" />} suffix={<GrDirections size={24} />}>Categoria</MenuItem>
           <MenuItem component={<Link to="/gastos-gerais/add" />} suffix={<GiPayMoney size={24} />}>Gastos Gerais</MenuItem>
           <MenuItem component={<Link to="/depositos/add" />} suffix={<TbPigMoney size={24} />}>Depósitos</MenuItem>
           <MenuItem component={<Link to="/transferencias/add" />} suffix={<BiTransfer size={24} />}>Transferências</MenuItem>

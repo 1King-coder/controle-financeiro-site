@@ -51,7 +51,7 @@ export default createGlobalStyle`
     color: #fff;
   }
 
-  .saldo-por-direcionamento-table-header .gradient {
+  .saldo-por-categoria-table-header .gradient {
     background: ${selectedBGColor} !important;
     color: ${secondaryColor};
     font-size: 2rem;
@@ -59,7 +59,7 @@ export default createGlobalStyle`
     padding: 10px;
   }
 
-  .saldo-por-direcionamento-table-row {
+  .saldo-por-categoria-table-row {
     background: ${tertiaryColor};
     font-size: 2rem;
     padding: 10px;
