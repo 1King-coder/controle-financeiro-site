@@ -12,6 +12,8 @@ import { toast } from "react-toastify";
 export default function AddBancos() {
   const [bancos, setBancos]: [Banco[], any] = React.useState([]);
 
+
+
   React.useEffect(() => {
     async function getBancos() {
 
@@ -28,8 +30,8 @@ export default function AddBancos() {
     const inputNomeBanco = document.getElementById("nome-banco");
     //@ts-ignore
     const nomeBanco = inputNomeBanco?.value;
-
-    nomeBanco === "" ? toast.warn("Preencha o nome do banco") : axios.post("/bancos", {
+    
+    nomeBanco === "" ? toast.warn("Preencha o nome do banco") : axios.post("/bancos",{
       nome_banco: nomeBanco
     }).then(async (response) => {
       console.log(response);
