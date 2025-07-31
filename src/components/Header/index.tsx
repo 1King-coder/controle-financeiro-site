@@ -6,9 +6,10 @@ import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { GiMoneyStack } from "react-icons/gi";
 import { BsBank2 } from "react-icons/bs";
 import { BiTransfer } from "react-icons/bi";
-import { Nav, Box } from "./styled";
+import { Nav, Box, BoxSide } from "./styled";
 import { Link } from "react-router-dom";
 import * as colors from "../../config/colors";
+import { IoPersonCircle } from "react-icons/io5";
 
 export default function Header(): JSX.Element {
   return (
@@ -42,6 +43,11 @@ export default function Header(): JSX.Element {
         <Box>
           <BiTransfer size={24} color={colors.secondaryColor}/>
         </Box>
+      </Link>
+      <Link to="/transferencias">
+        <BoxSide>
+          <IoPersonCircle size={24} color={colors.secondaryColor}/>
+        </BoxSide>
       </Link>
     </Nav>
   )

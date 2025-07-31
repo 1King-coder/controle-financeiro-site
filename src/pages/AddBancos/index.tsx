@@ -6,7 +6,6 @@ import axios from "../../services/axios";
 import { Banco } from "../../types/Banco";
 import { DataGrid } from "@mui/x-data-grid";
 import * as colors from "../../config/colors";
-import { Toast } from "react-toastify/dist/components";
 import { toast } from "react-toastify";
 
 export default function AddBancos() {

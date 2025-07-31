@@ -6,18 +6,20 @@ import GlobalStyles from './styles/GlobalStyles';
 import Header from './components/Header';
 import { ToastContainer } from 'react-toastify';
 import SideBar from './components/Sidebar';
+import AuthProvider from './components/AuthProvider';
 
 function App(): JSX.Element {
   return (
     <Router history={history}>
-      <Header />
-      <div className='AppWrapper'>
-        <SideBar />
-        <GlobalStyles />
-        <ToastContainer autoClose={3000} className={'toast-container'}/>
-        <Routes />
-      </div>
-      
+      <AuthProvider>
+        <Header />
+        <div className='AppWrapper'>
+          <SideBar />
+          <GlobalStyles />
+          <ToastContainer autoClose={3000} className={'toast-container'}/>
+          <Routes />
+        </div>
+      </AuthProvider>
     </Router>
   );
     
