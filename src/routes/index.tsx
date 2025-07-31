@@ -10,20 +10,53 @@ import Transferencias from "../pages/Transferencias";
 import AddBancos from "../pages/AddBancos";
 import AddCategorias from "../pages/AddCategorias";
 import AddUsuario from "../pages/AddUsuario";
+import Login from "../pages/Login";
+import { ProtectedRoute } from "../components/AuthProvider";
 
 export default function Routes(): JSX.Element {
 
   return (
       <Switch>
         <Route exact path="/" component={Home} />
-        <Route exact path="/bancos" component={Bancos} />
-        <Route exact path="/categorias" component={Categorias} />
-        <Route exact path="/gastos-gerais" component={GastosGerais} />
-        <Route exact path="/depositos" component={Depositos} />
-        <Route exact path="/transferencias" component={Transferencias} />
-        <Route exact path="/bancos/add" component={AddBancos} />
-        <Route exact path="/categorias/add" component={AddCategorias} />
-        <Route exact path="/usuarios/add" component={AddUsuario} />
+        <Route exact path="/login" component={Login} />
+        <Route exact path="/cadastro" component={AddUsuario} />
+        
+        {/* Protected Routes */}
+        <Route exact path="/bancos" component={(props: any) => (
+          <ProtectedRoute>
+            <Bancos {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/categorias" component={(props: any) => (
+          <ProtectedRoute>
+            <Categorias {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/gastos-gerais" component={(props: any) => (
+          <ProtectedRoute>
+            <GastosGerais {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/depositos" component={(props: any) => (
+          <ProtectedRoute>
+            <Depositos {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/transferencias" component={(props: any) => (
+          <ProtectedRoute>
+            <Transferencias {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/bancos/add" component={(props: any) => (
+          <ProtectedRoute>
+            <AddBancos {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/categorias/add" component={(props: any) => (
+          <ProtectedRoute>
+            <AddCategorias {...props} />
+          </ProtectedRoute>
+        )} />
 
         <Route path="*" component={Page404} />
       </Switch>

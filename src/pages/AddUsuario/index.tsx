@@ -7,20 +7,14 @@ import { Usuario } from "../../types/Usuario";
 import { DataGrid } from "@mui/x-data-grid";
 import * as colors from "../../config/colors";
 import { toast } from "react-toastify";
+import { useAuth } from "../../services/useAuth";
+import history from "../../services/history";
 
 export default function AddUsuario() {
-  const [usuarios, setUsuarios]: [Usuario[], any] = React.useState([]);
 
-  React.useEffect(() => {
-    async function getUsuarios() {
-      axios.get("/usuarios").then((response) => {
-        setUsuarios(response.data);
-      });
-    }
-    getUsuarios();
-  }, [])
+  const { user } = useAuth();
 
-  function handleAdicionaUsuario() {
+  function handleRegister() {
     const inputNome = document.getElementById("nome") as HTMLInputElement;
     const inputSobrenome = document.getElementById("sobrenome") as HTMLInputElement;
     const inputUsername = document.getElementById("username") as HTMLInputElement;
@@ -63,7 +57,9 @@ export default function AddUsuario() {
       senha,
       email
     }).then(async (response) => {
-      console.log(response);
+      if (response.status === 403) {
+        toast.warning(response.data.message)
+      }
       if (response.status === 201) {
         toast.success("Usuário adicionado com sucesso");
         // Clear form
@@ -72,9 +68,7 @@ export default function AddUsuario() {
         inputUsername.value = "";
         inputSenha.value = "";
         inputEmail.value = "";
-        // Refresh usuarios list
-        const updatedResponse = await axios.get("/usuarios");
-        setUsuarios(updatedResponse.data);
+
       } 
     }).catch((error) => {
       console.log(error)
@@ -85,10 +79,16 @@ export default function AddUsuario() {
       }
     });
   }
+  
+  if (user) {
+    toast.success("Você já está logado!")
+    history.goBack();
+    return <></>;
+  }
 
   return (
     <GeneralBox>
-      <Title>Adicionar Usuários</Title>
+      <Title>Cadastro</Title>
       <div style={{
         display: "flex",
         flexDirection: "row",
@@ -109,42 +109,18 @@ export default function AddUsuario() {
             <TextInput id="username" placeholder="Username (mín. 5 caracteres)"/>
           </InputBox>
           <InputBox>
-            <Label htmlFor="senha" value="Senha"/>
-            <TextInput id="senha" type="password" placeholder="Senha (mín. 8 caracteres)"/>
-          </InputBox>
-          <InputBox>
             <Label htmlFor="email" value="Email"/>
             <TextInput id="email" type="email" placeholder="Email"/>
           </InputBox>
           <InputBox>
-            <Button onClick={handleAdicionaUsuario}><span>Adicionar</span></Button>
+            <Label htmlFor="senha" value="Senha"/>
+            <TextInput id="senha" type="password" placeholder="Senha (mín. 8 caracteres)"/>
+          </InputBox>
+          <InputBox>
+            <Button onClick={handleRegister}><span>Adicionar</span></Button>
           </InputBox>
         </form>
-        <DataGridBox>
-          <SubTitle2>Usuários cadastrados</SubTitle2>
-          <DataGrid
-            rows={usuarios}
-            columns={[
-              { field: "id", headerName: "ID", width: 70, headerClassName: "datagrid-headers" },
-              { field: "nome", headerName: "Nome", width: 130, headerClassName: "datagrid-headers" },
-              { field: "sobrenome", headerName: "Sobrenome", width: 130, headerClassName: "datagrid-headers" },
-              { field: "username", headerName: "Username", width: 130, headerClassName: "datagrid-headers" },
-              { field: "email", headerName: "Email", width: 200, headerClassName: "datagrid-headers" },
-            ]}
-            slots={{footer: () => <div />}}
-            sx={
-              {
-                boxShadow: 4,
-                border: 2,
-                borderColor: colors.primaryColor,
-                height: "30rem",
-                width: '20rem',
-                backgroundColor: colors.tertiaryColor,
-                fontSize: 16,
-              }
-            }
-          />
-        </DataGridBox>
+        
       </div>
     </GeneralBox>
   );
