@@ -1,3 +1,5 @@
+import {Categoria} from "../types/Categoria"
+
 export type Banco = {
   id: number;
   nome: string;
@@ -6,10 +8,8 @@ export type Banco = {
 }
 
 export type SaldoBancoPorCategoria = {
-  id_banco: number;
-  id_categoria: number;
-  nome_banco: string;
-  nome_categoria: string;
+  banco: Banco;
+  categoria: Categoria;
   saldo: number;
 }
 

@@ -7,16 +7,17 @@ import { Banco } from "../../types/Banco";
 import { DataGrid } from "@mui/x-data-grid";
 import * as colors from "../../config/colors";
 import { toast } from "react-toastify";
+import { useAuth } from "../../services/useAuth";
 
 export default function AddBancos() {
   const [bancos, setBancos]: [Banco[], any] = React.useState([]);
-
+  const { user } = useAuth();
 
 
   React.useEffect(() => {
     async function getBancos() {
 
-      axios.get("/bancos").then((response) => {
+      axios.get(`/bancos/usuario/${user!.id}`).then((response) => {
         
         setBancos(response.data);
       });

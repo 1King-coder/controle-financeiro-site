@@ -7,18 +7,20 @@ import {Chart} from "react-google-charts";
 import { backgroundColor, secondaryColor, tertiaryColor } from "../../config/colors";
 import { title } from "process";
 import { table } from "console";
+import { useAuth } from "../../services/useAuth";
+import { toast } from "react-toastify";
 
 class GetBancosDataFuncions {
 
   static async getSaldosBancosPorCategoria(id_banco: number): Promise<SaldoBancoPorCategoria[]>{
-    const response = await axios.get("/bancos/saldo-por-categoria/" + id_banco);
+    const response = await axios.get("/saldos-por-categoria/banco/" + id_banco);
     
     return response.data;
   }
   
 
-  static async getBancos(): Promise<Banco[]>{
-    const response = await axios.get("/bancos");
+  static async getBancos(id_user: number): Promise<Banco[]>{
+    const response = await axios.get(`/bancos/usuario/${id_user}`);
     
     return response.data;
   }
@@ -26,33 +28,51 @@ class GetBancosDataFuncions {
 
 
 export default function Bancos(): JSX.Element {
-  const [bancos, setBancos]: [Banco[], any] = React.useState([{id: 1, nome: "", saldo: 0, updated_at: ""}]);
-  const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(1);
+  
   const [dadosSaldoBancoPorCategoria, setDadosSaldoBancoPorCategoria] = React.useState([["Categoria", "saldo"]]);
   const [nomeBancoSelected, setNomeBancoSelected] = React.useState("");
+  const { user } = useAuth();
+
+  const [bancos, setBancos]: [Banco[], any] = React.useState([]);
+  
+  const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(0);
 
   React.useEffect(() => {
-    GetBancosDataFuncions.getBancos().then((data: Banco[]) => {
+    GetBancosDataFuncions.getBancos(user!.id).then((data: Banco[]) => {
       setBancos(data);
-      GetBancosDataFuncions.getSaldosBancosPorCategoria(optionSelectedId).then((data: SaldoBancoPorCategoria[]) => {
-        const dados = [["Categoria", "Saldo"]];
-        setNomeBancoSelected(data[0].nome_banco);
-        data.forEach((saldoBancoPorCategoria: SaldoBancoPorCategoria) => {
-          // @ts-ignore
-          dados.push([saldoBancoPorCategoria.nome_categoria, Math.abs(saldoBancoPorCategoria.saldo)]);
+      // Automatically select the first bank if banks exist
+      if (data.length > 0) {
+        setOptionSelectedId(data[0].id);
+      }
+    });
+  }, []);
+
+  React.useEffect(() => {
+    if (optionSelectedId !== 0) {
+      GetBancosDataFuncions.getBancos(user!.id).then((data: Banco[]) => {
+        setBancos(data);
+        GetBancosDataFuncions.getSaldosBancosPorCategoria(optionSelectedId).then((data: SaldoBancoPorCategoria[]) => {
+          if (data.length === 0) {
+            toast.warning("Este Banco não possui saldo em nenhuma categoria.")
+            setDadosSaldoBancoPorCategoria([["Categoria", "Saldo"], ["", ""]])
+            return
+          }
+          const dados = [["Categoria", "Saldo"]];
+          setNomeBancoSelected(data[0].banco.nome);
+          data.forEach((saldoBancoPorCategoria: SaldoBancoPorCategoria) => {
+            // @ts-ignore
+            dados.push([saldoBancoPorCategoria.categoria.nome, Math.abs(saldoBancoPorCategoria.saldo)]);
+          })
+          setDadosSaldoBancoPorCategoria(dados);
         })
-        setDadosSaldoBancoPorCategoria(dados);
       })
-    })
+    }
     
   }, [optionSelectedId]);
 
   
 
-
-
   
-
   const pieChartOptions = {
     title: `Saldo por categoria ${nomeBancoSelected}`,
     titleTextStyle: {
