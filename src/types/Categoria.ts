@@ -1,3 +1,5 @@
+import { SaldoBancoPorCategoria } from "./Banco";
+
 export type Categoria = {
   id: number;
   nome: string;
@@ -5,13 +7,7 @@ export type Categoria = {
   updated_at: string;
 }
 
-export type SaldoCategoriaPorBanco = {
-  id_banco: number;
-  id_categoria: number;
-  nome_banco: string;
-  nome_categoria: string;
-  saldo: number;
-}
+export type SaldoCategoriaPorBanco = SaldoBancoPorCategoria
 
 export type CategoriaPorBancoPieChartProps = {
   id_banco: number;

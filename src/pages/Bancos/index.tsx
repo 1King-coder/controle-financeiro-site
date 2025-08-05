@@ -40,7 +40,6 @@ export default function Bancos(): JSX.Element {
   React.useEffect(() => {
     GetBancosDataFuncions.getBancos(user!.id).then((data: Banco[]) => {
       setBancos(data);
-      // Automatically select the first bank if banks exist
       if (data.length > 0) {
         setOptionSelectedId(data[0].id);
       }
