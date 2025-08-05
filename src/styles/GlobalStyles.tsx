@@ -61,7 +61,7 @@ export default createGlobalStyle`
 
   .saldo-por-categoria-table-row {
     background: ${tertiaryColor};
-    font-size: 2rem;
+    font-size: 1.5rem;
     padding: 10px;
   }
 

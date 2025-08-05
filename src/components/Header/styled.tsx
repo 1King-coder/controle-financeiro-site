@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { primaryColor, successColor} from "../../config/colors";
+import { primaryColor, successColor, secondaryColor} from "../../config/colors";
 
 export const Nav = styled.nav`
   background: ${primaryColor};
@@ -33,6 +33,23 @@ export const BoxSide = styled.div`
   top: 50%;
   transform: translateY(-50%);
   margin: 0 10px;
+`
+
+export const UsernameP = styled.p`
+  color: white;
+  padding:8px;
+  margin: 0 0 0 10px;
+  background:${secondaryColor};
+  border-radius:20px;
+  font-family: monospace;
+  font-weight: bold;
+`
+
+export const HoverEffect = styled.div`
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  margin:0px;
   :hover {
     cursor: pointer;
     background: ${successColor};

@@ -6,7 +6,7 @@ import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { GiMoneyStack } from "react-icons/gi";
 import { BsBank2 } from "react-icons/bs";
 import { BiTransfer } from "react-icons/bi";
-import { Nav, Box, BoxSide } from "./styled";
+import { Nav, Box, BoxSide, UsernameP, HoverEffect } from "./styled";
 import { Link } from "react-router-dom";
 import * as colors from "../../config/colors";
 import { IoPersonCircle } from "react-icons/io5";
@@ -14,6 +14,7 @@ import { IoLogOut } from "react-icons/io5";
 import { useAuth } from "../../services/useAuth";
 import { toast } from "react-toastify";
 import history from "../../services/history";
+import { relative } from "path";
 
 export default function Header(): JSX.Element {
 
@@ -60,9 +61,16 @@ export default function Header(): JSX.Element {
               <BiTransfer size={24} color={colors.secondaryColor}/>
             </Box>
           </Link>
-          <BoxSide onClick={handleLogout} style={{ cursor: 'pointer' }}>
-            <IoLogOut size={24} color={colors.secondaryColor}/>
+          
+          <BoxSide  style={{ cursor: 'pointer' }}>
+            <HoverEffect>
+              <IoLogOut onClick={handleLogout} size={24} color={colors.secondaryColor}/>
+            </HoverEffect>
+            <Link to="user-page"> 
+              <UsernameP>{user.username}</UsernameP>
+            </Link>
           </BoxSide>
+          
           </>
         ) : (
           <Link to={"/login"}>
