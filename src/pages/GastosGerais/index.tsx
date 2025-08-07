@@ -16,20 +16,21 @@ import { WeekDayPopoverCard } from "../../components/WeekDayPopoverCard";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { FaToolbox } from "react-icons/fa";
 import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
+import { useAuth } from "../../services/useAuth";
 
 class GetGastosGeraisDataFuncions {
-  static async getGastosGerais(): Promise<GastoGeral[]> {
-    const response = await axios.get("/gastos_gerais");
+  static async getGastosGerais(id_user: Number): Promise<GastoGeral[]> {
+    const response = await axios.get("/gastos/usuario/" + id_user);
 
     return await response.data;
   }
 
-  static async getGastosGeraisFilterByDateInterval (dateStart: Date, dateEnd: Date): Promise<GastoGeral[]> {
-    const filteredData =  GetGastosGeraisDataFuncions.getGastosGerais().then((data: GastoGeral[]) => {
+  static async getGastosGeraisFilterByDateInterval (dateStart: Date, dateEnd: Date, id_user: Number): Promise<GastoGeral[]> {
+    const filteredData =  GetGastosGeraisDataFuncions.getGastosGerais(id_user).then((data: GastoGeral[]) => {
       
       const filteredData = data.filter( (gastoGeral: GastoGeral) => {
-
-        const dateSplited = gastoGeral.created_at.split("/");
+        // @ts-ignore
+        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataGasto >= dateStart && dataGasto <= dateEnd) {
@@ -45,12 +46,12 @@ class GetGastosGeraisDataFuncions {
     return filteredData;
   }
 
-  static async getGastosGeraisFilterByMonthInterval (date: Date): Promise<GastoGeral[]> {
-    const filteredData =  GetGastosGeraisDataFuncions.getGastosGerais().then((data: GastoGeral[]) => {
+  static async getGastosGeraisFilterByMonthInterval (date: Date, id_user: Number): Promise<GastoGeral[]> {
+    const filteredData =  GetGastosGeraisDataFuncions.getGastosGerais(id_user).then((data: GastoGeral[]) => {
       
       const filteredData = data.filter( (gastoGeral: GastoGeral) => {
-
-        const dateSplited = gastoGeral.created_at.split("/");
+        // @ts-ignore
+        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataGasto.getMonth() === date.getMonth()) {
@@ -67,11 +68,11 @@ class GetGastosGeraisDataFuncions {
     return filteredData;
   }
 
-  static async getGastosGeraisFilterByLastWeek(): Promise<GastoGeral[]> {
+  static async getGastosGeraisFilterByLastWeek(id_user: Number): Promise<GastoGeral[]> {
     const dateStart = new Date();
     const dateEnd = new Date();
     dateStart.setDate(dateStart.getDate() - 7);
-    return await GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(dateStart, dateEnd);
+    return await GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(dateStart, dateEnd, id_user);
   }
 }
 
@@ -87,16 +88,51 @@ export function GastosGerais(): JSX.Element {
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(2);
   const [gastosByActualWeekDay, setgastosByActualWeekDay] = React.useState(Array<GastoGeral[]>([]));
   const [gastosByWeekDay, setgastosByWeekDay] = React.useState(Array<GastoGeral[]>([]));
-  const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
-  const [categorias, setCategorias]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
+  const [bancos, setBancos]: [any, any] = React.useState();
+  const [categorias, setCategorias]: [any, any] = React.useState();
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(dayjs());
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
   const [gastosByMonth, setGastosByMonth]: [GastoGeral[], any] = React.useState([]);
+  const { user } = useAuth();
+
+  
+  React.useEffect(() => {
+    async function getBancos() {
+
+      const bancosNameById: { [key: number]: string }  = {};
+
+      axios.get(`/bancos/usuario/${user!.id}`).then((response) => {
+        const data: Banco[] = response.data;
+
+        data.forEach((banco: Banco) => {
+          bancosNameById[banco.id] = banco.nome;
+        });
+        setBancos(bancosNameById);
+      });
+      
+    }
+    getBancos();
+  }, [])
+
+  React.useEffect(() => {
+    async function getCategorias() {
+      const categoriasNameById: { [key: number]: string }  = {};
+      axios.get(`/categorias/usuario/${user!.id}`).then((response) => {
+        const data: Categoria[] = response.data
+
+        data.forEach((categoria: Categoria) => {
+          categoriasNameById[categoria.id] = categoria.nome;
+        });
+        setCategorias(categoriasNameById);
+      });
+      
+    }
+    getCategorias();
+  }, [])
 
   React.useEffect(() => { 
-    GetGastosGeraisDataFuncions.getGastosGeraisFilterByMonthInterval(selectedMonthDate.toDate()).then((data: GastoGeral[]) => {
+    GetGastosGeraisDataFuncions.getGastosGeraisFilterByMonthInterval(selectedMonthDate.toDate(), user!.id).then((data: GastoGeral[]) => {
       setGastosByMonth(data);
-
     })
   }, [selectedMonthDate])
 
@@ -105,11 +141,12 @@ export function GastosGerais(): JSX.Element {
 
     
 
-    GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(semanaSelecionada[0], semanaSelecionada[1]).then((data: GastoGeral[]) => {
+    GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(semanaSelecionada[0], semanaSelecionada[1], user!.id).then((data: GastoGeral[]) => {
       setGastosGerais(data);
       const listgastosByWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
       data.forEach((gastoGeral: GastoGeral) => {
-        const dateSplited = gastoGeral.created_at.split("/");
+        // @ts-ignore
+        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listgastosByWeekDay[dataGasto.getDay()].push(gastoGeral);
@@ -123,49 +160,18 @@ export function GastosGerais(): JSX.Element {
     
     const semanaAtual = getSemanaAtual(new Date());
 
-    GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(semanaAtual[0], semanaAtual[1]).then((data: GastoGeral[]) => {
+    GetGastosGeraisDataFuncions.getGastosGeraisFilterByDateInterval(semanaAtual[0], semanaAtual[1], user!.id).then((data: GastoGeral[]) => {
       setGastosGerais(data);
       const listgastosByActualWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
       data.forEach((gastoGeral: GastoGeral) => {
-        const dateSplited = gastoGeral.created_at.split("/");
+        // @ts-ignore
+        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listgastosByActualWeekDay[dataGasto.getDay()].push(gastoGeral);
       })
       setgastosByActualWeekDay(listgastosByActualWeekDay);
 
-    async function getBancos() {
-      const bancosNameById: { [key: number]: string }  = {};
-
-      axios.get("/bancos").then((response) => {
-        const data: Banco[] = response.data;
-
-        data.forEach((banco: Banco) => {
-          bancosNameById[banco.id] = banco.nome;
-        });
-        setBancos(bancosNameById);
-      });
-      
-    }
-    getBancos();
-
-    function getCategorias() {
-      const categoriasNameById: { [key: number]: string }  = {};
-
-      axios.get("/categorias").then((response) => {
-        const data: Categoria[] = response.data
-
-        data.forEach((categoria: Categoria) => {
-          categoriasNameById[categoria.id] = categoria.nome;
-        });
-
-        setCategorias(categoriasNameById);
-
-      });
-
-      
-    }
-    getCategorias();
 
     });
   }, []);
@@ -243,8 +249,8 @@ export function GastosGerais(): JSX.Element {
                       const rows = gastosByMonth.map((gasto: GastoGeral) => {
                           return {
                               id: gasto.id,
-                              id_banco: bancos[gasto.id_banco],
-                              id_categoria: categorias[gasto.id_categoria],
+                              id_banco: bancos[gasto.banco.id],
+                              id_categoria: categorias[gasto.categoria.id],
                               descricao: gasto.descricao,
                               valor: gasto.valor,
                               created_at: gasto.created_at
@@ -267,22 +273,22 @@ export function GastosGerais(): JSX.Element {
 
                       const groupedByCategoriaGastos: { [key: number]: number } = gastosByMonth.reduce(
                         (groupedByCategoriaGastos: { [key: string]: number }, item: any) => {
-                          if (!groupedByCategoriaGastos.hasOwnProperty(item.id_categoria)) {
-                            groupedByCategoriaGastos[item.id_categoria] = 0;
+                          if (!groupedByCategoriaGastos.hasOwnProperty(item.categoria.id)) {
+                            groupedByCategoriaGastos[item.categoria.id] = 0;
                           }
 
-                          groupedByCategoriaGastos[item.id_categoria] += item.valor;
+                          groupedByCategoriaGastos[item.categoria.id] += item.valor;
                           return groupedByCategoriaGastos;
                         }, {}
                       )
 
                       const groupedByBancoGastos: { [key: number]: number } = gastosByMonth.reduce(
                         (groupedByBancoGastos: { [key: string]: number }, item: any) => {
-                          if (!groupedByBancoGastos.hasOwnProperty(item.id_banco)) {
-                            groupedByBancoGastos[item.id_banco] = 0;
+                          if (!groupedByBancoGastos.hasOwnProperty(item.banco.id)) {
+                            groupedByBancoGastos[item.banco.id] = 0;
                           }
 
-                          groupedByBancoGastos[item.id_banco] += item.valor;
+                          groupedByBancoGastos[item.banco.id] += item.valor;
                           return groupedByBancoGastos;
                         }, {}
                       )

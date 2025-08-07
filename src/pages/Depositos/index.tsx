@@ -15,20 +15,21 @@ import { WeekDayPopoverCard } from "../../components/WeekDayPopoverCard";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
 import { Deposito } from "../../types/Deposito";
+import { useAuth } from "../../services/useAuth";
 
 class GetDepositosFunctions {
-  static async getDepositos(): Promise<Deposito[]> {
-    const response = await axios.get("/depositos");
+  static async getDepositos(id_user: Number): Promise<Deposito[]> {
+    const response = await axios.get("/depositos/usuario/" + id_user);
 
     return await response.data;
   }
 
-  static async getDepositosFilterByDateInterval (dateStart: Date, dateEnd: Date): Promise<Deposito[]> {
-    const filteredData =  GetDepositosFunctions.getDepositos().then((data: Deposito[]) => {
+  static async getDepositosFilterByDateInterval (dateStart: Date, dateEnd: Date, id_user: Number): Promise<Deposito[]> {
+    const filteredData =  GetDepositosFunctions.getDepositos(id_user).then((data: Deposito[]) => {
       
       const filteredData = data.filter( (deposito: Deposito) => {
 
-        const dateSplited = deposito.created_at.split("/");
+        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataDeposito = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataDeposito >= dateStart && dataDeposito <= dateEnd) {
@@ -44,12 +45,12 @@ class GetDepositosFunctions {
     return filteredData;
   }
 
-  static async getDepositosFilterByMonthInterval (date: Date): Promise<Deposito[]> {
-    const filteredData =  GetDepositosFunctions.getDepositos().then((data: Deposito[]) => {
+  static async getDepositosFilterByMonthInterval (date: Date, id_user: Number): Promise<Deposito[]> {
+    const filteredData =  GetDepositosFunctions.getDepositos(id_user).then((data: Deposito[]) => {
       
       const filteredData = data.filter( (deposito: Deposito) => {
 
-        const dateSplited = deposito.created_at.split("/");
+        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataDeposito = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataDeposito.getMonth() === date.getMonth()) {
@@ -66,11 +67,11 @@ class GetDepositosFunctions {
     return filteredData;
   }
 
-  static async getDepositosFilterByLastWeek(): Promise<Deposito[]> {
+  static async getDepositosFilterByLastWeek(id_user: Number): Promise<Deposito[]> {
     const dateStart = new Date();
     const dateEnd = new Date();
     dateStart.setDate(dateStart.getDate() - 7);
-    return await GetDepositosFunctions.getDepositosFilterByDateInterval(dateStart, dateEnd);
+    return await GetDepositosFunctions.getDepositosFilterByDateInterval(dateStart, dateEnd, id_user);
   }
 }
 
@@ -86,14 +87,50 @@ export function Depositos(): JSX.Element {
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(2);
   const [depositosByActualWeekDay, setdepositosByActualWeekDay] = React.useState(Array<Deposito[]>([]));
   const [depositosByWeekDay, setdepositosByWeekDay] = React.useState(Array<Deposito[]>([]));
-  const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
-  const [categorias, setCategorias]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
+  const [bancos, setBancos]: [any, any] = React.useState();
+  const [categorias, setCategorias]: [any, any] = React.useState();
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(dayjs());
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
   const [depositosByMonth, setdepositosByMonth]: [Deposito[], any] = React.useState([]);
+  const {user} = useAuth();
+
+  
+  React.useEffect(() => {
+    async function getBancos() {
+
+      const bancosNameById: { [key: number]: string }  = {};
+
+      axios.get(`/bancos/usuario/${user!.id}`).then((response) => {
+        const data: Banco[] = response.data;
+
+        data.forEach((banco: Banco) => {
+          bancosNameById[banco.id] = banco.nome;
+        });
+        setBancos(bancosNameById);
+      });
+      
+    }
+    getBancos();
+  }, [])
+
+  React.useEffect(() => {
+    async function getCategorias() {
+      const categoriasNameById: { [key: number]: string }  = {};
+      axios.get(`/categorias/usuario/${user!.id}`).then((response) => {
+        const data: Categoria[] = response.data
+
+        data.forEach((categoria: Categoria) => {
+          categoriasNameById[categoria.id] = categoria.nome;
+        });
+        setCategorias(categoriasNameById);
+      });
+      
+    }
+    getCategorias();
+  }, [])
 
   React.useEffect(() => { 
-    GetDepositosFunctions.getDepositosFilterByMonthInterval(selectedMonthDate.toDate()).then((data: Deposito[]) => {
+    GetDepositosFunctions.getDepositosFilterByMonthInterval(selectedMonthDate.toDate(), user!.id).then((data: Deposito[]) => {
       setdepositosByMonth(data);
 
     })
@@ -104,11 +141,11 @@ export function Depositos(): JSX.Element {
 
     
 
-    GetDepositosFunctions.getDepositosFilterByDateInterval(semanaSelecionada[0], semanaSelecionada[1]).then((data: Deposito[]) => {
+    GetDepositosFunctions.getDepositosFilterByDateInterval(semanaSelecionada[0], semanaSelecionada[1], user!.id).then((data: Deposito[]) => {
       setDepositos(data);
       const listdepositosByWeekDay: Array<Deposito[]> = [[], [], [], [], [], [], []];
       data.forEach((deposito: Deposito) => {
-        const dateSplited = deposito.created_at.split("/");
+        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listdepositosByWeekDay[dataGasto.getDay()].push(deposito);
@@ -122,49 +159,17 @@ export function Depositos(): JSX.Element {
     
     const semanaAtual = getSemanaAtual(new Date());
 
-    GetDepositosFunctions.getDepositosFilterByDateInterval(semanaAtual[0], semanaAtual[1]).then((data: Deposito[]) => {
+    GetDepositosFunctions.getDepositosFilterByDateInterval(semanaAtual[0], semanaAtual[1], user!.id).then((data: Deposito[]) => {
       setDepositos(data);
       const listdepositosByActualWeekDay: Array<Deposito[]> = [[], [], [], [], [], [], []];
       data.forEach((deposito: Deposito) => {
-        const dateSplited = deposito.created_at.split("/");
+        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listdepositosByActualWeekDay[dataGasto.getDay()].push(deposito);
       })
       setdepositosByActualWeekDay(listdepositosByActualWeekDay);
 
-    async function getBancos() {
-      const bancosNameById: { [key: number]: string }  = {};
-
-      axios.get("/bancos").then((response) => {
-        const data: Banco[] = response.data;
-
-        data.forEach((banco: Banco) => {
-          bancosNameById[banco.id] = banco.nome;
-        });
-        setBancos(bancosNameById);
-      });
-      
-    }
-    getBancos();
-
-    function getCategorias() {
-      const categoriasNameById: { [key: number]: string }  = {};
-
-      axios.get("/categorias").then((response) => {
-        const data: Categoria[] = response.data
-
-        data.forEach((categoria: Categoria) => {
-          categoriasNameById[categoria.id] = categoria.nome;
-        });
-
-        setCategorias(categoriasNameById);
-
-      });
-
-      
-    }
-    getCategorias();
 
     });
   }, []);
@@ -242,8 +247,8 @@ export function Depositos(): JSX.Element {
                       const rows = depositosByMonth.map((deposito: Deposito) => {
                           return {
                               id: deposito.id,
-                              id_banco: bancos[deposito.id_banco],
-                              id_categoria: categorias[deposito.id_categoria],
+                              banco: bancos[deposito.banco.id],
+                              categoria: categorias[deposito.categoria.id],
                               descricao: deposito.descricao,
                               valor: deposito.valor,
                               created_at: deposito.created_at
@@ -252,8 +257,8 @@ export function Depositos(): JSX.Element {
 
                       const columns: GridColDef[] = [
                         { field: 'id', headerName: 'ID', width: 70, headerClassName: 'datagrid-headers', headerAlign: 'center' },
-                        { field: 'id_banco', headerName: 'Banco', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
-                        { field: 'id_categoria', headerName: 'Categoria', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'banco', headerName: 'Banco', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'categoria', headerName: 'Categoria', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'descricao', headerName: 'Descrição', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'valor', headerName: 'Valor', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center', type: 'number', valueFormatter: (value: number) => `R$ ${value.toFixed(2)}` },
                         { field: 'created_at', headerName: 'Data', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
@@ -266,22 +271,22 @@ export function Depositos(): JSX.Element {
 
                       const groupedByCategoriaGastos: { [key: number]: number } = depositosByMonth.reduce(
                         (groupedByCategoriaGastos: { [key: string]: number }, item: any) => {
-                          if (!groupedByCategoriaGastos.hasOwnProperty(item.id_categoria)) {
-                            groupedByCategoriaGastos[item.id_categoria] = 0;
+                          if (!groupedByCategoriaGastos.hasOwnProperty(item.categoria.id)) {
+                            groupedByCategoriaGastos[item.categoria.id] = 0;
                           }
 
-                          groupedByCategoriaGastos[item.id_categoria] += item.valor;
+                          groupedByCategoriaGastos[item.categoria.id] += item.valor;
                           return groupedByCategoriaGastos;
                         }, {}
                       )
 
                       const groupedByBancoGastos: { [key: number]: number } = depositosByMonth.reduce(
                         (groupedByBancoGastos: { [key: string]: number }, item: any) => {
-                          if (!groupedByBancoGastos.hasOwnProperty(item.id_banco)) {
-                            groupedByBancoGastos[item.id_banco] = 0;
+                          if (!groupedByBancoGastos.hasOwnProperty(item.banco.id)) {
+                            groupedByBancoGastos[item.banco.id] = 0;
                           }
 
-                          groupedByBancoGastos[item.id_banco] += item.valor;
+                          groupedByBancoGastos[item.banco.id] += item.valor;
                           return groupedByBancoGastos;
                         }, {}
                       )

@@ -1,8 +1,12 @@
+import { Banco } from "./Banco";
+import { Categoria } from "./Categoria";
+
 export type Deposito = {
   id: number;
-  id_banco: number;
-  id_categoria: number;
+  banco: Banco;
+  categoria: Categoria;
   descricao: string;
+  data_de_competencia: string;
   valor: number;
   created_at: string;
 }

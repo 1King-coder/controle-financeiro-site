@@ -9,9 +9,10 @@ import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
+
 type Props = {
-  bancos: { [key: number]: string };
-  categorias: { [key: number]: string };
+  bancos: {[key:number]: string};
+  categorias: {[key:number]: string};
   itemInWeekDay: GastoGeral[] | Deposito[];
   index: number;
   itemUrlPath: "depositos" | "gastos-gerais";
@@ -23,7 +24,7 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
       <SubTitle2>{dayOfTheWeek.withFeira[props.index]}</SubTitle2>
       {
         props.itemInWeekDay.map((item: GastoGeral | Deposito) => {
-          const splitedDate = item.created_at.split("/");
+          const splitedDate = new Date(item.data_de_competencia).toLocaleDateString("pt-br").split("/");
           const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) - 1,  Number(splitedDate[0]));
           return (
             <>          
@@ -35,11 +36,11 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
                   <table className="gastos-gerais-popover-table">
                     <tr>
                       <td className="gastos-gerais-popover-table-label-cell">Banco:</td>
-                      <td className="gastos-gerais-popover-table-data-cell">{props.bancos[item.id_banco]}</td>
+                      <td className="gastos-gerais-popover-table-data-cell">{props.bancos[item.banco.id]}</td>
                     </tr>
                     <tr>
                       <td className="gastos-gerais-popover-table-label-cell">Categoria:</td>
-                      <td className="gastos-gerais-popover-table-data-cell">{props.categorias[item.id_categoria]}</td>
+                      <td className="gastos-gerais-popover-table-data-cell">{props.categorias[item.categoria.id]}</td>
                     </tr>
                     <tr>
                       <td className="gastos-gerais-popover-table-label-cell">Descrição:</td>
