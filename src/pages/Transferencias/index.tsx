@@ -13,6 +13,7 @@ import * as colors from "../../config/colors";
 import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { useAuth } from "../../services/useAuth";
 
 class getTransferencias {
 
@@ -21,26 +22,28 @@ class getTransferencias {
     const data = await res.data;
 
     const transferencias = data.map((transf: any) => {
-      if (tipoTransferenciaUrlPath === "/transferencias_entre_bancos") {
+      if (tipoTransferenciaUrlPath.includes("transferencias/entre-bancos")) {
         return {
           id: transf.id,
-          id_origem: transf.id_banco_origem,
-          id_destino: transf.id_banco_destino,
-          id_intermediario: transf.id_direcionamento,
-          valor: transf.valor,
-          descricao: transf.descricao,
           created_at: transf.created_at,
+          origem: transf.bancoOrigem,
+          destino: transf.bancoDestino,
+          intermediario: transf.categoria,
+          data_de_competencia: transf.data_de_competencia,
+          valor: transf.valor,
+          descricao: transf.descricao
         }
       }
 
       return {
         id: transf.id,
-        id_origem: transf.id_direcionamento_origem,
-        id_destino: transf.id_direcionamento_destino,
-        id_intermediario: transf.id_banco,
-        valor: transf.valor,
-        descricao: transf.descricao,
         created_at: transf.created_at,
+        origem: transf.categoriaOrigem,
+        destino: transf.categoriaDestino,
+        intermediario: transf.banco,
+        data_de_competencia: transf.data_de_competencia,
+        valor: transf.valor,
+        descricao: transf.descricao
       }
     })
 
@@ -48,7 +51,6 @@ class getTransferencias {
   }
 
   static async getTransferenciasByMonth(tipoTransferenciaUrlPath: string, date: Date): Promise<Transferencia[]> {
-    const res = await axios.get(tipoTransferenciaUrlPath);
 
     const filteredData =  getTransferencias.getTransferencias(tipoTransferenciaUrlPath).then((data: any) => {
       
@@ -56,7 +58,7 @@ class getTransferencias {
 
       const filteredData = data.filter( (transferencia: Transferencia) => {
 
-        const dateSplited = transferencia.created_at.split("/");
+        const dateSplited = new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br").split("/");
         const dataTransferencia = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataTransferencia.getMonth() === date.getMonth()) {
@@ -78,23 +80,20 @@ class getTransferencias {
 export default function Transferencias() {
   const [transferencias, setTransferencias]: [Transferencia[], any] = React.useState([]);
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(1);
-  const [transferenciasUrlPath, setTransferenciasUrlPath]: [string, any] = React.useState("/transferencias_entre_bancos");
   const [transferenciasByMonth, setTransferenciasByMonth]: [Transferencia[], any] = React.useState([]);
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
   const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
   const [categorias, setCategorias]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
+  const { user } = useAuth();
+  const [transferenciasUrlPath, setTransferenciasUrlPath]: [string, any] = React.useState("/transferencias/entre-bancos/" + user!.id);
 
 
   React.useEffect(() => {
-    getTransferencias.getTransferencias(transferenciasUrlPath).then((data) => {
+    async function getBancos() {
 
-      setTransferencias(data);
-
-    });
-    function getBancos() {
       const bancosNameById: { [key: number]: string }  = {};
 
-      axios.get("/bancos").then((response) => {
+      axios.get(`/bancos/usuario/${user!.id}`).then((response) => {
         const data: Banco[] = response.data;
 
         data.forEach((banco: Banco) => {
@@ -105,32 +104,37 @@ export default function Transferencias() {
       
     }
     getBancos();
+  }, [])
 
-    function getCategorias() {
+  React.useEffect(() => {
+    async function getCategorias() {
       const categoriasNameById: { [key: number]: string }  = {};
-
-      axios.get("/categorias").then((response) => {
+      axios.get(`/categorias/usuario/${user!.id}`).then((response) => {
         const data: Categoria[] = response.data
 
         data.forEach((categoria: Categoria) => {
           categoriasNameById[categoria.id] = categoria.nome;
         });
-
         setCategorias(categoriasNameById);
-
       });
+      
     }
     getCategorias();
+  }, [])
 
-    
+  React.useEffect(() => {
+    getTransferencias.getTransferencias(transferenciasUrlPath).then((data) => {
 
+      setTransferencias(data);
+
+    });
   }, [transferenciasUrlPath]);
 
   React.useEffect(() => {
     if (optionSelectedId === 1) {
-      setTransferenciasUrlPath("/transferencias_entre_bancos");
+      setTransferenciasUrlPath("/transferencias/entre-bancos/" + user!.id);
     } else {
-      setTransferenciasUrlPath("/transferencias_entre_categorias");
+      setTransferenciasUrlPath("/transferencias/entre-categorias/" + user!.id);
     }
   }, [optionSelectedId]);
 
@@ -140,10 +144,10 @@ export default function Transferencias() {
       const namedTransferencias = data.map((transferencia: Transferencia) => {
         return {
           id: transferencia.id,
-          created_at: transferencia.created_at,
-          origem: transferenciasUrlPath === "/transferencias_entre_bancos" ? bancos[transferencia.id_origem] : categorias[transferencia.id_origem],
-          destino: transferenciasUrlPath === "/transferencias_entre_bancos" ? bancos[transferencia.id_destino] : categorias[transferencia.id_destino],
-          intermediario: transferenciasUrlPath === "/transferencias_entre_categorias" ? bancos[transferencia.id_intermediario] : categorias[transferencia.id_intermediario],
+          created_at: new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br"),
+          origem: transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id ? bancos[transferencia.origem.id] : categorias[transferencia.origem.id],
+          destino: transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id ? bancos[transferencia.destino.id] : categorias[transferencia.destino.id],
+          intermediario: transferenciasUrlPath === "/transferencias/entre-categorias/" + user!.id ? bancos[transferencia.intermediario.id] : categorias[transferencia.intermediario.id],
           valor: transferencia.valor,
           opcoes: (
             <div style={{ display: "flex", gap:"1rem" }}>
