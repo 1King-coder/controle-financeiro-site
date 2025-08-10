@@ -31,8 +31,9 @@ export default function AddBancos() {
     //@ts-ignore
     const nomeBanco = inputNomeBanco?.value;
     
-    nomeBanco === "" ? toast.warn("Preencha o nome do banco") : axios.post("/bancos",{
-      nome_banco: nomeBanco
+    nomeBanco === "" ? toast.warn("Preencha o nome do banco") : axios.post("/bancos/novo",{
+      nome: nomeBanco,
+      id_user: user!.id
     }).then(async (response) => {
       console.log(response);
       if (response.status === 201) {
