@@ -87,11 +87,12 @@ export function Depositos(): JSX.Element {
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(2);
   const [depositosByActualWeekDay, setdepositosByActualWeekDay] = React.useState(Array<Deposito[]>([]));
   const [depositosByWeekDay, setdepositosByWeekDay] = React.useState(Array<Deposito[]>([]));
-  const [bancos, setBancos]: [any, any] = React.useState();
-  const [categorias, setCategorias]: [any, any] = React.useState();
+  const [bancos, setBancos]: [any, any] = React.useState([]);
+  const [categorias, setCategorias]: [any, any] = React.useState([]);
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(dayjs());
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
   const [depositosByMonth, setdepositosByMonth]: [Deposito[], any] = React.useState([]);
+  const [isLoding, setIsLoading]: [boolean, any] = React.useState(true);
   const {user} = useAuth();
 
   
@@ -110,10 +111,7 @@ export function Depositos(): JSX.Element {
       });
       
     }
-    getBancos();
-  }, [])
 
-  React.useEffect(() => {
     async function getCategorias() {
       const categoriasNameById: { [key: number]: string }  = {};
       axios.get(`/categorias/usuario/${user!.id}`).then((response) => {
@@ -123,18 +121,22 @@ export function Depositos(): JSX.Element {
           categoriasNameById[categoria.id] = categoria.nome;
         });
         setCategorias(categoriasNameById);
+
       });
       
     }
-    getCategorias();
-  }, [])
+
+    Promise.all([getBancos(), getCategorias()]).then((res) => {
+      setIsLoading(false)
+    })
+  }, [user])
 
   React.useEffect(() => { 
     GetDepositosFunctions.getDepositosFilterByMonthInterval(selectedMonthDate.toDate(), user!.id).then((data: Deposito[]) => {
       setdepositosByMonth(data);
 
     })
-  }, [selectedMonthDate])
+  }, [selectedMonthDate, user])
 
   React.useEffect(() => { 
     const semanaSelecionada = getSemanaAtual(startWeekDayDate.toDate());
@@ -153,7 +155,7 @@ export function Depositos(): JSX.Element {
       setdepositosByWeekDay(listdepositosByWeekDay);
 
     })
-  }, [startWeekDayDate])
+  }, [startWeekDayDate, user])
 
   React.useEffect(() => {
     
@@ -172,11 +174,11 @@ export function Depositos(): JSX.Element {
 
 
     });
-  }, []);
+  }, [user]);
 
 
 
-  return (
+  return isLoding ? (<div>Loading</div>) :(
     <div style={{
       display: "flex",
       flexDirection: "column",
@@ -201,7 +203,7 @@ export function Depositos(): JSX.Element {
       </TimeIntervalOptionsDiv>
 
       <div>
-        {
+        { 
           optionSelectedId === 1 ? (
             <div style={{marginTop: "2rem"}}>
 

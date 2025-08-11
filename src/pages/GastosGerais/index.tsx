@@ -88,11 +88,12 @@ export function GastosGerais(): JSX.Element {
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(2);
   const [gastosByActualWeekDay, setgastosByActualWeekDay] = React.useState(Array<GastoGeral[]>([]));
   const [gastosByWeekDay, setgastosByWeekDay] = React.useState(Array<GastoGeral[]>([]));
-  const [bancos, setBancos]: [any, any] = React.useState();
-  const [categorias, setCategorias]: [any, any] = React.useState();
+  const [bancos, setBancos]: [any, any] = React.useState([]);
+  const [categorias, setCategorias]: [any, any] = React.useState([]);
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(dayjs());
   const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
   const [gastosByMonth, setGastosByMonth]: [GastoGeral[], any] = React.useState([]);
+  const [isLoading, setIsLoading]: [boolean, any] = React.useState(true)
   const { user } = useAuth();
 
   
@@ -111,10 +112,7 @@ export function GastosGerais(): JSX.Element {
       });
       
     }
-    getBancos();
-  }, [])
 
-  React.useEffect(() => {
     async function getCategorias() {
       const categoriasNameById: { [key: number]: string }  = {};
       axios.get(`/categorias/usuario/${user!.id}`).then((response) => {
@@ -124,17 +122,22 @@ export function GastosGerais(): JSX.Element {
           categoriasNameById[categoria.id] = categoria.nome;
         });
         setCategorias(categoriasNameById);
+
       });
       
     }
-    getCategorias();
-  }, [])
+
+    Promise.all([getBancos(), getCategorias()]).then((res) => {
+      setIsLoading(false)
+    })
+  }, [user])
+
 
   React.useEffect(() => { 
     GetGastosGeraisDataFuncions.getGastosGeraisFilterByMonthInterval(selectedMonthDate.toDate(), user!.id).then((data: GastoGeral[]) => {
       setGastosByMonth(data);
     })
-  }, [selectedMonthDate])
+  }, [selectedMonthDate, user])
 
   React.useEffect(() => { 
     const semanaSelecionada = getSemanaAtual(startWeekDayDate.toDate());
@@ -154,7 +157,7 @@ export function GastosGerais(): JSX.Element {
       setgastosByWeekDay(listgastosByWeekDay);
 
     })
-  }, [startWeekDayDate])
+  }, [startWeekDayDate, user])
 
   React.useEffect(() => {
     
@@ -174,11 +177,11 @@ export function GastosGerais(): JSX.Element {
 
 
     });
-  }, []);
+  }, [user]);
 
 
 
-  return (
+  return isLoading ? (<div>Loading</div>) : (
     <div style={{
       display: "flex",
       flexDirection: "column",
@@ -203,7 +206,7 @@ export function GastosGerais(): JSX.Element {
       </TimeIntervalOptionsDiv>
 
       <div>
-        {
+        { 
           optionSelectedId === 1 ? (
             <div style={{marginTop: "2rem"}}>
 

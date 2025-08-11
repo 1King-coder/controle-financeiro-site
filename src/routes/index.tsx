@@ -10,6 +10,8 @@ import Transferencias from "../pages/Transferencias";
 import AddBancos from "../pages/AddBancos";
 import AddCategorias from "../pages/AddCategorias";
 import AddGastosGerais from "../pages/AddGastosGerais";
+import AddDeposito from "../pages/AddDeposito";
+import AddTransferencia from "../pages/AddTransferencia";
 import AddUsuario from "../pages/AddUsuario";
 import Login from "../pages/Login";
 import { ProtectedRoute } from "../components/AuthProvider";
@@ -61,6 +63,17 @@ export default function Routes(): JSX.Element {
         <Route exact path="/gastos-gerais/add" component={(props: any) => (
           <ProtectedRoute>
             <AddGastosGerais {...props} />
+          </ProtectedRoute>
+        )} />
+
+        <Route exact path="/depositos/add" component={(props: any) => (
+          <ProtectedRoute>
+            <AddDeposito {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/transferencias/add" component={(props: any) => (
+          <ProtectedRoute>
+            <AddTransferencia {...props} />
           </ProtectedRoute>
         )} />
 

@@ -8,55 +8,40 @@ import { Categoria } from "../../types/Categoria";
 import * as colors from "../../config/colors";
 import { toast } from "react-toastify";
 import { useAuth } from "../../services/useAuth";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
-export default function AddGastosGerais(): JSX.Element {
+export default function AddDeposito(): JSX.Element {
   const [bancos, setBancos]: [Banco[], any] = React.useState([]);
   const [categorias, setCategorias]: [Categoria[], any] = React.useState([]);
 
-  const [tipoGasto, setTipoGasto] = React.useState<"normal" | "periodico">("normal");
-
-  // Common fields
+  // Fields
   const [idBanco, setIdBanco] = React.useState<number | "">("");
   const [idCategoria, setIdCategoria] = React.useState<number | "">("");
   const [descricao, setDescricao] = React.useState<string>("");
   const [valor, setValor] = React.useState<string>("");
-
-  // Normal
   const [dataCompetencia, setDataCompetencia] = React.useState<string>("");
-
-  // Periódico
-  const [dataInicio, setDataInicio] = React.useState<string>("");
-  const [dataFim, setDataFim] = React.useState<string>("");
-  const [frequencia, setFrequencia] = React.useState<"diario" | "semanal" | "mensal" | "anual">("mensal");
 
   const { user } = useAuth();
 
-  type RecentGasto = {
+  type RecentDeposito = {
     id: number;
     data: string;
     banco: string;
     categoria: string;
     descricao: string;
     valor: number;
-    tipo: string;
   };
-  const [recentItems, setRecentItems] = React.useState<RecentGasto[]>([]);
+  const [recentItems, setRecentItems] = React.useState<RecentDeposito[]>([]);
 
-  type PendingGasto = {
-    id: number; // temp id for DataGrid
-    tipo: "normal" | "periodico";
+  type PendingDeposito = {
+    id: number; // temp id for list
     id_banco: number | "";
     id_categoria: number | "";
     descricao: string;
     valor: number | "";
-    data_de_competencia?: string; // YYYY-MM-DD
-    data_ultimo_pagamento?: string; // YYYY-MM-DD (periódico)
-    data_fim?: string | null; // optional
-    frequencia?: "diario" | "semanal" | "mensal" | "anual";
+    data_de_competencia: string; // YYYY-MM-DD
   };
 
-  const [pendingItems, setPendingItems] = React.useState<PendingGasto[]>([]);
+  const [pendingItems, setPendingItems] = React.useState<PendingDeposito[]>([]);
   const [nextRowId, setNextRowId] = React.useState<number>(1);
 
   React.useEffect(() => {
@@ -80,23 +65,24 @@ export default function AddGastosGerais(): JSX.Element {
     try {
       const sinceDate = new Date();
       sinceDate.setDate(sinceDate.getDate() - 2);
-      const res = await axios.get(`/gastos/usuario/${user!.id}`);
-      const data = res.data as any[];
-      const lastTwoDays = data.filter((g: any) => new Date(g.created_at) >= sinceDate);
 
-      const mapped: RecentGasto[] = lastTwoDays.map((g: any) => {
-        const bancoNome = g.banco?.nome ?? bancos.find((b) => b.id === (g.banco?.id || g.id_banco || g.banco_id))?.nome ?? "";
-        const categoriaNome = g.categoria?.nome ?? categorias.find((c) => c.id === (g.categoria?.id || g.id_categoria || g.categoria_id))?.nome ?? "";
+      const res = await axios.get(`/depositos/usuario/${user!.id}`);
+      const data = res.data as any[];
+      const recent = data.filter((d: any) => new Date(d.created_at) >= sinceDate);
+
+      const mapped: RecentDeposito[] = recent.map((d: any) => {
+        const bancoNome = d.banco?.nome ?? bancos.find((b) => b.id === (d.banco?.id || d.id_banco || d.banco_id))?.nome ?? "";
+        const categoriaNome = d.categoria?.nome ?? categorias.find((c) => c.id === (d.categoria?.id || d.id_categoria || d.categoria_id))?.nome ?? "";
         return {
-          id: g.id,
-          data: new Date(g.data_de_competencia ?? g.created_at).toLocaleDateString("pt-BR"),
+          id: d.id,
+          data: new Date(d.data_de_competencia).toLocaleDateString("pt-BR"),
           banco: bancoNome,
           categoria: categoriaNome,
-          descricao: g.descricao || "",
-          valor: Number(g.valor) || 0,
-          tipo: g.tipo || g.tipo_gasto || "",
+          descricao: d.descricao || "",
+          valor: Number(d.valor) || 0,
         };
       });
+
       setRecentItems(mapped);
     } catch (error) {
       // silent
@@ -109,12 +95,8 @@ export default function AddGastosGerais(): JSX.Element {
     setDescricao("");
     setValor("");
     setDataCompetencia("");
-    setDataInicio("");
-    setDataFim("");
-    setTipoGasto("normal");
   }
 
-  // Add current form entry to the editable list
   function handleAddToList(e: React.FormEvent) {
     e.preventDefault();
 
@@ -123,70 +105,51 @@ export default function AddGastosGerais(): JSX.Element {
     if (!descricao) return toast.warn("Preencha a descrição");
     const valorNumber = Number(valor);
     if (!valor || isNaN(valorNumber) || valorNumber <= 0) return toast.warn("Informe um valor válido");
+    if (!dataCompetencia) return toast.warn("Informe a data de competência");
 
-    if (tipoGasto === "normal" && !dataCompetencia) return toast.warn("Informe a data de competência");
-    if (tipoGasto === "periodico" && !dataInicio) return toast.warn("Informe a data de início");
-
-    const newItem: PendingGasto = {
+    const newItem: PendingDeposito = {
       id: nextRowId,
-      tipo: tipoGasto,
       id_banco: idBanco,
       id_categoria: idCategoria,
       descricao,
       valor: valorNumber,
-      data_de_competencia: tipoGasto === "normal" ? dataCompetencia : undefined,
-      data_ultimo_pagamento: tipoGasto === "periodico" ? dataInicio : undefined,
-      data_fim: tipoGasto === "periodico" ? (dataFim || null) : undefined,
-      frequencia: tipoGasto === "periodico" ? frequencia : undefined,
+      data_de_competencia: dataCompetencia,
     };
 
     setPendingItems((prev) => [...prev, newItem]);
     setNextRowId((id) => id + 1);
   }
 
-  // Save all items in the list to the backend
   async function handleSaveAll() {
     if (pendingItems.length === 0) return toast.info("Adicione itens à lista antes de salvar");
     try {
-      const payload = pendingItems.map(
-        (gasto: PendingGasto) => {
-          return {
-            id_usuario: user!.id,
-            id_banco: gasto.id_banco,
-            id_categoria: gasto.id_categoria,
-            valor: gasto.valor,
-            descricao: gasto.descricao,
-            data_de_competencia: gasto.data_de_competencia,
-            tipo: gasto.tipo
-          }
-        }
-      )
-      const res = await axios.post("/gastos/novo/lista", payload);
-
+      const payload = pendingItems.map((item) => ({
+        id_usuario: user!.id,
+        id_banco: item.id_banco,
+        id_categoria: item.id_categoria,
+        valor: item.valor,
+        descricao: item.descricao,
+        data_de_competencia: item.data_de_competencia,
+      }));
+      const res = await axios.post("/depositos/novo/lista", payload);
       if (res.status === 201) {
         resetForm();
-        setPendingItems([])
+        setPendingItems([]);
+        toast.success("Lista de depósitos enviada");
         fetchRecent();
       }
-    } catch (err) {
-      toast.error("Erro inesperado ao salvar a lista");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || "Erro inesperado ao salvar a lista");
     }
   }
 
   return (
     <GeneralBox>
-      <Title>Adicionar Gastos Gerais</Title>
+      <Title>Adicionar Depósitos</Title>
       <TwoColumns>
         <FormColumn>
           <form onSubmit={handleAddToList}>
             <FormRow>
-              <InputBox>
-                <Label htmlFor="tipo-gasto" value="Tipo de gasto" />
-                <Select id="tipo-gasto" value={tipoGasto} onChange={(e) => setTipoGasto(e.target.value as any)}>
-                  <option value="normal">Normal</option>
-                  <option value="periodico">Periódico</option>
-                </Select>
-              </InputBox>
               <InputBox>
                 <Label htmlFor="banco" value="Banco" />
                 <Select id="banco" value={idBanco} onChange={(e) => setIdBanco(Number(e.target.value))}>
@@ -205,46 +168,22 @@ export default function AddGastosGerais(): JSX.Element {
                   ))}
                 </Select>
               </InputBox>
+              <InputBox>
+                <Label htmlFor="descricao" value="Descrição" />
+                <TextInput id="descricao" placeholder="Ex: salário" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+              </InputBox>
             </FormRow>
 
             <FormRow>
               <InputBox>
-                <Label htmlFor="descricao" value="Descrição" />
-                <TextInput id="descricao" placeholder="Ex: cafezinho" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
-              </InputBox>
-              <InputBox>
                 <Label htmlFor="valor" value="Valor (R$)" />
                 <TextInput id="valor" type="number" step="0.01" min="0" placeholder="0,00" value={valor} onChange={(e) => setValor(e.target.value)} />
               </InputBox>
-              {tipoGasto === "normal" && (
-                <InputBox>
-                  <Label htmlFor="data-competencia" value="Data de competência" />
-                  <TextInput id="data-competencia" type="date" value={dataCompetencia} onChange={(e) => setDataCompetencia(e.target.value)} />
-                </InputBox>
-              )}
+              <InputBox>
+                <Label htmlFor="data-competencia" value="Data de competência" />
+                <TextInput id="data-competencia" type="date" value={dataCompetencia} onChange={(e) => setDataCompetencia(e.target.value)} />
+              </InputBox>
             </FormRow>
-
-            {tipoGasto === "periodico" && (
-              <FormRow>
-                <InputBox>
-                  <Label htmlFor="data-inicio" value="Início" />
-                  <TextInput id="data-inicio" type="date" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} />
-                </InputBox>
-                <InputBox>
-                  <Label htmlFor="data-fim" value="Fim (opcional)" />
-                  <TextInput id="data-fim" type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} />
-                </InputBox>
-                <InputBox>
-                  <Label htmlFor="frequencia" value="Frequência" />
-                  <Select id="frequencia" value={frequencia} onChange={(e) => setFrequencia(e.target.value as any)}>
-                    <option value="diario">Diário</option>
-                    <option value="semanal">Semanal</option>
-                    <option value="mensal">Mensal</option>
-                    <option value="anual">Anual</option>
-                  </Select>
-                </InputBox>
-              </FormRow>
-            )}
 
             <FormRow>
               <InputBox>
@@ -256,48 +195,29 @@ export default function AddGastosGerais(): JSX.Element {
               <InputBox>
                 <Button color="purple" onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
                   e.preventDefault();
-                  // send only current input as one gasto
                   if (!idBanco) return toast.warn("Selecione um banco");
                   if (!idCategoria) return toast.warn("Selecione uma categoria");
                   if (!descricao) return toast.warn("Preencha a descrição");
                   const valorNumber = Number(valor);
                   if (!valor || isNaN(valorNumber) || valorNumber <= 0) return toast.warn("Informe um valor válido");
+                  if (!dataCompetencia) return toast.warn("Informe a data de competência");
+
                   try {
-                    if (tipoGasto === "normal") {
-                      if (!dataCompetencia) return toast.warn("Informe a data de competência");
-                      const payload = {
-                        id_usuario: user!.id,
-                        id_banco: idBanco,
-                        id_categoria: idCategoria,
-                        descricao,
-                        valor: valorNumber,
-                        data_de_competencia: dataCompetencia,
-                        tipo: "normal",
-                      };
-                      const res = await axios.post("/gastos/novo", payload);
-                      if (res.status === 201 || res.status === 200) {
-                        toast.success("Gasto enviado");
-                        fetchRecent();
-                      }
-                    } else {
-                      if (!dataInicio) return toast.warn("Informe a data de início");
-                      const payload = {
-                        id_usuario: user!.id,
-                        id_banco: idBanco,
-                        id_categoria: idCategoria,
-                        descricao,
-                        valor: valorNumber,
-                        data_ultimo_pagamento: dataInicio,
-                        tipo: "periodico",
-                      };
-                      const res = await axios.post("/gastos/novo", payload);
-                      if (res.status === 201 || res.status === 200) {
-                        toast.success("Gasto periódico enviado");
-                        fetchRecent();
-                      }
+                    const payload = {
+                      id_usuario: user!.id,
+                      id_banco: idBanco,
+                      id_categoria: idCategoria,
+                      descricao,
+                      valor: valorNumber,
+                      data_de_competencia: dataCompetencia,
+                    };
+                    const res = await axios.post("/depositos/novo", payload);
+                    if (res.status === 201 || res.status === 200) {
+                      toast.success("Depósito enviado");
+                      fetchRecent();
                     }
                   } catch (error: any) {
-                    toast.error(error?.response?.data?.detail || "Erro ao enviar gasto");
+                    toast.error(error?.response?.data?.detail || "Erro ao enviar depósito");
                   }
                 }}><span>Enviar somente este</span></Button>
               </InputBox>
@@ -305,9 +225,8 @@ export default function AddGastosGerais(): JSX.Element {
           </form>
         </FormColumn>
 
-        {/* Right side simple list */}
         <ListColumn>
-          <h3 style={{ color: colors.secondaryColor, marginBottom: 10 }}>Gastos na lista</h3>
+          <h3 style={{ color: colors.secondaryColor, marginBottom: 10 }}>Depósitos na lista</h3>
           <div style={{ maxHeight: 480, overflowY: "auto" }}>
             {pendingItems.length === 0 ? (
               <p style={{ color: "#333" }}>Nenhum item na lista</p>
@@ -348,13 +267,12 @@ export default function AddGastosGerais(): JSX.Element {
         <h3 style={{ fontWeight: "bold", marginBottom: 10 }}>Histórico (últimos 2 dias)</h3>
         <div style={{ maxHeight: 400, overflowY: "auto" }}>
           {recentItems.length === 0 ? (
-            <p style={{ color: "#333" }}>Nenhum gasto recente</p>
+            <p style={{ color: "#333" }}>Nenhum depósito recente</p>
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
                   <th style={{ textAlign: "left", padding: 8 }}>Data</th>
-                  <th style={{ textAlign: "left", padding: 8 }}>Tipo</th>
                   <th style={{ textAlign: "left", padding: 8 }}>Banco</th>
                   <th style={{ textAlign: "left", padding: 8 }}>Categoria</th>
                   <th style={{ textAlign: "left", padding: 8 }}>Descrição</th>
@@ -365,7 +283,6 @@ export default function AddGastosGerais(): JSX.Element {
                 {recentItems.map((item) => (
                   <tr key={item.id} style={{ background: "#fff" }}>
                     <td style={{ padding: 8 }}>{item.data}</td>
-                    <td style={{ padding: 8 }}>{item.tipo}</td>
                     <td style={{ padding: 8 }}>{item.banco}</td>
                     <td style={{ padding: 8 }}>{item.categoria}</td>
                     <td style={{ padding: 8 }}>{item.descricao}</td>
