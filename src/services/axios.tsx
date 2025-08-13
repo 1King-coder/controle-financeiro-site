@@ -1,4 +1,7 @@
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // CSRF token cache to avoid multiple API calls
 let csrfTokenCache: string | null = null;
@@ -16,8 +19,11 @@ const getCSRFTokenFromCookie = (): string | null => {
 // Function to get CSRF token from API
 const getCSRFTokenFromAPI = async (): Promise<string | null> => {
   try {
-    const res = await axios.get('http://localhost:3333/csrf-token', {
-      withCredentials: true
+    const res = await axios.get('https://api-ctrl-fin.vsbdev.com.br/csrf-token', {
+      withCredentials: true,
+      headers: {
+        "Auth": process.env.AUTH_CODE
+      }
     });
     return res.data.csrfToken;
   } catch (error) {
@@ -51,10 +57,11 @@ export const refreshCSRFToken = async (): Promise<string | null> => {
 
 // Create axios instance
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3333',
+  baseURL: 'https://api-ctrl-fin.vsbdev.com.br',
   headers: {
     'Content-type': 'application/json',
     'Access-Control-Allow-Origin': '*',
+    'auth': process.env.AUTH_CODE
   },
   withCredentials: true, // This is important for CSRF cookies
 });

@@ -28,7 +28,7 @@ export default function AddCategorias() {
     //@ts-ignore
     const nomeCategoria = inputNomeCategoria?.value;
 
-    nomeCategoria === "" ? toast.warn("Preencha o nome da categoria") : axios.post("/categorias", {
+    nomeCategoria === "" ? toast.warn("Preencha o nome da categoria") : axios.post("/categorias/novo", {
       nome_categoria: nomeCategoria
     }).then(async (response) => {
       console.log(response);
