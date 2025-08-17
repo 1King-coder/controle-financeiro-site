@@ -7,14 +7,16 @@ import { Categoria } from "../../types/Categoria";
 import { DataGrid } from "@mui/x-data-grid";
 import * as colors from "../../config/colors";
 import { toast } from "react-toastify";
+import { useAuth } from "../../services/useAuth";
 
 export default function AddCategorias() {
   const [categorias, setCategorias]: [Categoria[], any] = React.useState([]);
+  const {user} = useAuth();
 
   React.useEffect(() => {
     async function getCategorias() {
 
-      axios.get("/categorias").then((response) => {
+      axios.get("/categorias/usuario/" + user!.id).then((response) => {
         
         setCategorias(response.data);
       });
@@ -29,7 +31,8 @@ export default function AddCategorias() {
     const nomeCategoria = inputNomeCategoria?.value;
 
     nomeCategoria === "" ? toast.warn("Preencha o nome da categoria") : axios.post("/categorias/novo", {
-      nome_categoria: nomeCategoria
+      nome: nomeCategoria,
+      id_user: user!.id
     }).then(async (response) => {
       console.log(response);
       if (response.status === 201) {

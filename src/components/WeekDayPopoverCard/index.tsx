@@ -24,7 +24,7 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
       <SubTitle2>{dayOfTheWeek.withFeira[props.index]}</SubTitle2>
       {
         props.itemInWeekDay.map((item: GastoGeral | Deposito) => {
-          const splitedDate = new Date(item.data_de_competencia).toLocaleDateString("pt-br").split("/");
+          const splitedDate = new Date(item.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
           const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) - 1,  Number(splitedDate[0]));
           return (
             <>          

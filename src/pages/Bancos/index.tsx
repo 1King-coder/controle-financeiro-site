@@ -187,11 +187,10 @@ export default function Bancos(): JSX.Element {
               textAlign: "center"
             }
           }
-        >{`R$ ${bancos.reduce((acc, banco) => {
+        >{`R$ ${Math.round((bancos.reduce((acc, banco) => {
           return acc + Math.abs(banco.saldo)
-        }, 0)
-          
-          }`}</p>
+          }, 0))*1e2)/1e2
+        }`}</p>
       </FullLineCard>
       
 

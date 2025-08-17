@@ -190,9 +190,9 @@ export default function Categorias(): JSX.Element {
               textAlign: "center"
             }
           }
-        >{`R$ ${categorias.reduce((acc, categoria) => {
+        >{`R$ ${Math.round(categorias.reduce((acc, categoria) => {
           return acc + Math.abs(categoria.saldo)
-        }, 0)
+        }, 0)*1e2)/1e2
           
           }`}</p>
       </FullLineCard>
