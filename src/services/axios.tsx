@@ -59,7 +59,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'auth': process.env.AUTH_CODE
+    'auth': process.env.REACT_APP_AUTH_CODE
   },
   withCredentials: true, // This is important for CSRF cookies
 });
