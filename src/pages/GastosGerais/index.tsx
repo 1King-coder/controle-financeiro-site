@@ -30,7 +30,7 @@ class GetGastosGeraisDataFuncions {
       
       const filteredData = data.filter( (gastoGeral: GastoGeral) => {
         // @ts-ignore
-        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataGasto >= dateStart && dataGasto <= dateEnd) {
@@ -51,7 +51,7 @@ class GetGastosGeraisDataFuncions {
       
       const filteredData = data.filter( (gastoGeral: GastoGeral) => {
         // @ts-ignore
-        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataGasto.getMonth() === date.getMonth()) {
@@ -149,7 +149,7 @@ export function GastosGerais(): JSX.Element {
       const listgastosByWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
       data.forEach((gastoGeral: GastoGeral) => {
         // @ts-ignore
-        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listgastosByWeekDay[dataGasto.getDay()].push(gastoGeral);
@@ -168,7 +168,7 @@ export function GastosGerais(): JSX.Element {
       const listgastosByActualWeekDay: Array<GastoGeral[]> = [[], [], [], [], [], [], []];
       data.forEach((gastoGeral: GastoGeral) => {
         // @ts-ignore
-        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+        const dateSplited = new Date(gastoGeral.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listgastosByActualWeekDay[dataGasto.getDay()].push(gastoGeral);
@@ -210,7 +210,7 @@ export function GastosGerais(): JSX.Element {
           optionSelectedId === 1 ? (
             <div style={{marginTop: "2rem"}}>
 
-              <SubTitle1>Semana Atual: {getSemanaAtual(new Date())[0].toLocaleDateString("pt-br", {timeZone: "GMT-3"})} - {getSemanaAtual(new Date())[1].toLocaleDateString("pt-br", {timeZone: "GMT-3"})} </SubTitle1>
+              <SubTitle1>Semana Atual: {getSemanaAtual(new Date())[0].toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})} - {getSemanaAtual(new Date())[1].toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})} </SubTitle1>
               <div style={{display:"flow", width: "100%", height: "100%", justifyContent: "center"}}>
                 {
                   gastosByActualWeekDay.map((gastosInWeekDay: GastoGeral[], index: number) => {
@@ -220,7 +220,7 @@ export function GastosGerais(): JSX.Element {
                   })
                 }
               </div>
-              <SubTitle1>Semana Selecionada: {getSemanaAtual(startWeekDayDate.toDate())[0].toLocaleDateString("pt-br", {timeZone: "GMT-3"})} - {getSemanaAtual(startWeekDayDate.toDate())[1].toLocaleDateString("pt-br", {timeZone: "GMT-3"})} </SubTitle1>
+              <SubTitle1>Semana Selecionada: {getSemanaAtual(startWeekDayDate.toDate())[0].toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})} - {getSemanaAtual(startWeekDayDate.toDate())[1].toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})} </SubTitle1>
               <div style={{display:"flex", width: "100%", height: "100%", justifyContent: "center"}}>
                 <div style={{marginRight: "2rem"}}>
                   <WeekPicker value={startWeekDayDate} onChange={(newValue:any) => setStartWeekDayDate(newValue)}/>

@@ -29,7 +29,7 @@ class GetDepositosFunctions {
       
       const filteredData = data.filter( (deposito: Deposito) => {
 
-        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataDeposito = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataDeposito >= dateStart && dataDeposito <= dateEnd) {
@@ -50,7 +50,7 @@ class GetDepositosFunctions {
       
       const filteredData = data.filter( (deposito: Deposito) => {
 
-        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataDeposito = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataDeposito.getMonth() === date.getMonth()) {
@@ -147,7 +147,7 @@ export function Depositos(): JSX.Element {
       setDepositos(data);
       const listdepositosByWeekDay: Array<Deposito[]> = [[], [], [], [], [], [], []];
       data.forEach((deposito: Deposito) => {
-        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listdepositosByWeekDay[dataGasto.getDay()].push(deposito);
@@ -165,7 +165,7 @@ export function Depositos(): JSX.Element {
       setDepositos(data);
       const listdepositosByActualWeekDay: Array<Deposito[]> = [[], [], [], [], [], [], []];
       data.forEach((deposito: Deposito) => {
-        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+        const dateSplited = new Date(deposito.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataGasto = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
         
         listdepositosByActualWeekDay[dataGasto.getDay()].push(deposito);
@@ -207,7 +207,7 @@ export function Depositos(): JSX.Element {
           optionSelectedId === 1 ? (
             <div style={{marginTop: "2rem"}}>
 
-              <SubTitle1>Semana Atual: {getSemanaAtual(new Date())[0].toLocaleDateString("pt-br", {timeZone: "GMT-3"})} - {getSemanaAtual(new Date())[1].toLocaleDateString("pt-br", {timeZone: "GMT-3"})} </SubTitle1>
+              <SubTitle1>Semana Atual: {getSemanaAtual(new Date())[0].toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})} - {getSemanaAtual(new Date())[1].toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})} </SubTitle1>
               <div style={{display:"flow", width: "100%", height: "100%", justifyContent: "center"}}>
                 {
                   depositosByActualWeekDay.map((depositosInWeekDay: Deposito[], index: number) => {
@@ -217,7 +217,7 @@ export function Depositos(): JSX.Element {
                   })
                 }
               </div>
-              <SubTitle1>Semana Selecionada: {getSemanaAtual(startWeekDayDate.toDate())[0].toLocaleDateString("pt-br", {timeZone: "GMT-3"})} - {getSemanaAtual(startWeekDayDate.toDate())[1].toLocaleDateString("pt-br", {timeZone: "GMT-3"})} </SubTitle1>
+              <SubTitle1>Semana Selecionada: {getSemanaAtual(startWeekDayDate.toDate())[0].toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})} - {getSemanaAtual(startWeekDayDate.toDate())[1].toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})} </SubTitle1>
               <div style={{display:"flex", width: "100%", height: "100%", justifyContent: "center"}}>
                 <div style={{marginRight: "2rem"}}>
                   <WeekPicker value={startWeekDayDate} onChange={(newValue:any) => setStartWeekDayDate(newValue)}/>

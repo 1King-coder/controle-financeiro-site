@@ -58,7 +58,7 @@ class getTransferencias {
 
       const filteredData = data.filter( (transferencia: Transferencia) => {
 
-        const dateSplited = new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br").split("/");
+        const dateSplited = new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
         const dataTransferencia = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
   
         if (dataTransferencia.getMonth() === date.getMonth()) {
@@ -144,7 +144,7 @@ export default function Transferencias() {
       const namedTransferencias = data.map((transferencia: Transferencia) => {
         return {
           id: transferencia.id,
-          created_at: new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br"),
+          created_at: new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}),
           origem: transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id ? bancos[transferencia.origem.id] : categorias[transferencia.origem.id],
           destino: transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id ? bancos[transferencia.destino.id] : categorias[transferencia.destino.id],
           intermediario: transferenciasUrlPath === "/transferencias/entre-categorias/" + user!.id ? bancos[transferencia.intermediario.id] : categorias[transferencia.intermediario.id],

@@ -19,12 +19,15 @@ type Props = {
 }
 
 export function WeekDayPopoverCard(props: Props): JSX.Element {
+  const total: number = (props.itemInWeekDay.map((item: GastoGeral | Deposito) => item.valor)).reduce((acc: number, i: number) => acc + i, 0)
+  
   return (
     <WeekDayGastosDiv key={props.index}>
       <SubTitle2>{dayOfTheWeek.withFeira[props.index]}</SubTitle2>
+      <SubTitle2>Total: R${Math.round(total*1e2)/1e2}</SubTitle2>
       {
         props.itemInWeekDay.map((item: GastoGeral | Deposito) => {
-          const splitedDate = new Date(item.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "GMT-3"}).split("/");
+          const splitedDate = new Date(item.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
           const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) - 1,  Number(splitedDate[0]));
           return (
             <>          

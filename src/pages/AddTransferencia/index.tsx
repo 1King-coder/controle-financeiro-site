@@ -86,7 +86,7 @@ export default function AddTransferencia(): JSX.Element {
           const intermediario = t.categoria?.nome ?? categorias.find(c => c.id === (t.id_categoria || t.categoria_id))?.nome ?? "";
           return {
             id: t.id,
-            data: new Date(t.data_de_competencia).toLocaleDateString("pt-BR", {timeZone: "GMT-3"}),
+            data: new Date(t.data_de_competencia).toLocaleDateString("pt-BR", {timeZone: "America/Sao_Paulo"}),
             origem,
             destino,
             intermediario,
@@ -99,7 +99,7 @@ export default function AddTransferencia(): JSX.Element {
           const intermediario = t.banco?.nome ?? bancos.find(b => b.id === (t.id_banco || t.banco_id))?.nome ?? "";
           return {
             id: t.id,
-            data: new Date(t.data_de_competencia).toLocaleDateString("pt-BR", {timeZone: "GMT-3"}),
+            data: new Date(t.data_de_competencia).toLocaleDateString("pt-BR", {timeZone: "America/Sao_Paulo"}),
             origem,
             destino,
             intermediario,

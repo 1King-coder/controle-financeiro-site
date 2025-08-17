@@ -89,7 +89,7 @@ export default function AddGastosGerais(): JSX.Element {
         const categoriaNome = g.categoria?.nome ?? categorias.find((c) => c.id === (g.categoria?.id || g.id_categoria || g.categoria_id))?.nome ?? "";
         return {
           id: g.id,
-          data: new Date(g.data_de_competencia ?? g.created_at).toLocaleDateString("pt-BR", {timeZone: "GMT-3"}),
+          data: new Date(g.data_de_competencia ?? g.created_at).toLocaleDateString("pt-BR", {timeZone: "America/Sao_Paulo"}),
           banco: bancoNome,
           categoria: categoriaNome,
           descricao: g.descricao || "",

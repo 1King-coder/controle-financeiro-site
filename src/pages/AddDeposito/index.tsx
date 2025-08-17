@@ -75,7 +75,7 @@ export default function AddDeposito(): JSX.Element {
         const categoriaNome = d.categoria?.nome ?? categorias.find((c) => c.id === (d.categoria?.id || d.id_categoria || d.categoria_id))?.nome ?? "";
         return {
           id: d.id,
-          data: new Date(d.data_de_competencia).toLocaleDateString("pt-BR", {timeZone:"GMT-3"}),
+          data: new Date(d.data_de_competencia).toLocaleDateString("pt-BR", {timeZone:"America/Sao_Paulo"}),
           banco: bancoNome,
           categoria: categoriaNome,
           descricao: d.descricao || "",

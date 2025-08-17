@@ -36,6 +36,18 @@ export const SubTitle2 = styled.h3`
   margin-top: 0.1rem;
 `
 
+export const SubTitle3 = styled.h4`
+  color: ${colors.secondaryColor};
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+  background-color: ${colors.primaryColor};
+  padding: 5px;
+  width: 100%;
+  margin-top: 0.1rem;
+`
+
 export const WeekDayGastosDiv = styled.div`
   display: inline-block;  
   width: 10rem;
