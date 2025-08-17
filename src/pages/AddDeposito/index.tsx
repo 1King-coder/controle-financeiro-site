@@ -257,6 +257,14 @@ export default function AddDeposito(): JSX.Element {
                       </tr>
                     )
                   })}
+                  <tr  style={{ background: "#fff" }}>
+                    <td style={{ padding: 8 }}></td>
+                    <td style={{ padding: 8 }}></td>
+                    <td style={{ padding: 8 }}>Total:</td>
+
+                    <td style={{ padding: 8, textAlign: "right" }}>R$ {pendingItems.map(item => Number(item.valor)).reduce((acc: number, currentVal: number) => acc + currentVal, 0).toFixed(2)}</td>
+                    <td></td>
+                  </tr>
                 </tbody>
               </table>
             )}
@@ -289,6 +297,14 @@ export default function AddDeposito(): JSX.Element {
                     <td style={{ padding: 8, textAlign: "right" }}>R$ {item.valor.toFixed(2)}</td>
                   </tr>
                 ))}
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>Total:</td>
+                  <td style={{ padding: 8, textAlign: "right" }}>R$ {recentItems.map(item => item.valor).reduce((acc, currentVal) => acc + currentVal, 0).toFixed(2)}</td>
+                </tr>
               </tbody>
             </table>
           )}
