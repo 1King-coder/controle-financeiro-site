@@ -7,6 +7,7 @@ import axios from "../../services/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../services/useAuth";
 import history from "../../services/history";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const { user, setUser } = useAuth()
@@ -70,11 +71,12 @@ export default function Login() {
           loggedUser
         )
 
-        history.replace("/home")
+        history.replace("/")
       } 
     }).catch((error) => {
-      if (error.response?.data?.detail) {
-        toast.error(error.response.data.detail);
+      
+      if (error.status === 403) {
+        toast.warning(error.response.data.message)
       } else {
         toast.error("Erro ao fazer login");
       }
@@ -101,8 +103,12 @@ export default function Login() {
             <TextInput id="senha" type="password" placeholder="Senha"/>
           </InputBox>
           <InputBox>
-            <Button onClick={handleLogin}><span>Adicionar</span></Button>
+            <Button onClick={handleLogin}><span>Entrar</span></Button>
           </InputBox>
+          <span>Não possui conta? Cadastre-se </span>
+          <Link to='/cadastro' style={{color: "blue", textDecoration: "underline"}}>
+          aqui
+          </Link>
         </form>
         
       </div>

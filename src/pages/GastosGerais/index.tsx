@@ -256,7 +256,7 @@ export function GastosGerais(): JSX.Element {
                               id_categoria: categorias[gasto.categoria.id],
                               descricao: gasto.descricao,
                               valor: gasto.valor,
-                              created_at: gasto.created_at
+                              data_de_competencia: gasto.data_de_competencia
                           }
                       })
 
@@ -266,7 +266,7 @@ export function GastosGerais(): JSX.Element {
                         { field: 'id_categoria', headerName: 'Categoria', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'descricao', headerName: 'Descrição', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'valor', headerName: 'Valor', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center', type: 'number', valueFormatter: (value: number) => `R$ ${value.toFixed(2)}` },
-                        { field: 'created_at', headerName: 'Data', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'data_de_competencia', headerName: 'Data', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                       ]
                       type PieChartData = {
                         id:number;

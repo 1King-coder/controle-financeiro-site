@@ -9,10 +9,11 @@ import * as colors from "../../config/colors";
 import { toast } from "react-toastify";
 import { useAuth } from "../../services/useAuth";
 import history from "../../services/history";
+import { Link } from "react-router-dom";
 
 export default function AddUsuario() {
 
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
   function handleRegister() {
     const inputNome = document.getElementById("nome") as HTMLInputElement;
@@ -70,6 +71,7 @@ export default function AddUsuario() {
         inputEmail.value = "";
 
       } 
+      return response.data;
     }).catch((error) => {
       console.log(error)
       if (error.response?.data?.detail) {
@@ -77,6 +79,19 @@ export default function AddUsuario() {
       } else {
         toast.error("Erro ao adicionar usuário");
       }
+    }).then((resUser) => {
+      
+      const loggedUser = {
+        id: resUser.id,
+        username: resUser.username,
+        email: resUser.email,
+        isAuthenticated: true
+      }
+      setUser(
+        loggedUser
+      )
+      console.log(loggedUser)
+      history.replace("/")
     });
   }
   
@@ -117,8 +132,12 @@ export default function AddUsuario() {
             <TextInput id="senha" type="password" placeholder="Senha (mín. 8 caracteres)"/>
           </InputBox>
           <InputBox>
-            <Button onClick={handleRegister}><span>Adicionar</span></Button>
+            <Button onClick={handleRegister}><span>Registrar</span></Button>
           </InputBox>
+          <span>Já possui uma conta? Entre </span>
+          <Link to='/login' style={{color: "blue", textDecoration: "underline"}}>
+          aqui
+          </Link>
         </form>
         
       </div>
