@@ -4,6 +4,7 @@ import { primaryColor, successColor, secondaryColor} from "../../config/colors";
 export const Nav = styled.nav`
   background: ${primaryColor};
   display: flex;
+  flex-wrap: wrap;
   padding: 20px;
   align-items: center;
   justify-content: center;
@@ -30,6 +31,17 @@ export const BoxSide = styled.div`
   justify-content: center;
   position: absolute;
   right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0 10px;
+`
+
+export const BoxSideRight = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
   margin: 0 10px;

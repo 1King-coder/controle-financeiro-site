@@ -51,7 +51,7 @@ export const InputBox = styled.div`
     transition: all 0.5s;
     box-shadow: 0 5px 10px ${colors.primaryColor};
 
-    width: 100%;
+    width: 50%;
 
     span {
       cursor: pointer;

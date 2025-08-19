@@ -4,9 +4,9 @@ import { CiAlignLeft } from "react-icons/ci";
 import { GrDirections } from "react-icons/gr";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { GiMoneyStack } from "react-icons/gi";
-import { BsBank2 } from "react-icons/bs";
+import { BsArrowReturnLeft, BsBank2 } from "react-icons/bs";
 import { BiTransfer } from "react-icons/bi";
-import { Nav, Box, BoxSide, UsernameP, HoverEffect } from "./styled";
+import { Nav, Box, BoxSide, UsernameP, HoverEffect, BoxSideRight } from "./styled";
 import { Link } from "react-router-dom";
 import * as colors from "../../config/colors";
 import { IoPersonCircle } from "react-icons/io5";
@@ -15,6 +15,7 @@ import { useAuth } from "../../services/useAuth";
 import { toast } from "react-toastify";
 import history from "../../services/history";
 import { relative } from "path";
+import { Button } from "flowbite-react";
 
 export default function Header(): JSX.Element {
 
@@ -71,13 +72,19 @@ export default function Header(): JSX.Element {
             </Link>
           </BoxSide>
           
-          </>
+          <BoxSideRight onClick={() => history.goBack()} style={{cursor:"pointer"}}>                
+                  <BsArrowReturnLeft size={24} color={colors.secondaryColor}/>
+          </BoxSideRight>
+          
+        </>
         ) : (
+          
           <Link to={"/login"}>
             <BoxSide>
               <IoPersonCircle size={24} color={colors.secondaryColor}/>
             </BoxSide>
           </Link>
+          
         )
       }
     </Nav>

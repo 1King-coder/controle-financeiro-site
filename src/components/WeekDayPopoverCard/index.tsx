@@ -55,7 +55,7 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
                     </tr>
                     <tr>
                       <td className="gastos-gerais-popover-table-label-cell">Data:</td>
-                      <td className="gastos-gerais-popover-table-data-cell">{gastoDate.toLocaleDateString()}</td>
+                      <td className="gastos-gerais-popover-table-data-cell">{gastoDate.toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})}</td>
                     </tr>
                   </table>
                   <div className="gastos-gerais-popover-edit-delete-btns-div">

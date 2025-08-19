@@ -183,6 +183,7 @@ export const Container = styled.section`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  display:flex;
 `
 
 export const ScrollableDiv = styled.div`
@@ -190,6 +191,13 @@ export const ScrollableDiv = styled.div`
   display: flex;
   height: 50%;
   width: 50%;
+  padding: 10px
+`
+export const ScrollableDivY = styled.div`
+  overflow-y: scroll;
+  display: grid;
+  height: 10%;
+  width: 100%;
   padding: 10px
 `
 
@@ -221,9 +229,9 @@ export const Card = styled.div`
 
 export const FullLineCard = styled.div`
   width: 98%;
-  height: 90%;
+  height: 400px;
   background-color: ${tertiaryColor};
-  margin: 10px auto;
+  margin: 10px 10px 100px 10px;
   padding: 30px;
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
