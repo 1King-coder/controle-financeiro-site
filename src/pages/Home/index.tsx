@@ -202,7 +202,7 @@ export default function Home(): JSX.Element {
                 </Box>
                 <Box>
                   <SubTitle1>Gastos por categoria no mês</SubTitle1>
-                  { (gastosByMonth.length > 0 && bancos.length > 0 && categorias.length > 0)? (() => {
+                  { (gastosByMonth.length > 0 && bancos.length > 0 && categorias.length > 0) ? (() => {
                     type PieChartData = {
                       id:number;
                       value: number;
@@ -210,7 +210,9 @@ export default function Home(): JSX.Element {
                     }
 
                     const groupedByCategoriaGastos: { [key: number]: number } = gastosByMonth.reduce(
+                      
                       (groupedByCategoriaGastos: { [key: string]: number }, item: any) => {
+
                         if (!groupedByCategoriaGastos.hasOwnProperty(item.categoria.id)) {
                           groupedByCategoriaGastos[item.categoria.id] = 0;
                         }
@@ -225,6 +227,7 @@ export default function Home(): JSX.Element {
                       value: groupedByCategoriaGastos[Number(categoria)],
                       label: categoriasByNameId[Number(categoria)],
                     }))
+
                     return (
                       <>
                         <PieChart 
@@ -255,7 +258,11 @@ export default function Home(): JSX.Element {
                               />
                       </>
                     )
-                  })() : (<></>)
+                  })() : (<>
+                  <div style={{display: "flex", justifyContent: "center", height: "100%"}}>
+                    <h3>Não houve gastos neste mês</h3>
+                  </div>
+                  </>)
                   }
                 
                 </Box>

@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import axios from "../../services/axios";
+import { toast } from "react-toastify";
 
 
 type Props = {
@@ -23,7 +24,12 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
   const total: number = (props.itemInWeekDay.map((item: GastoGeral | Deposito) => item.valor)).reduce((acc: number, i: number) => acc + i, 0)
   
   const handleDelete = async (itemUrl: string) => {
-    await axios.delete(itemUrl);
+    const res = await axios.delete(itemUrl);
+    if (res.status === 200) {
+      toast.success(props.itemUrlPath === "gastos-gerais" ? "Gasto deletado com sucesso" : "Depósito deletado com sucesso");
+    } else {
+      toast.error(props.itemUrlPath === "gastos-gerais" ? "Erro ao deletar gasto" : "Erro ao deletar depósito");
+    }
   }
   
   return (
@@ -63,10 +69,10 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
                     </tr>
                   </table>
                   <div className="gastos-gerais-popover-edit-delete-btns-div">
-                    <Link to={`/gastos/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex", marginRight: "10px"}}>
+                    <Link to={props.itemUrlPath === "gastos-gerais" ? `/gastos/edit/${item.id}` : `/depositos/edit/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex", marginRight: "10px"}}>
                       <FaEdit size={20} color={colors.secondaryColor}/>
                     </Link>
-                    <span onClick={() => handleDelete(`/gastos/${item.id}`)} style={{justifyContent: "center", alignItems: "center", display: "flex", cursor: "pointer"}}>
+                    <span onClick={() => handleDelete(props.itemUrlPath === "gastos-gerais" ? `/gastos/${item.id}` : `/depositos/${item.id}`)} style={{justifyContent: "center", alignItems: "center", display: "flex", cursor: "pointer"}}>
                       <MdDelete size={20} color={colors.dangerColor}/>
                     </span>
                   </div>

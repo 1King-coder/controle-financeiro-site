@@ -143,9 +143,7 @@ export default function Bancos(): JSX.Element {
               
             }
             return acc;
-          }, 0)
-            
-            }`}</p>
+          }, 0).toFixed(2)}`}</p>
         </Card>
 
       </div>
@@ -187,10 +185,9 @@ export default function Bancos(): JSX.Element {
               textAlign: "center"
             }
           }
-        >{`R$ ${Math.round((bancos.reduce((acc, banco) => {
+        >{`R$ ${bancos.reduce((acc, banco) => {
           return acc + Math.abs(banco.saldo)
-          }, 0))*1e2)/1e2
-        }`}</p>
+          }, 0).toFixed(2)}`}</p>
       </FullLineCard>
       
 

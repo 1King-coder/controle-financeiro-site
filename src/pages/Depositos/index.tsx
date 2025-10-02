@@ -16,6 +16,10 @@ import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
 import { Deposito } from "../../types/Deposito";
 import { useAuth } from "../../services/useAuth";
+import { Link } from "react-router-dom";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { toast } from "react-toastify";
 
 class GetDepositosFunctions {
   static async getDepositos(id_user: Number): Promise<Deposito[]> {
@@ -176,6 +180,16 @@ export function Depositos(): JSX.Element {
     });
   }, [user]);
 
+  const handleDeleteDeposito = async (itemUrl: string) => {
+    const res = await axios.delete(itemUrl);
+    if (res.status === 200) {
+      toast.success("Gasto deletado com sucesso");
+      window.location.reload();
+    } else {
+      toast.error("Erro ao deletar gasto");
+    }
+  }
+
 
 
   return isLoding ? (<div>Loading</div>) :(
@@ -253,7 +267,13 @@ export function Depositos(): JSX.Element {
                               categoria: categorias[deposito.categoria.id],
                               descricao: deposito.descricao,
                               valor: deposito.valor,
-                              created_at: deposito.created_at
+                              created_at: deposito.created_at,
+                              opcoes: (
+                                <div style={{ display: "flex", gap:"1rem" }}>
+                                  <Link to={`depositos/edit/${deposito.id}/`}><FaEdit size={24} color={colors.secondaryColor}/></Link>
+                                  <span onClick={() => handleDeleteDeposito(`depositos/${deposito.id}/`)} style={{cursor: "pointer"}}><MdDelete size={24} color={colors.dangerColor}/></span>
+                                </div>
+                              )
                           }
                       })
 
@@ -264,6 +284,7 @@ export function Depositos(): JSX.Element {
                         { field: 'descricao', headerName: 'Descrição', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'valor', headerName: 'Valor', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center', type: 'number', valueFormatter: (value: number) => `R$ ${value.toFixed(2)}` },
                         { field: 'created_at', headerName: 'Data', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: 'opcoes', headerName: 'Opções', width: 130, headerClassName: 'datagrid-headers', headerAlign: 'center', renderCell: (params) => params.value },
                       ]
                       type PieChartData = {
                         id:number;

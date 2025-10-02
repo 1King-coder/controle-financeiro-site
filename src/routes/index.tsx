@@ -69,7 +69,7 @@ export default function Routes(): JSX.Element {
           </ProtectedRoute>
         )} />
 
-        <Route exact path="/gastos/:id" component={(props: any) => (
+        <Route exact path="/gastos/edit/:id" component={(props: any) => (
           <ProtectedRoute>
             <EditGastosGerais {...props} />
           </ProtectedRoute>
@@ -80,7 +80,7 @@ export default function Routes(): JSX.Element {
             <AddDeposito {...props} />
           </ProtectedRoute>
         )} />
-        <Route exact path="/depositos/:id" component={(props: any) => (
+        <Route exact path="/depositos/edit/:id" component={(props: any) => (
           <ProtectedRoute>
             <EditDeposito {...props} />
           </ProtectedRoute>

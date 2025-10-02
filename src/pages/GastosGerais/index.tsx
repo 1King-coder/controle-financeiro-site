@@ -14,9 +14,12 @@ import dayjs, { Dayjs } from "dayjs";
 import WeekPicker from "../../components/WeekPicker";
 import { WeekDayPopoverCard } from "../../components/WeekDayPopoverCard";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { FaToolbox } from "react-icons/fa";
+import { FaEdit, FaToolbox } from "react-icons/fa";
 import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
 import { useAuth } from "../../services/useAuth";
+import { Link } from "react-router-dom";
+import { MdDelete } from "react-icons/md";
+import { toast } from "react-toastify";
 
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(id_user: Number): Promise<GastoGeral[]> {
@@ -159,6 +162,17 @@ export function GastosGerais(): JSX.Element {
     })
   }, [startWeekDayDate, user])
 
+  const handleDeleteGasto = async (itemUrl: string) => {
+    const res = await axios.delete(itemUrl);
+    if (res.status === 200) {
+      toast.success("Gasto deletado com sucesso");
+      window.location.reload();
+
+    } else {
+      toast.error("Erro ao deletar gasto");
+    }
+  }
+
   React.useEffect(() => {
     
     const semanaAtual = getSemanaAtual(new Date());
@@ -256,7 +270,13 @@ export function GastosGerais(): JSX.Element {
                               id_categoria: categorias[gasto.categoria.id],
                               descricao: gasto.descricao,
                               valor: gasto.valor,
-                              data_de_competencia: gasto.data_de_competencia
+                              data_de_competencia: gasto.data_de_competencia,
+                              opcoes: (
+                                <div style={{ display: "flex", gap:"1rem" }}>
+                                  <Link to={`gastos/edit/${gasto.id}/`}><FaEdit size={24} color={colors.secondaryColor}/></Link>
+                                  <span onClick={() => handleDeleteGasto(`gastos/${gasto.id}/`)} style={{cursor: "pointer"}}><MdDelete size={24} color={colors.dangerColor}/></span>
+                                </div>
+                              )
                           }
                       })
 
@@ -267,6 +287,7 @@ export function GastosGerais(): JSX.Element {
                         { field: 'descricao', headerName: 'Descrição', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
                         { field: 'valor', headerName: 'Valor', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center', type: 'number', valueFormatter: (value: number) => `R$ ${value.toFixed(2)}` },
                         { field: 'data_de_competencia', headerName: 'Data', width: 150, headerClassName: 'datagrid-headers', headerAlign: 'center' },
+                        { field: "opcoes", headerName: "Opções", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center', renderCell: (params) => params.value },
                       ]
                       type PieChartData = {
                         id:number;

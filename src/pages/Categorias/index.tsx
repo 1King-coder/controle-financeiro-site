@@ -144,9 +144,7 @@ export default function Categorias(): JSX.Element {
               
             }
             return acc;
-          }, 0)
-            
-            }`}</p>
+          }, 0).toFixed(2)}`}</p>
         </Card>
 
       </div>
@@ -190,11 +188,9 @@ export default function Categorias(): JSX.Element {
               textAlign: "center"
             }
           }
-        >{`R$ ${Math.round(categorias.reduce((acc, categoria) => {
+        >{`R$ ${categorias.reduce((acc, categoria) => {
           return acc + Math.abs(categoria.saldo)
-        }, 0)*1e2)/1e2
-          
-          }`}</p>
+        }, 0).toFixed(2)}`}</p>
       </FullLineCard>
       
 
