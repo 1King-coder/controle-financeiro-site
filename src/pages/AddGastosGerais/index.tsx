@@ -297,7 +297,7 @@ export default function AddGastosGerais(): JSX.Element {
                       }
                     }
                   } catch (error: any) {
-                    toast.error(error?.response?.data?.detail || "Erro ao enviar gasto");
+                    toast.error(error?.response?.data.message || "Erro ao enviar gasto");
                   }
                 }}><span>Enviar somente este</span></Button>
               </InputBox>

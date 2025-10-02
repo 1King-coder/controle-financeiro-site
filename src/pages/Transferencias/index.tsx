@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { DataGridBox, SubTitle1, SubTitle2, Title } from "./styled";
 import axios from "../../services/axios";
 import { StyledButton, StyledButtonGroup } from "../../styles/GlobalStyles";
@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useAuth } from "../../services/useAuth";
+import EditTransferencia from "../EditTransferencia";
 
 class getTransferencias {
 
@@ -104,7 +105,7 @@ export default function Transferencias() {
       
     }
     getBancos();
-  }, [])
+  }, [user])
 
   React.useEffect(() => {
     async function getCategorias() {
@@ -120,7 +121,7 @@ export default function Transferencias() {
       
     }
     getCategorias();
-  }, [])
+  }, [user])
 
   React.useEffect(() => {
     getTransferencias.getTransferencias(transferenciasUrlPath).then((data) => {
@@ -136,12 +137,16 @@ export default function Transferencias() {
     } else {
       setTransferenciasUrlPath("/transferencias/entre-categorias/" + user!.id);
     }
-  }, [optionSelectedId]);
+  }, [optionSelectedId, user]);
+  const handleDeleteTranf = async (url: string) => {
+    await axios.delete(url);
+  }
 
   React.useEffect(() => {
     getTransferencias.getTransferenciasByMonth(transferenciasUrlPath, selectedMonthDate.toDate()).then((data) => {
       
       const namedTransferencias = data.map((transferencia: Transferencia) => {
+        const tipoTransf = transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id ? "entre-bancos" : "entre-categorias"
         return {
           id: transferencia.id,
           created_at: new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}),
@@ -151,8 +156,8 @@ export default function Transferencias() {
           valor: transferencia.valor,
           opcoes: (
             <div style={{ display: "flex", gap:"1rem" }}>
-              <Link to={`transferencias/edit/${transferencia.id}`}><FaEdit size={24} color={colors.secondaryColor}/></Link>
-              <Link to={`transferencias/delete/${transferencia.id}`}><MdDelete size={24} color={colors.dangerColor}/></Link>
+              <Link to={`transferencias/edit/${tipoTransf}/${transferencia.id}/`}><FaEdit size={24} color={colors.secondaryColor}/></Link>
+              <span onClick={() => handleDeleteTranf(`transferencias/${tipoTransf}/${transferencia.id}`)} style={{cursor: "pointer"}}><MdDelete size={24} color={colors.dangerColor}/></span>
             </div>
           )
         }
@@ -160,7 +165,7 @@ export default function Transferencias() {
       
       setTransferenciasByMonth(namedTransferencias);
     })
-  }, [selectedMonthDate, transferenciasUrlPath, bancos, categorias]);
+  }, [selectedMonthDate, transferenciasUrlPath, bancos, categorias, user]);
 
 
   return (

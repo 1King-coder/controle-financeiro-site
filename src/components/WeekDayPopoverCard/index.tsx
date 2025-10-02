@@ -8,6 +8,7 @@ import * as colors from "../../config/colors";
 import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import axios from "../../services/axios";
 
 
 type Props = {
@@ -21,14 +22,17 @@ type Props = {
 export function WeekDayPopoverCard(props: Props): JSX.Element {
   const total: number = (props.itemInWeekDay.map((item: GastoGeral | Deposito) => item.valor)).reduce((acc: number, i: number) => acc + i, 0)
   
+  const handleDelete = async (itemUrl: string) => {
+    await axios.delete(itemUrl);
+  }
+  
   return (
     <WeekDayGastosDiv key={props.index}>
       <SubTitle2>{dayOfTheWeek.withFeira[props.index]}</SubTitle2>
       <SubTitle2>Total: R${Math.round(total*1e2)/1e2}</SubTitle2>
       {
         props.itemInWeekDay.map((item: GastoGeral | Deposito) => {
-          const splitedDate = new Date(item.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
-          const gastoDate = new Date (Number(splitedDate[2]), Number(splitedDate[1]) - 1,  Number(splitedDate[0]));
+          const gastoDate = new Date(item.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"});
           return (
             <>          
               <Popover content={
@@ -55,16 +59,16 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
                     </tr>
                     <tr>
                       <td className="gastos-gerais-popover-table-label-cell">Data:</td>
-                      <td className="gastos-gerais-popover-table-data-cell">{gastoDate.toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"})}</td>
+                      <td className="gastos-gerais-popover-table-data-cell">{gastoDate}</td>
                     </tr>
                   </table>
                   <div className="gastos-gerais-popover-edit-delete-btns-div">
-                    <Link to={`/${props.itemUrlPath}/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex", marginRight: "10px"}}>
+                    <Link to={`/gastos/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex", marginRight: "10px"}}>
                       <FaEdit size={20} color={colors.secondaryColor}/>
                     </Link>
-                    <Link to={`/${props.itemUrlPath}/${item.id}`} style={{justifyContent: "center", alignItems: "center", display: "flex"}}>
+                    <span onClick={() => handleDelete(`/gastos/${item.id}`)} style={{justifyContent: "center", alignItems: "center", display: "flex", cursor: "pointer"}}>
                       <MdDelete size={20} color={colors.dangerColor}/>
-                    </Link>
+                    </span>
                   </div>
                 </div>
               } placement="right" trigger="hover" >

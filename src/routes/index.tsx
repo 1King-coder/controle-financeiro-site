@@ -12,6 +12,9 @@ import AddCategorias from "../pages/AddCategorias";
 import AddGastosGerais from "../pages/AddGastosGerais";
 import AddDeposito from "../pages/AddDeposito";
 import AddTransferencia from "../pages/AddTransferencia";
+import EditGastosGerais from "../pages/EditGastosGerais";
+import EditDeposito from "../pages/EditDeposito";
+import EditTransferencia from "../pages/EditTransferencia";
 import AddUsuario from "../pages/AddUsuario";
 import Login from "../pages/Login";
 import { ProtectedRoute } from "../components/AuthProvider";
@@ -66,14 +69,35 @@ export default function Routes(): JSX.Element {
           </ProtectedRoute>
         )} />
 
+        <Route exact path="/gastos/:id" component={(props: any) => (
+          <ProtectedRoute>
+            <EditGastosGerais {...props} />
+          </ProtectedRoute>
+        )} />
+
         <Route exact path="/depositos/add" component={(props: any) => (
           <ProtectedRoute>
             <AddDeposito {...props} />
           </ProtectedRoute>
         )} />
+        <Route exact path="/depositos/:id" component={(props: any) => (
+          <ProtectedRoute>
+            <EditDeposito {...props} />
+          </ProtectedRoute>
+        )} />
         <Route exact path="/transferencias/add" component={(props: any) => (
           <ProtectedRoute>
             <AddTransferencia {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/transferencias/edit/entre-bancos/:id" component={(props: any) => (
+          <ProtectedRoute>
+            <EditTransferencia tipoTransferencia="entre-bancos" />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/transferencias/edit/entre-categorias/:id" component={(props: any) => (
+          <ProtectedRoute>
+            <EditTransferencia tipoTransferencia="entre-categorias" />
           </ProtectedRoute>
         )} />
 
