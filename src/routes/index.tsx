@@ -17,6 +17,7 @@ import EditDeposito from "../pages/EditDeposito";
 import EditTransferencia from "../pages/EditTransferencia";
 import AddUsuario from "../pages/AddUsuario";
 import Login from "../pages/Login";
+import EnviaPorPlanilha from "../pages/EnviaPorPlanilha";
 import { ProtectedRoute } from "../components/AuthProvider";
 
 export default function Routes(): JSX.Element {
@@ -98,6 +99,11 @@ export default function Routes(): JSX.Element {
         <Route exact path="/transferencias/edit/entre-categorias/:id" component={(props: any) => (
           <ProtectedRoute>
             <EditTransferencia tipoTransferencia="entre-categorias" />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/envia-por-planilha" component={(props: any) => (
+          <ProtectedRoute>
+            <EnviaPorPlanilha {...props} />
           </ProtectedRoute>
         )} />
 
