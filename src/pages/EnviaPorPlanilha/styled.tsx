@@ -17,15 +17,6 @@ export const GeneralBox = styled.div`
 
   }
 `
-export const DataGridBox = styled.div`
-  height: 100%;
-  .datagrid-headers {
-    background-color: ${colors.primaryColor};
-    color: ${colors.secondaryColor};
-    font-weight: bold;
-    font-size: 16px;
-  }
-`
 
 export const DropzoneBox = styled.div`
   width: 100%;
@@ -34,7 +25,36 @@ export const DropzoneBox = styled.div`
   justify-content: center;
 `
 
-export const InputBox = styled.div`
+export const InputBox = styled.div<{fileUploaded?: boolean}>`
+  display: flex;
+  height:${props => props.fileUploaded ? '20%' : '100%'};
+  flex-direction: ${props => props.fileUploaded ? 'row' : 'column'};
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  gap: 1rem;
+
+  Button:hover {
+    transform: translateY(-4px);
+  }
+
+  Button span:after {
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    transition: 0.5s;
+  }
+
+
+  Button:hover span:after {
+    opacity: 1;
+    right: 0;
+  }
+
+  Button:active {
+      transform: translateY(4px);
+  }
 
   Button {
     padding: 1rem;
@@ -43,7 +63,7 @@ export const InputBox = styled.div`
     background-color: ${colors.primaryColor};
     transition: all 0.5s;
     box-shadow: 0 5px 10px ${colors.primaryColor};
-
+    height:100%;
     width: 100%;
 
     span {
@@ -55,29 +75,6 @@ export const InputBox = styled.div`
       font-weight: bold;
       transition: 0.5s;
     }
-
-    span:after {
-      content: '>>';
-      position: absolute;
-      opacity: 0;
-      top: 0;
-      right: -20px;
-      transition: 0.5s;
-    }
-
-    :hover span {
-      padding-right: 25px;
-    }
-
-    :hover span:after {
-      opacity: 1;
-      right: 0;
-    }
-
-    :active {
-      transform: translateY(4px);
-    }
-
     
   }
 
