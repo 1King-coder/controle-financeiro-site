@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import history from "../../services/history";
 import { relative } from "path";
 import { Button } from "flowbite-react";
+import { BsFillFileEarmarkSpreadsheetFill } from "react-icons/bs";
 
 export default function Header(): JSX.Element {
 
@@ -62,11 +63,16 @@ export default function Header(): JSX.Element {
               <BiTransfer size={24} color={colors.secondaryColor}/>
             </Box>
           </Link>
+          <Link to="/envia-por-planilha">
+            <Box>
+              <BsFillFileEarmarkSpreadsheetFill size={24} color={colors.secondaryColor}/>
+            </Box>
+          </Link>
           
           <BoxSide  style={{ cursor: 'pointer' }}>
             <HoverEffect>
               <IoLogOut onClick={handleLogout} size={24} color={colors.secondaryColor}/>
-            </HoverEffect>
+            </HoverEffect> 
             <Link to="user-page"> 
               <UsernameP>{user.username}</UsernameP>
             </Link>

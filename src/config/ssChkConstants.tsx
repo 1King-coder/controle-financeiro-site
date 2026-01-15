@@ -5,5 +5,5 @@ export const EntradasSaidasColumns = [
 ];
 
 export const TransferenciasColumns = [
-  "Tipo de Transferência","Descrição","Valor","Origem","Destino","Categoria","Data de competência"
+  "Tipo de Transferência","Descrição","Valor","Origem","Destino","Intermediario","Data de competência"
 ];

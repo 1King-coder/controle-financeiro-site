@@ -18,11 +18,19 @@ export const Box = styled.div`
   margin: 0 10px;
   :hover {
     cursor: pointer;
-    background: ${successColor};
-    opacity: 0.5;
+    padding: 0px;
     transition: ease-out 500ms;
-    border-radius: 5px;
+    background-color: ${successColor};
+    border-radius: 15px;
+    transform: scale(1.2);
+    margin: 0 12px;
   }
+
+  :active {
+    transform: scale(1.0);
+  }
+
+  
 `
 
 export const BoxSide = styled.div`
@@ -62,9 +70,9 @@ export const HoverEffect = styled.div`
   align-items: center;
   padding: 0px;
   margin:0px;
-  :hover {
+
+  div:hover {
     cursor: pointer;
-    background: ${successColor};
     opacity: 0.5;
     transition: ease-out 500ms;
     border-radius: 5px;

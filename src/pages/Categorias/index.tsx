@@ -1,5 +1,5 @@
 import React from "react";
-import { Title } from "./styled";
+import { ActionButton, Title } from "./styled";
 import axios from "../../services/axios";
 import { Categoria, SaldoCategoriaPorBanco } from "../../types/Categoria";
 import { Card, CardTitle, Container, FullLineCard, FullLineCardTitle, OptionBtn, ScrollableDiv } from "../../styles/GlobalStyles";
@@ -30,6 +30,8 @@ export default function Categorias(): JSX.Element {
   const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(0);
   const [dadosSaldoCategoriaPorBanco, setDadosSaldoCategoriaPorBanco] = React.useState([["Banco", "saldo"]]);
   const [NomeCategoriaSelected, setNomeCategoriaSelected] = React.useState("");
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [categoriaToDelete, setCategoriaToDelete] = React.useState<number | null>(null);
   const {user} = useAuth()
 
   React.useEffect(() => {
@@ -64,6 +66,29 @@ export default function Categorias(): JSX.Element {
     
   }, [optionSelectedId]);
 
+  function handleDeleteCategoria(id_categoria: number) {
+    setCategoriaToDelete(id_categoria);
+    setShowDeleteModal(true);
+  }
+
+  function confirmDelete() {
+    if (categoriaToDelete) {
+      axios.delete(`/categorias/${categoriaToDelete}`).then(() => {
+        const updatedCategorias = categorias.filter((categoria: Categoria) => categoria.id !== categoriaToDelete);
+        setCategorias(updatedCategorias);
+        toast.success("Categoria deletada com sucesso.");
+        setShowDeleteModal(false);
+        setCategoriaToDelete(null);
+      }).catch((error) => {
+        toast.error("Erro ao deletar categoria: " + (error.response?.data?.message || error.message));
+      });
+    }
+  }
+
+  function cancelDelete() {
+    setShowDeleteModal(false);
+    setCategoriaToDelete(null);
+  }
 
   const pieChartOptions = {
     title: `Saldo por Banco ${NomeCategoriaSelected}`,
@@ -145,6 +170,9 @@ export default function Categorias(): JSX.Element {
             }
             return acc;
           }, 0).toFixed(2)}`}</p>
+          <ActionButton onClick={() => handleDeleteCategoria(optionSelectedId)}>
+            <span>Deletar Categoria</span>
+          </ActionButton>
         </Card>
 
       </div>
@@ -192,6 +220,61 @@ export default function Categorias(): JSX.Element {
           return acc + Math.abs(categoria.saldo)
         }, 0).toFixed(2)}`}</p>
       </FullLineCard>
+
+      {showDeleteModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            padding: "30px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            maxWidth: "400px"
+          }}>
+            <h2 style={{ marginBottom: "20px", color: "black" }}>Confirmar Exclusão</h2>
+            <p style={{ marginBottom: "30px", color: "black" }}>
+              Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita.
+            </p>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button 
+                onClick={cancelDelete}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                  backgroundColor: "white",
+                  cursor: "pointer"
+                }}
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={confirmDelete}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "4px",
+                  border: "none",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  cursor: "pointer"
+                }}
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
 
       

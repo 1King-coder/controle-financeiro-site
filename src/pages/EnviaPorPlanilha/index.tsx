@@ -27,7 +27,7 @@ type TR = {
   Valor: string,
   Origem: string,
   Destino: string,
-  Categoria: string,
+  Intermediario: string,
   "Data de competência": string
 }
 
@@ -139,17 +139,21 @@ export default function AddBancos() {
 
   const [bancosNames, setBancos]: [string[], any] = React.useState([]);
   const [categoriasNames, setCategorias]: [string[], any] = React.useState([]);
+  const [idBancos, setIdBancos] = React.useState<{[key: string]: number}>({});
+  const [idCategorias, setIdCategorias] = React.useState<{[key: string]: number}>({});
   
   React.useEffect(() => {
       GetBancosDataFuncions.getBancos(user!.id).then((data: Banco[]) => {
         setBancos(data.map(banco => banco.nome));
+        setIdBancos(Object.assign({}, ...data.map(banco => ({[banco.nome]: banco.id}))));
       });
     }, [user]);
 
   React.useEffect(() => {
       GetCategoriasDataFuncions.getCategorias(user!.id).then((data: Categoria[]) => {
         setCategorias(data.map(categoria => categoria.nome));
-      })
+        setIdCategorias(Object.assign({}, ...data.map(categoria => ({[categoria.nome]: categoria.id}))));
+      });
     }, [user])
 
   function handleSelectFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -201,20 +205,27 @@ export default function AddBancos() {
               valor: row[2] || 0,
               origem: row[3] || '',
               destino: row[4] || '',
-              categoria: row[5] || '',
+              intermediario: row[5] || '',
               dataCompetencia: row[6] ? new Date(new Date(getJsDateFromExcel(row[6])).setDate(new Date(getJsDateFromExcel(row[6])).getDate() + 1)).toLocaleDateString("pt-br") : ''
-            })).filter(row => (row.tipoTransferencia && row.descricao && row.origem && row.destino && row.categoria));
-          
-            console.log(bancosNames);
-            console.log(categoriasNames);
+            })).filter(row => (row.tipoTransferencia && row.descricao && row.origem && row.destino && row.intermediario));
+
             trData.forEach((tr) => {
-              console.log(tr.categoria)
-              if (!categoriasNames.includes(tr.categoria)) {
-                toast.error(`Categoria inválida na transferência: ${tr.descricao}`);
+              if (tr.tipoTransferencia === 'Entre Bancos') {
+                if (!categoriasNames.includes(tr.intermediario)) {
+                  toast.error(`Categoria inválida na transferência: ${tr.descricao}`);
+                }
+                if (!bancosNames.includes(tr.destino) || !bancosNames.includes(tr.origem)) {
+                  toast.error(`Banco de origem ou destino inválido na transferência: ${tr.descricao}`);
+                }
+              } else if (tr.tipoTransferencia === 'Entre Categorias') {
+                if (!bancosNames.includes(tr.intermediario)) {
+                  toast.error(`Banco inválido na transferência: ${tr.descricao}`);
+                }
+                if (!categoriasNames.includes(tr.destino) || !categoriasNames.includes(tr.origem)) {
+                  toast.error(`Categoria de origem ou destino inválida na transferência: ${tr.descricao}`);
+                }
               }
-              if (!bancosNames.includes(tr.destino) || !bancosNames.includes(tr.origem)) {
-                toast.error(`Banco de origem ou destino inválido na transferência: ${tr.descricao}`);
-              }
+              
             })
 
             esData.forEach((es) => {
@@ -227,7 +238,11 @@ export default function AddBancos() {
             })
 
             trData = trData.filter((tr) => {
-              return (categoriasNames.includes(tr.categoria) && bancosNames.includes(tr.destino) && bancosNames.includes(tr.origem))
+              if (tr.tipoTransferencia === 'Entre Bancos') {
+                return (bancosNames.includes(tr.origem) && bancosNames.includes(tr.destino) && categoriasNames.includes(tr.intermediario))
+              } else if (tr.tipoTransferencia === 'Entre Categorias') {
+                return (categoriasNames.includes(tr.origem) && categoriasNames.includes(tr.destino) && bancosNames.includes(tr.intermediario))
+              }
             })
             esData = esData.filter((es) => {
             return (bancosNames.includes(es.banco) && categoriasNames.includes(es.categoria))
@@ -238,6 +253,126 @@ export default function AddBancos() {
             setFileUploaded(true);
           }
 
+  }
+
+  async function saveTransferencias () {
+    const transferenciasPayload: any[] = [];
+
+    for (let i = 0; i < transferenciasData.length; i++) {
+      if (transferenciasData[i]['tipoTransferencia'] === 'Entre Bancos') {
+        if (
+        !Object.hasOwn(idBancos, transferenciasData[i].origem) || 
+        !Object.hasOwn(idBancos, transferenciasData[i].destino) || 
+        !Object.hasOwn(idCategorias, transferenciasData[i].intermediario)) {
+          toast.error(`Erro ao enviar transferência: ${transferenciasData[i].descricao}. Verifique os dados e tente novamente.`);
+          return;
+        }
+
+        transferenciasPayload.push({
+          tipo: "entre_bancos",
+          id_usuario: user!.id,
+          id_banco_origem: idBancos[transferenciasData[i].origem],
+          id_banco_destino: idBancos[transferenciasData[i].destino],
+          id_categoria: idCategorias[transferenciasData[i].intermediario],
+          descricao: transferenciasData[i].descricao,
+          valor: transferenciasData[i].valor,
+          data_de_competencia: transferenciasData[i].dataCompetencia,
+        })
+
+      } else if (transferenciasData[i]['tipoTransferencia'] === 'Entre Categorias') {
+        if (
+        !Object.hasOwn(idCategorias, transferenciasData[i].origem) || 
+        !Object.hasOwn(idCategorias, transferenciasData[i].destino) || 
+        !Object.hasOwn(idBancos, transferenciasData[i].intermediario)) {
+          toast.error(`Erro ao enviar transferência: ${transferenciasData[i].descricao}. Verifique os dados e tente novamente.`);
+          return;
+        }
+
+        transferenciasPayload.push({
+          tipo: "entre_categorias",
+          id_usuario: user!.id,
+          id_categoria_origem: idCategorias[transferenciasData[i].origem],
+          id_categoria_destino: idCategorias[transferenciasData[i].destino],
+          id_banco: idBancos[transferenciasData[i].intermediario],
+          descricao: transferenciasData[i].descricao,
+          valor: transferenciasData[i].valor,
+          data_de_competencia: transferenciasData[i].dataCompetencia,
+        })
+
+      }
+      try {
+        const res = await axios.post("/transferencias/novo/lista", transferenciasPayload);
+        if (res.status === 201 || res.status === 200) {
+          toast.success("Transferência entre bancos enviada");
+        }
+      } catch (error: any) {
+        toast.error(error?.response?.data?.detail || "Erro ao enviar transferência");
+      }
+    }
+  }
+
+  async function saveEntradasSaidas () {
+    const depositosPayload: any[] = [];
+    const gastosPayload: any[] = [];
+
+    if (entradasSaidasData.length === 0) {
+      toast.warning("Nenhum dado de entradas e saídas para salvar.");
+      return;
+    }
+
+    for (let i = 0; i < entradasSaidasData.length; i++) {
+      if (
+        !Object.hasOwn(idBancos, entradasSaidasData[i].banco) || 
+        !Object.hasOwn(idCategorias, entradasSaidasData[i].categoria)) {
+          toast.error(`Erro ao enviar entrada/saída: ${entradasSaidasData[i].descricao}. Verifique os dados e tente novamente.`);
+          return;
+        }
+      if (entradasSaidasData[i].valor >= 0) {
+        depositosPayload.push({
+          id_usuario: user!.id,
+          id_banco: idBancos[entradasSaidasData[i].banco],
+          id_categoria: idCategorias[entradasSaidasData[i].categoria],
+          descricao: entradasSaidasData[i].descricao,
+          valor: entradasSaidasData[i].valor,
+          data_de_competencia: entradasSaidasData[i].dataCompetencia,
+        })
+      } else if (entradasSaidasData[i].valor < 0) {
+        gastosPayload.push({
+          id_usuario: user!.id,
+          id_banco: idBancos[entradasSaidasData[i].banco],
+          id_categoria: idCategorias[entradasSaidasData[i].categoria],
+          descricao: entradasSaidasData[i].descricao,
+          valor: Math.abs(entradasSaidasData[i].valor),
+          data_de_competencia: entradasSaidasData[i].dataCompetencia,
+        })
+      }
+
+    }
+
+    try {
+      if (depositosPayload.length > 0) {
+        const resDepositos = await axios.post("/depositos/novo/lista", depositosPayload);
+        if (resDepositos.status === 201 || resDepositos.status === 200) {
+          toast.success("Depósitos enviados com sucesso!");
+        }
+      }
+      if (gastosPayload.length > 0) {
+        const resGastos = await axios.post("/gastos/novo/lista", gastosPayload);
+        if (resGastos.status === 201 || resGastos.status === 200) {
+          toast.success("Gastos enviados com sucesso!");
+        }
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.detail || "Erro ao enviar entradas/saídas");
+    }
+    
+  }
+
+  function handleSaveData () {
+    saveEntradasSaidas().then((res) => {
+      saveTransferencias().then(() => {});  
+    });
+              
   }
 
   return (
@@ -253,7 +388,7 @@ export default function AddBancos() {
             display: "flex",
             flexDirection: "column",
             width: "100%",
-            height: fileUploaded ? "20%" : "100%",
+            height: fileUploaded ? "2rem" : "100%",
             alignItems: "center",
             justifyContent: "center", 
           }}>
@@ -313,7 +448,7 @@ export default function AddBancos() {
           {optionSelectedId === 1 ? (
             <div style={{ margin: "0 1rem" }}>
               <SubTitle2>Entradas e Saídas</SubTitle2>
-              <div style={{ height: 400, width: "100%", marginTop: "1rem" }}>
+              <div style={{ height: 300, width: "100%", marginTop: "1rem" }}>
                 <DataGrid
                   rows={entradasSaidasData}
                   columns={[
@@ -347,11 +482,16 @@ export default function AddBancos() {
                   }}
                 />
               </div>
+              <InputBox style={{alignItems: "top", justifyContent: "flex-start", marginTop: "1rem"}}>
+                <Button style={{marginTop: '0.1rem', width: '10rem', height: "5rem"}} onClick={handleSaveData}>
+                  <span>Salvar Dados</span>
+                </Button>
+              </InputBox>
             </div>
           ): (
             <div style={{ margin: "2rem 1rem" }}>
               <SubTitle2>Transferências</SubTitle2>
-              <div style={{ height: 400, width: "100%", marginTop: "1rem" }}>
+              <div style={{ height: 300, width: "100%", marginTop: "1rem" }}>
                 <DataGrid
                   rows={transferenciasData}
                   columns={[
@@ -360,7 +500,7 @@ export default function AddBancos() {
                     { field: 'valor', headerName: 'Valor', width: 130, editable: true, type: 'number', valueFormatter: (value: number) => `R$ ${value.toFixed(2)}` },
                     { field: 'origem', headerName: 'Origem', width: 150, editable: true },
                     { field: 'destino', headerName: 'Destino', width: 150, editable: true },
-                    { field: 'categoria', headerName: 'Categoria', width: 150, editable: true },
+                    { field: 'intermediario', headerName: 'Intermediario', width: 150, editable: true },
                     { field: 'dataCompetencia', headerName: 'Data de Competência', width: 180, editable: true },
                   ]}
                   processRowUpdate={(newRow) => {
@@ -379,6 +519,11 @@ export default function AddBancos() {
                   }}
                 />
               </div>
+              <InputBox style={{alignItems: "top", justifyContent: "flex-start", marginTop: "1rem"}}>
+                <Button style={{marginTop: '0.1rem', width: '10rem', height: "5rem"}} onClick={handleSaveData}>
+                  <span>Salvar Dados</span>
+                </Button>
+              </InputBox>
             </div>
           )}
 
