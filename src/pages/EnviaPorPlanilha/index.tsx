@@ -193,7 +193,7 @@ export default function AddBancos() {
               categoria: row[1] || '',
               descricao: row[2] || '',
               valor: row[3] || 0,
-              dataCompetencia: row[4] ? new Date(new Date(getJsDateFromExcel(row[4])).setDate(new Date(getJsDateFromExcel(row[4])).getDate() + 1)).toLocaleDateString("pt-br") : ''
+              dataCompetencia: row[4] ? new Date(new Date(getJsDateFromExcel(row[4])).setDate(new Date(getJsDateFromExcel(row[4])).getDate() + 1)).toLocaleDateString("pt-br").split("/").reverse().join("-") : ''
             })).filter(row => row.banco || row.categoria || row.descricao);
             
             // Parse Transferencias sheet
@@ -206,7 +206,7 @@ export default function AddBancos() {
               origem: row[3] || '',
               destino: row[4] || '',
               intermediario: row[5] || '',
-              dataCompetencia: row[6] ? new Date(new Date(getJsDateFromExcel(row[6])).setDate(new Date(getJsDateFromExcel(row[6])).getDate() + 1)).toLocaleDateString("pt-br") : ''
+              dataCompetencia: row[6] ? new Date(new Date(getJsDateFromExcel(row[6])).setDate(new Date(getJsDateFromExcel(row[6])).getDate() + 1)).toLocaleDateString("pt-br").split("/").reverse().join("-") : ''
             })).filter(row => (row.tipoTransferencia && row.descricao && row.origem && row.destino && row.intermediario));
 
             trData.forEach((tr) => {
@@ -300,7 +300,8 @@ export default function AddBancos() {
         })
 
       }
-      try {
+    }
+    try {
         const res = await axios.post("/transferencias/novo/lista", transferenciasPayload);
         if (res.status === 201 || res.status === 200) {
           toast.success("Transferência entre bancos enviada");
@@ -308,7 +309,6 @@ export default function AddBancos() {
       } catch (error: any) {
         toast.error(error?.response?.data?.detail || "Erro ao enviar transferência");
       }
-    }
   }
 
   async function saveEntradasSaidas () {
@@ -369,7 +369,7 @@ export default function AddBancos() {
   }
 
   function handleSaveData () {
-    saveEntradasSaidas().then((res) => {
+    saveEntradasSaidas().then(() => {
       saveTransferencias().then(() => {});  
     });
               

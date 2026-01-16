@@ -35,7 +35,7 @@ export const InputBox = styled.div`
     font-weight: bold;
   }
 
-  #nome-banco {
+  #nome-categoria {
     font-size: 1rem;
     margin-top: 0.5rem;
     padding: 0.5rem;

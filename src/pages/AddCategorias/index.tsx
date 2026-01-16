@@ -26,7 +26,7 @@ export default function AddCategorias() {
   }, [])
 
   function handleAdicionaCategoria () {
-    const inputNomeCategoria = document.getElementById("nome-categoria");
+    const inputNomeCategoria = document.getElementById("nome-categoria") as HTMLInputElement;
     //@ts-ignore
     const nomeCategoria = inputNomeCategoria?.value;
 
@@ -34,9 +34,11 @@ export default function AddCategorias() {
       nome: nomeCategoria,
       id_user: user!.id
     }).then(async (response) => {
-      console.log(response);
       if (response.status === 201) {
         toast.success("Categoria adicionada com sucesso");
+        inputNomeCategoria.value = "";
+        const res = await axios.get("/categorias/usuario/" + user!.id);
+        setCategorias(res.data);
       } 
     }).catch((error) => {
       toast.error(error.response.data.detail);

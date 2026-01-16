@@ -27,7 +27,7 @@ export default function AddBancos() {
   }, [])
 
   function handleAdicionaBanco () {
-    const inputNomeBanco = document.getElementById("nome-banco");
+    const inputNomeBanco = document.getElementById("nome-banco") as HTMLInputElement;
     //@ts-ignore
     const nomeBanco = inputNomeBanco?.value;
     
@@ -35,9 +35,11 @@ export default function AddBancos() {
       nome: nomeBanco,
       id_user: user!.id
     }).then(async (response) => {
-      console.log(response);
       if (response.status === 201) {
         toast.success("Banco adicionado com sucesso");
+        inputNomeBanco.value = "";
+        const resBancos = await axios.get(`/bancos/usuario/${user!.id}`);
+        setBancos(resBancos.data);
       } 
     }).catch((error) => {
       toast.error(error.response.data.detail);
