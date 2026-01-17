@@ -13,13 +13,22 @@ const getCSRFTokenFromCookie = (): string | null => {
   return null;
 };
 
+const getConnectionToken = async (): Promise<string | null> => {
+  const res = await axios.get((process.env.REACT_APP_ENV === "DEV" ? process.env.REACT_APP_DEV_URL : process.env.REACT_APP_PROD_URL ) +'/connection-token', {
+    withCredentials: true,
+  });
+
+  return res.data.connectionToken;
+}
+
 // Function to get CSRF token from API
 const getCSRFTokenFromAPI = async (): Promise<string | null> => {
   try {
+    const connectionToken = await getConnectionToken();
     const res = await axios.get((process.env.REACT_APP_ENV === "DEV" ? process.env.REACT_APP_DEV_URL : process.env.REACT_APP_PROD_URL ) +'/csrf-token', {
       withCredentials: true,
       headers: {
-        "Auth": process.env.REACT_APP_AUTH_CODE
+        'Authorization': connectionToken || ''
       }
     });
     
@@ -59,7 +68,6 @@ const axiosInstance = axios.create({
   headers: {
     'Content-type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'auth': process.env.REACT_APP_AUTH_CODE
   },
   withCredentials: true, // This is important for CSRF cookies
 });
@@ -76,12 +84,18 @@ axiosInstance.interceptors.request.use(
       if (!csrfToken) {
         csrfToken = await refreshCSRFToken();
       }
+
       
       if (csrfToken) {
         config.headers['CSRF-Token'] = csrfToken;
         config.headers['X-CSRF-Token'] = csrfToken; // Some servers expect this header
       }
     }
+    const connectionToken = await getConnectionToken();
+    if (connectionToken) {
+      config.headers['Authorization'] = connectionToken;
+    }
+
     return config;
   },
   (error) => {
