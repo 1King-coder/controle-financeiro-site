@@ -435,6 +435,17 @@ export default function EnviaPorPlanilha() {
           <Button style={{marginTop: '1rem'}} onClick={handleUploadPlanilha}>
             <span>Enviar Planilha</span>
           </Button>
+          {
+            fileUploaded ? null : (
+              <a href="https://drive.google.com/uc?export=download&id=17-ja9_i4gODMC_gnGcYsDRwgmfbY3n6o">
+                <Button>
+                  <span>Baixar modelo XLSX</span>
+                </Button>
+              </a>
+            )
+          }
+          
+          
         </InputBox>
       </div>
 
