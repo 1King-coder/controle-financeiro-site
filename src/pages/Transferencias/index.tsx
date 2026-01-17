@@ -1,8 +1,17 @@
 import React, { useContext } from "react";
-import { DataGridBox, SubTitle1, SubTitle2, Title } from "./styled";
+import {
+  DataGridBox,
+  StyledStaticDatePicker,
+  SubTitle1,
+  SubTitle2,
+  Title,
+} from "./styled";
 import axios from "../../services/axios";
 import { StyledButton, StyledButtonGroup } from "../../styles/GlobalStyles";
-import { Transferencia, TransferenciaWithNames } from "../../types/Transferencia";
+import {
+  Transferencia,
+  TransferenciaWithNames,
+} from "../../types/Transferencia";
 import { LocalizationProvider, MonthCalendar } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
@@ -17,8 +26,9 @@ import { useAuth } from "../../services/useAuth";
 import EditTransferencia from "../EditTransferencia";
 
 class getTransferencias {
-
-  static async getTransferencias(tipoTransferenciaUrlPath: string): Promise<Transferencia[]> {
+  static async getTransferencias(
+    tipoTransferenciaUrlPath: string,
+  ): Promise<Transferencia[]> {
     const res = await axios.get(tipoTransferenciaUrlPath);
     const data = await res.data;
 
@@ -32,8 +42,8 @@ class getTransferencias {
           intermediario: transf.categoria,
           data_de_competencia: transf.data_de_competencia,
           valor: transf.valor,
-          descricao: transf.descricao
-        }
+          descricao: transf.descricao,
+        };
       }
 
       return {
@@ -44,55 +54,68 @@ class getTransferencias {
         intermediario: transf.banco,
         data_de_competencia: transf.data_de_competencia,
         valor: transf.valor,
-        descricao: transf.descricao
-      }
-    })
+        descricao: transf.descricao,
+      };
+    });
 
     return transferencias;
   }
 
-  static async getTransferenciasByMonth(tipoTransferenciaUrlPath: string, date: Date): Promise<Transferencia[]> {
+  static async getTransferenciasByMonth(
+    tipoTransferenciaUrlPath: string,
+    date: Date,
+  ): Promise<Transferencia[]> {
+    const filteredData = getTransferencias
+      .getTransferencias(tipoTransferenciaUrlPath)
+      .then((data: any) => {
+        const filteredData = data.filter((transferencia: Transferencia) => {
+          const dateSplited = new Date(transferencia.data_de_competencia)
+            .toLocaleDateString("pt-br", { timeZone: "America/Sao_Paulo" })
+            .split("/");
+          const dataTransferencia = new Date(
+            Number(dateSplited[2]),
+            Number(dateSplited[1]) - 1,
+            Number(dateSplited[0]),
+          );
 
-    const filteredData =  getTransferencias.getTransferencias(tipoTransferenciaUrlPath).then((data: any) => {
-      
+          if (dataTransferencia.getMonth() === date.getMonth()) {
+            return transferencia;
+          }
 
+          return null;
+        });
 
-      const filteredData = data.filter( (transferencia: Transferencia) => {
-
-        const dateSplited = new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}).split("/");
-        const dataTransferencia = new Date(Number(dateSplited[2]), Number(dateSplited[1]) - 1,  Number(dateSplited[0]));
-  
-        if (dataTransferencia.getMonth() === date.getMonth()) {
-          return transferencia;
-        }
-
-        return null;
+        return filteredData;
       });
-      
-      return filteredData;
-      
-    });
 
     return filteredData;
   }
-
 }
 
 export default function Transferencias() {
-  const [transferencias, setTransferencias]: [Transferencia[], any] = React.useState([]);
-  const [optionSelectedId, setOptionSelectedId]: [number, any] = React.useState(1);
-  const [transferenciasByMonth, setTransferenciasByMonth]: [Transferencia[], any] = React.useState([]);
-  const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] = React.useState(dayjs());
-  const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
-  const [categorias, setCategorias]: [{ [key: number]: string }, any] = React.useState({id:1, nome:""});
+  const [transferencias, setTransferencias]: [Transferencia[], any] =
+    React.useState([]);
+  const [optionSelectedId, setOptionSelectedId]: [number, any] =
+    React.useState(1);
+  const [transferenciasByMonth, setTransferenciasByMonth]: [
+    Transferencia[],
+    any,
+  ] = React.useState([]);
+  const [selectedMonthDate, setSelectedMonthDate]: [Dayjs, any] =
+    React.useState(dayjs());
+  const [bancos, setBancos]: [{ [key: number]: string }, any] = React.useState({
+    id: 1,
+    nome: "",
+  });
+  const [categorias, setCategorias]: [{ [key: number]: string }, any] =
+    React.useState({ id: 1, nome: "" });
   const { user } = useAuth();
-  const [transferenciasUrlPath, setTransferenciasUrlPath]: [string, any] = React.useState("/transferencias/entre-bancos/" + user!.id);
-
+  const [transferenciasUrlPath, setTransferenciasUrlPath]: [string, any] =
+    React.useState("/transferencias/entre-bancos/" + user!.id);
 
   React.useEffect(() => {
     async function getBancos() {
-
-      const bancosNameById: { [key: number]: string }  = {};
+      const bancosNameById: { [key: number]: string } = {};
 
       axios.get(`/bancos/usuario/${user!.id}`).then((response) => {
         const data: Banco[] = response.data;
@@ -102,32 +125,28 @@ export default function Transferencias() {
         });
         setBancos(bancosNameById);
       });
-      
     }
     getBancos();
-  }, [user])
+  }, [user]);
 
   React.useEffect(() => {
     async function getCategorias() {
-      const categoriasNameById: { [key: number]: string }  = {};
+      const categoriasNameById: { [key: number]: string } = {};
       axios.get(`/categorias/usuario/${user!.id}`).then((response) => {
-        const data: Categoria[] = response.data
+        const data: Categoria[] = response.data;
 
         data.forEach((categoria: Categoria) => {
           categoriasNameById[categoria.id] = categoria.nome;
         });
         setCategorias(categoriasNameById);
       });
-      
     }
     getCategorias();
-  }, [user])
+  }, [user]);
 
   React.useEffect(() => {
     getTransferencias.getTransferencias(transferenciasUrlPath).then((data) => {
-
       setTransferencias(data);
-
     });
   }, [transferenciasUrlPath]);
 
@@ -140,104 +159,203 @@ export default function Transferencias() {
   }, [optionSelectedId, user]);
   const handleDeleteTranf = async (url: string) => {
     await axios.delete(url);
-  }
+  };
 
   React.useEffect(() => {
-    getTransferencias.getTransferenciasByMonth(transferenciasUrlPath, selectedMonthDate.toDate()).then((data) => {
-      
-      const namedTransferencias = data.map((transferencia: Transferencia) => {
-        const tipoTransf = transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id ? "entre-bancos" : "entre-categorias"
-        return {
-          id: transferencia.id,
-          created_at: new Date(transferencia.data_de_competencia).toLocaleDateString("pt-br", {timeZone: "America/Sao_Paulo"}),
-          origem: transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id ? bancos[transferencia.origem.id] : categorias[transferencia.origem.id],
-          destino: transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id ? bancos[transferencia.destino.id] : categorias[transferencia.destino.id],
-          intermediario: transferenciasUrlPath === "/transferencias/entre-categorias/" + user!.id ? bancos[transferencia.intermediario.id] : categorias[transferencia.intermediario.id],
-          valor: transferencia.valor,
-          opcoes: (
-            <div style={{ display: "flex", gap:"1rem" }}>
-              <Link to={`transferencias/edit/${tipoTransf}/${transferencia.id}/`}><FaEdit size={24} color={colors.secondaryColor}/></Link>
-              <span onClick={() => handleDeleteTranf(`transferencias/${tipoTransf}/${transferencia.id}`)} style={{cursor: "pointer"}}><MdDelete size={24} color={colors.dangerColor}/></span>
-            </div>
-          )
-        }
-      })
-      
-      setTransferenciasByMonth(namedTransferencias);
-    })
-  }, [selectedMonthDate, transferenciasUrlPath, bancos, categorias, user]);
+    getTransferencias
+      .getTransferenciasByMonth(
+        transferenciasUrlPath,
+        selectedMonthDate.toDate(),
+      )
+      .then((data) => {
+        const namedTransferencias = data.map((transferencia: Transferencia) => {
+          const tipoTransf =
+            transferenciasUrlPath === "/transferencias/entre-bancos/" + user!.id
+              ? "entre-bancos"
+              : "entre-categorias";
+          return {
+            id: transferencia.id,
+            created_at: new Date(
+              transferencia.data_de_competencia,
+            ).toLocaleDateString("pt-br", { timeZone: "America/Sao_Paulo" }),
+            origem:
+              transferenciasUrlPath ===
+              "/transferencias/entre-bancos/" + user!.id
+                ? bancos[transferencia.origem.id]
+                : categorias[transferencia.origem.id],
+            destino:
+              transferenciasUrlPath ===
+              "/transferencias/entre-bancos/" + user!.id
+                ? bancos[transferencia.destino.id]
+                : categorias[transferencia.destino.id],
+            intermediario:
+              transferenciasUrlPath ===
+              "/transferencias/entre-categorias/" + user!.id
+                ? bancos[transferencia.intermediario.id]
+                : categorias[transferencia.intermediario.id],
+            valor: transferencia.valor,
+            opcoes: (
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <Link
+                  to={`transferencias/edit/${tipoTransf}/${transferencia.id}/`}
+                >
+                  <FaEdit size={24} color={colors.secondaryColor} />
+                </Link>
+                <span
+                  onClick={() =>
+                    handleDeleteTranf(
+                      `transferencias/${tipoTransf}/${transferencia.id}`,
+                    )
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  <MdDelete size={24} color={colors.dangerColor} />
+                </span>
+              </div>
+            ),
+          };
+        });
 
+        setTransferenciasByMonth(namedTransferencias);
+      });
+  }, [selectedMonthDate, transferenciasUrlPath, bancos, categorias, user]);
 
   return (
     <div className="transferencias-body-div">
       <Title>Transferencias</Title>
       <StyledButtonGroup className="transferencias-button-group">
-        <StyledButton id={1} selected={optionSelectedId === 1} onClick={() => setOptionSelectedId(1)}>Entre Bancos</StyledButton>
-        <StyledButton id={2} selected={optionSelectedId === 2} onClick={() => setOptionSelectedId(2)}>Entre Categorias</StyledButton>
+        <StyledButton
+          id={1}
+          selected={optionSelectedId === 1}
+          onClick={() => setOptionSelectedId(1)}
+        >
+          Entre Bancos
+        </StyledButton>
+        <StyledButton
+          id={2}
+          selected={optionSelectedId === 2}
+          onClick={() => setOptionSelectedId(2)}
+        >
+          Entre Categorias
+        </StyledButton>
       </StyledButtonGroup>
-      <div style={
-        {
+      <div
+        style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           flexDirection: "row",
-          margin: "10px auto"
-        }
-      }>
-        <div style={{margin: "2rem", border:`1px solid ${colors.primaryColor}`, boxShadow: "1px rgba(0, 0, 0, 0.5)"}}>
+          margin: "10px auto",
+        }}
+      >
+        <div
+          style={{
+            margin: "2rem",
+            border: `1px solid ${colors.primaryColor}`,
+            boxShadow: "1px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           <SubTitle2>Selecione o mês:</SubTitle2>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>  
-            <MonthCalendar value={selectedMonthDate} onChange={setSelectedMonthDate} className="transferencias-calendar"/>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <StyledStaticDatePicker
+              value={selectedMonthDate}
+              onChange={(newValue: any) => setSelectedMonthDate(newValue)}
+              views={["year", "month"]}
+              disableFuture={true}
+              slotProps={{
+                actionBar: {
+                  actions: [],
+                },
+                toolbar: {
+                  hidden: true,
+                },
+              }}
+            />
           </LocalizationProvider>
-
         </div>
-          {
-            (
-            <DataGridBox>
-
-              <DataGrid
-                rows={transferenciasByMonth}
-                columns={[
-                  { field: "id", headerName: "ID", width: 70, headerClassName: "datagrid-headers", headerAlign: 'center' },
-                  { field: "created_at", headerName: "Data", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center' },
-                  { field: "origem", headerName: "Origem", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center' },
-                  { field: "destino", headerName: "Destino", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center' },
-                  { field: "intermediario", headerName: "Intermediario", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center' },
-                  { field: "valor", headerName: "Valor", width: 130, valueFormatter: (value: number) => `R$ ${value.toFixed(2)}`, headerClassName: "datagrid-headers", headerAlign: 'center'},
-                  { field: "opcoes", headerName: "Opções", width: 130, headerClassName: "datagrid-headers", headerAlign: 'center', renderCell: (params) => params.value },
-                ]}
-                sx= {
-                  {
-                    boxShadow: 4,
-                    border: 2,
-                    borderColor: colors.primaryColor,
-                    '& .MuiDataGrid-cell:hover': {
-                      color: 'primary.main',
-                    },
-                    width: "53rem",
-                    height: "50rem",
-                    position: "relative",
-                    margin: "10px auto",
-                    backgroundColor: colors.tertiaryColor,
-                    fontSize: 16,
-                  }
-                }
-                slots={{
-                  toolbar: GridToolbar,
-                }}
-                slotProps={{
-                  toolbar: {
-                    showQuickFilter: true
-                  }
-                }}
-                />
-
-            </DataGridBox>
-
-              )
-          }
+        {
+          <DataGridBox>
+            <DataGrid
+              rows={transferenciasByMonth}
+              columns={[
+                {
+                  field: "id",
+                  headerName: "ID",
+                  width: 70,
+                  headerClassName: "datagrid-headers",
+                  headerAlign: "center",
+                },
+                {
+                  field: "created_at",
+                  headerName: "Data",
+                  width: 130,
+                  headerClassName: "datagrid-headers",
+                  headerAlign: "center",
+                },
+                {
+                  field: "origem",
+                  headerName: "Origem",
+                  width: 130,
+                  headerClassName: "datagrid-headers",
+                  headerAlign: "center",
+                },
+                {
+                  field: "destino",
+                  headerName: "Destino",
+                  width: 130,
+                  headerClassName: "datagrid-headers",
+                  headerAlign: "center",
+                },
+                {
+                  field: "intermediario",
+                  headerName: "Intermediario",
+                  width: 130,
+                  headerClassName: "datagrid-headers",
+                  headerAlign: "center",
+                },
+                {
+                  field: "valor",
+                  headerName: "Valor",
+                  width: 130,
+                  valueFormatter: (value: number) => `R$ ${value.toFixed(2)}`,
+                  headerClassName: "datagrid-headers",
+                  headerAlign: "center",
+                },
+                {
+                  field: "opcoes",
+                  headerName: "Opções",
+                  width: 130,
+                  headerClassName: "datagrid-headers",
+                  headerAlign: "center",
+                  renderCell: (params) => params.value,
+                },
+              ]}
+              sx={{
+                boxShadow: 4,
+                border: 2,
+                borderColor: colors.primaryColor,
+                "& .MuiDataGrid-cell:hover": {
+                  color: "primary.main",
+                },
+                width: "53rem",
+                height: "50rem",
+                position: "relative",
+                margin: "10px auto",
+                backgroundColor: colors.tertiaryColor,
+                fontSize: 16,
+              }}
+              slots={{
+                toolbar: GridToolbar,
+              }}
+              slotProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                },
+              }}
+            />
+          </DataGridBox>
+        }
       </div>
-
     </div>
   );
 }

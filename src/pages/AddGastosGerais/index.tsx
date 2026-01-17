@@ -1,5 +1,13 @@
 import React from "react";
-import { GeneralBox, DataGridBox, InputBox, FormRow, TwoColumns, FormColumn, ListColumn } from "./styled";
+import {
+  GeneralBox,
+  DataGridBox,
+  InputBox,
+  FormRow,
+  TwoColumns,
+  FormColumn,
+  ListColumn,
+} from "./styled";
 import { Title } from "../../styles/GlobalStyles";
 import { Button, Label, Select, TextInput } from "flowbite-react";
 import axios from "../../services/axios";
@@ -9,12 +17,15 @@ import * as colors from "../../config/colors";
 import { toast } from "react-toastify";
 import { useAuth } from "../../services/useAuth";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { fixDate } from "../../config/dates";
 
 export default function AddGastosGerais(): JSX.Element {
   const [bancos, setBancos]: [Banco[], any] = React.useState([]);
   const [categorias, setCategorias]: [Categoria[], any] = React.useState([]);
 
-  const [tipoGasto, setTipoGasto] = React.useState<"normal" | "periodico">("normal");
+  const [tipoGasto, setTipoGasto] = React.useState<"normal" | "periodico">(
+    "normal",
+  );
 
   // Common fields
   const [idBanco, setIdBanco] = React.useState<number | "">("");
@@ -28,7 +39,9 @@ export default function AddGastosGerais(): JSX.Element {
   // Periódico
   const [dataInicio, setDataInicio] = React.useState<string>("");
   const [dataFim, setDataFim] = React.useState<string>("");
-  const [frequencia, setFrequencia] = React.useState<"diario" | "semanal" | "mensal" | "anual">("mensal");
+  const [frequencia, setFrequencia] = React.useState<
+    "diario" | "semanal" | "mensal" | "anual"
+  >("mensal");
 
   const { user } = useAuth();
 
@@ -69,7 +82,9 @@ export default function AddGastosGerais(): JSX.Element {
         setBancos(bancosRes.data);
         setCategorias(categoriasRes.data);
       } catch (error: any) {
-        toast.error(error?.response?.data?.detail || "Erro ao carregar bancos/categorias");
+        toast.error(
+          error?.response?.data?.detail || "Erro ao carregar bancos/categorias",
+        );
       }
     }
     fetchData();
@@ -82,14 +97,31 @@ export default function AddGastosGerais(): JSX.Element {
       sinceDate.setDate(sinceDate.getDate() - 2);
       const res = await axios.get(`/gastos/usuario/${user!.id}`);
       const data = res.data as any[];
-      const lastTwoDays = data.filter((g: any) => new Date(g.created_at) >= sinceDate);
+      const lastTwoDays = data.filter(
+        (g: any) => new Date(g.created_at) >= sinceDate,
+      );
 
       const mapped: RecentGasto[] = lastTwoDays.map((g: any) => {
-        const bancoNome = g.banco?.nome ?? bancos.find((b) => b.id === (g.banco?.id || g.id_banco || g.banco_id))?.nome ?? "";
-        const categoriaNome = g.categoria?.nome ?? categorias.find((c) => c.id === (g.categoria?.id || g.id_categoria || g.categoria_id))?.nome ?? "";
+        const bancoNome =
+          g.banco?.nome ??
+          bancos.find((b) => b.id === (g.banco?.id || g.id_banco || g.banco_id))
+            ?.nome ??
+          "";
+        const categoriaNome =
+          g.categoria?.nome ??
+          categorias.find(
+            (c) =>
+              c.id === (g.categoria?.id || g.id_categoria || g.categoria_id),
+          )?.nome ??
+          "";
         return {
           id: g.id,
-          data: new Date(g.data_de_competencia ?? g.created_at).toLocaleDateString("pt-BR", {timeZone: "America/Sao_Paulo"}),
+          data: fixDate(
+            new Date(g.data_de_competencia ?? g.created_at).toLocaleDateString(
+              "pt-BR",
+              { timeZone: "America/Sao_Paulo" },
+            ),
+          ).toLocaleDateString("pt-br"),
           banco: bancoNome,
           categoria: categoriaNome,
           descricao: g.descricao || "",
@@ -122,10 +154,13 @@ export default function AddGastosGerais(): JSX.Element {
     if (!idCategoria) return toast.warn("Selecione uma categoria");
     if (!descricao) return toast.warn("Preencha a descrição");
     const valorNumber = Number(valor);
-    if (!valor || isNaN(valorNumber) || valorNumber <= 0) return toast.warn("Informe um valor válido");
+    if (!valor || isNaN(valorNumber) || valorNumber <= 0)
+      return toast.warn("Informe um valor válido");
 
-    if (tipoGasto === "normal" && !dataCompetencia) return toast.warn("Informe a data de competência");
-    if (tipoGasto === "periodico" && !dataInicio) return toast.warn("Informe a data de início");
+    if (tipoGasto === "normal" && !dataCompetencia)
+      return toast.warn("Informe a data de competência");
+    if (tipoGasto === "periodico" && !dataInicio)
+      return toast.warn("Informe a data de início");
 
     const newItem: PendingGasto = {
       id: nextRowId,
@@ -136,7 +171,7 @@ export default function AddGastosGerais(): JSX.Element {
       valor: valorNumber,
       data_de_competencia: tipoGasto === "normal" ? dataCompetencia : undefined,
       data_ultimo_pagamento: tipoGasto === "periodico" ? dataInicio : undefined,
-      data_fim: tipoGasto === "periodico" ? (dataFim || null) : undefined,
+      data_fim: tipoGasto === "periodico" ? dataFim || null : undefined,
       frequencia: tipoGasto === "periodico" ? frequencia : undefined,
     };
 
@@ -146,26 +181,25 @@ export default function AddGastosGerais(): JSX.Element {
 
   // Save all items in the list to the backend
   async function handleSaveAll() {
-    if (pendingItems.length === 0) return toast.info("Adicione itens à lista antes de salvar");
+    if (pendingItems.length === 0)
+      return toast.info("Adicione itens à lista antes de salvar");
     try {
-      const payload = pendingItems.map(
-        (gasto: PendingGasto) => {
-          return {
-            id_usuario: user!.id,
-            id_banco: gasto.id_banco,
-            id_categoria: gasto.id_categoria,
-            valor: gasto.valor,
-            descricao: gasto.descricao,
-            data_de_competencia: gasto.data_de_competencia,
-            tipo: gasto.tipo
-          }
-        }
-      )
+      const payload = pendingItems.map((gasto: PendingGasto) => {
+        return {
+          id_usuario: user!.id,
+          id_banco: gasto.id_banco,
+          id_categoria: gasto.id_categoria,
+          valor: gasto.valor,
+          descricao: gasto.descricao,
+          data_de_competencia: gasto.data_de_competencia,
+          tipo: gasto.tipo,
+        };
+      });
       const res = await axios.post("/gastos/novo/lista", payload);
 
       if (res.status === 201) {
         resetForm();
-        setPendingItems([])
+        setPendingItems([]);
         fetchRecent();
       }
     } catch (err) {
@@ -182,26 +216,42 @@ export default function AddGastosGerais(): JSX.Element {
             <FormRow>
               <InputBox>
                 <Label htmlFor="tipo-gasto" value="Tipo de gasto" />
-                <Select id="tipo-gasto" value={tipoGasto} onChange={(e) => setTipoGasto(e.target.value as any)}>
+                <Select
+                  id="tipo-gasto"
+                  value={tipoGasto}
+                  onChange={(e) => setTipoGasto(e.target.value as any)}
+                >
                   <option value="normal">Normal</option>
                   <option value="periodico">Periódico</option>
                 </Select>
               </InputBox>
               <InputBox>
                 <Label htmlFor="banco" value="Banco" />
-                <Select id="banco" value={idBanco} onChange={(e) => setIdBanco(Number(e.target.value))}>
+                <Select
+                  id="banco"
+                  value={idBanco}
+                  onChange={(e) => setIdBanco(Number(e.target.value))}
+                >
                   <option value="">Selecione...</option>
                   {bancos.map((b) => (
-                    <option key={b.id} value={b.id}>{b.nome}</option>
+                    <option key={b.id} value={b.id}>
+                      {b.nome}
+                    </option>
                   ))}
                 </Select>
               </InputBox>
               <InputBox>
                 <Label htmlFor="categoria" value="Categoria" />
-                <Select id="categoria" value={idCategoria} onChange={(e) => setIdCategoria(Number(e.target.value))}>
+                <Select
+                  id="categoria"
+                  value={idCategoria}
+                  onChange={(e) => setIdCategoria(Number(e.target.value))}
+                >
                   <option value="">Selecione...</option>
                   {categorias.map((c) => (
-                    <option key={c.id} value={c.id}>{c.nome}</option>
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
                   ))}
                 </Select>
               </InputBox>
@@ -210,16 +260,37 @@ export default function AddGastosGerais(): JSX.Element {
             <FormRow>
               <InputBox>
                 <Label htmlFor="descricao" value="Descrição" />
-                <TextInput id="descricao" placeholder="Ex: cafezinho" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+                <TextInput
+                  id="descricao"
+                  placeholder="Ex: cafezinho"
+                  value={descricao}
+                  onChange={(e) => setDescricao(e.target.value)}
+                />
               </InputBox>
               <InputBox>
                 <Label htmlFor="valor" value="Valor (R$)" />
-                <TextInput id="valor" type="number" step="0.01" min="0" placeholder="0,00" value={valor} onChange={(e) => setValor(e.target.value)} />
+                <TextInput
+                  id="valor"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0,00"
+                  value={valor}
+                  onChange={(e) => setValor(e.target.value)}
+                />
               </InputBox>
               {tipoGasto === "normal" && (
                 <InputBox>
-                  <Label htmlFor="data-competencia" value="Data de competência" />
-                  <TextInput id="data-competencia" type="date" value={dataCompetencia} onChange={(e) => setDataCompetencia(e.target.value)} />
+                  <Label
+                    htmlFor="data-competencia"
+                    value="Data de competência"
+                  />
+                  <TextInput
+                    id="data-competencia"
+                    type="date"
+                    value={dataCompetencia}
+                    onChange={(e) => setDataCompetencia(e.target.value)}
+                  />
                 </InputBox>
               )}
             </FormRow>
@@ -228,15 +299,29 @@ export default function AddGastosGerais(): JSX.Element {
               <FormRow>
                 <InputBox>
                   <Label htmlFor="data-inicio" value="Início" />
-                  <TextInput id="data-inicio" type="date" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} />
+                  <TextInput
+                    id="data-inicio"
+                    type="date"
+                    value={dataInicio}
+                    onChange={(e) => setDataInicio(e.target.value)}
+                  />
                 </InputBox>
                 <InputBox>
                   <Label htmlFor="data-fim" value="Fim (opcional)" />
-                  <TextInput id="data-fim" type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} />
+                  <TextInput
+                    id="data-fim"
+                    type="date"
+                    value={dataFim}
+                    onChange={(e) => setDataFim(e.target.value)}
+                  />
                 </InputBox>
                 <InputBox>
                   <Label htmlFor="frequencia" value="Frequência" />
-                  <Select id="frequencia" value={frequencia} onChange={(e) => setFrequencia(e.target.value as any)}>
+                  <Select
+                    id="frequencia"
+                    value={frequencia}
+                    onChange={(e) => setFrequencia(e.target.value as any)}
+                  >
                     <option value="diario">Diário</option>
                     <option value="semanal">Semanal</option>
                     <option value="mensal">Mensal</option>
@@ -248,58 +333,79 @@ export default function AddGastosGerais(): JSX.Element {
 
             <FormRow>
               <InputBox>
-                <Button type="submit"><span>Adicionar à lista</span></Button>
+                <Button type="submit">
+                  <span>Adicionar à lista</span>
+                </Button>
               </InputBox>
               <InputBox>
-                <Button color="success" onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); handleSaveAll(); }}><span>Enviar lista</span></Button>
+                <Button
+                  color="success"
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.preventDefault();
+                    handleSaveAll();
+                  }}
+                >
+                  <span>Enviar lista</span>
+                </Button>
               </InputBox>
               <InputBox>
-                <Button color="purple" onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.preventDefault();
-                  // send only current input as one gasto
-                  if (!idBanco) return toast.warn("Selecione um banco");
-                  if (!idCategoria) return toast.warn("Selecione uma categoria");
-                  if (!descricao) return toast.warn("Preencha a descrição");
-                  const valorNumber = Number(valor);
-                  if (!valor || isNaN(valorNumber) || valorNumber <= 0) return toast.warn("Informe um valor válido");
-                  try {
-                    if (tipoGasto === "normal") {
-                      if (!dataCompetencia) return toast.warn("Informe a data de competência");
-                      const payload = {
-                        id_usuario: user!.id,
-                        id_banco: idBanco,
-                        id_categoria: idCategoria,
-                        descricao,
-                        valor: valorNumber,
-                        data_de_competencia: dataCompetencia,
-                        tipo: "normal",
-                      };
-                      const res = await axios.post("/gastos/novo", payload);
-                      if (res.status === 201 || res.status === 200) {
-                        toast.success("Gasto enviado");
-                        fetchRecent();
+                <Button
+                  color="purple"
+                  onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.preventDefault();
+                    // send only current input as one gasto
+                    if (!idBanco) return toast.warn("Selecione um banco");
+                    if (!idCategoria)
+                      return toast.warn("Selecione uma categoria");
+                    if (!descricao) return toast.warn("Preencha a descrição");
+                    const valorNumber = Number(valor);
+                    if (!valor || isNaN(valorNumber) || valorNumber <= 0)
+                      return toast.warn("Informe um valor válido");
+                    try {
+                      if (tipoGasto === "normal") {
+                        if (!dataCompetencia)
+                          return toast.warn("Informe a data de competência");
+                        const payload = {
+                          id_usuario: user!.id,
+                          id_banco: idBanco,
+                          id_categoria: idCategoria,
+                          descricao,
+                          valor: valorNumber,
+                          data_de_competencia: dataCompetencia,
+                          tipo: "normal",
+                        };
+                        const res = await axios.post("/gastos/novo", payload);
+                        if (res.status === 201 || res.status === 200) {
+                          toast.success("Gasto enviado");
+                          fetchRecent();
+                        }
+                      } else {
+                        if (!dataInicio)
+                          return toast.warn("Informe a data de início");
+                        const payload = {
+                          id_usuario: user!.id,
+                          id_banco: idBanco,
+                          id_categoria: idCategoria,
+                          descricao,
+                          valor: valorNumber,
+                          data_ultimo_pagamento: dataInicio,
+                          tipo: "periodico",
+                        };
+                        const res = await axios.post("/gastos/novo", payload);
+                        if (res.status === 201 || res.status === 200) {
+                          toast.success("Gasto periódico enviado");
+                          fetchRecent();
+                        }
                       }
-                    } else {
-                      if (!dataInicio) return toast.warn("Informe a data de início");
-                      const payload = {
-                        id_usuario: user!.id,
-                        id_banco: idBanco,
-                        id_categoria: idCategoria,
-                        descricao,
-                        valor: valorNumber,
-                        data_ultimo_pagamento: dataInicio,
-                        tipo: "periodico",
-                      };
-                      const res = await axios.post("/gastos/novo", payload);
-                      if (res.status === 201 || res.status === 200) {
-                        toast.success("Gasto periódico enviado");
-                        fetchRecent();
-                      }
+                    } catch (error: any) {
+                      toast.error(
+                        error?.response?.data.message || "Erro ao enviar gasto",
+                      );
                     }
-                  } catch (error: any) {
-                    toast.error(error?.response?.data.message || "Erro ao enviar gasto");
-                  }
-                }}><span>Enviar somente este</span></Button>
+                  }}
+                >
+                  <span>Enviar somente este</span>
+                </Button>
               </InputBox>
             </FormRow>
           </form>
@@ -307,14 +413,21 @@ export default function AddGastosGerais(): JSX.Element {
 
         {/* Right side simple list */}
         <ListColumn>
-          <h3 style={{ color: colors.secondaryColor, marginBottom: 10 }}>Gastos na lista</h3>
+          <h3 style={{ color: colors.secondaryColor, marginBottom: 10 }}>
+            Gastos na lista
+          </h3>
           <div style={{ maxHeight: 480, overflowY: "auto" }}>
             {pendingItems.length === 0 ? (
               <p style={{ color: "#333" }}>Nenhum item na lista</p>
             ) : (
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
-                  <tr style={{ background: colors.primaryColor, color: colors.secondaryColor }}>
+                  <tr
+                    style={{
+                      background: colors.primaryColor,
+                      color: colors.secondaryColor,
+                    }}
+                  >
                     <th style={{ textAlign: "left", padding: 8 }}>Banco</th>
                     <th style={{ textAlign: "left", padding: 8 }}>Categoria</th>
                     <th style={{ textAlign: "left", padding: 8 }}>Descrição</th>
@@ -324,26 +437,50 @@ export default function AddGastosGerais(): JSX.Element {
                 </thead>
                 <tbody>
                   {pendingItems.map((item) => {
-                    const bancoNome = bancos.find((b) => b.id === item.id_banco)?.nome || "";
-                    const categoriaNome = categorias.find((c) => c.id === item.id_categoria)?.nome || "";
+                    const bancoNome =
+                      bancos.find((b) => b.id === item.id_banco)?.nome || "";
+                    const categoriaNome =
+                      categorias.find((c) => c.id === item.id_categoria)
+                        ?.nome || "";
                     return (
                       <tr key={item.id} style={{ background: "#fff" }}>
                         <td style={{ padding: 8 }}>{bancoNome}</td>
                         <td style={{ padding: 8 }}>{categoriaNome}</td>
                         <td style={{ padding: 8 }}>{item.descricao}</td>
-                        <td style={{ padding: 8, textAlign: "right" }}>R$ {Number(item.valor || 0).toFixed(2)}</td>
+                        <td style={{ padding: 8, textAlign: "right" }}>
+                          R$ {Number(item.valor || 0).toFixed(2)}
+                        </td>
                         <td style={{ padding: 8 }}>
-                          <Button color="failure" size="xs" onClick={() => setPendingItems((prev) => prev.filter((r) => r.id !== item.id))}><span>Remover</span></Button>
+                          <Button
+                            color="failure"
+                            size="xs"
+                            onClick={() =>
+                              setPendingItems((prev) =>
+                                prev.filter((r) => r.id !== item.id),
+                              )
+                            }
+                          >
+                            <span>Remover</span>
+                          </Button>
                         </td>
                       </tr>
-                    )
+                    );
                   })}
-                  <tr  style={{ background: "#fff" }}>
+                  <tr style={{ background: "#fff" }}>
                     <td style={{ padding: 8 }}></td>
                     <td style={{ padding: 8 }}></td>
                     <td style={{ padding: 8 }}>Total:</td>
 
-                    <td style={{ padding: 8, textAlign: "right" }}>R$ {pendingItems.map(item => Number(item.valor)).reduce((acc: number, currentVal: number) => acc + currentVal, 0).toFixed(2)}</td>
+                    <td style={{ padding: 8, textAlign: "right" }}>
+                      R${" "}
+                      {pendingItems
+                        .map((item) => Number(item.valor))
+                        .reduce(
+                          (acc: number, currentVal: number) => acc + currentVal,
+                          0,
+                        )
+                        .toFixed(2)}
+                    </td>
                     <td></td>
                   </tr>
                 </tbody>
@@ -353,7 +490,9 @@ export default function AddGastosGerais(): JSX.Element {
         </ListColumn>
       </TwoColumns>
       <div style={{ margin: "2rem 1rem" }}>
-        <h3 style={{ fontWeight: "bold", marginBottom: 10 }}>Histórico (últimos 2 dias)</h3>
+        <h3 style={{ fontWeight: "bold", marginBottom: 10 }}>
+          Histórico (últimos 2 dias)
+        </h3>
         <div style={{ maxHeight: 400, overflowY: "auto" }}>
           {recentItems.length === 0 ? (
             <p style={{ color: "#333" }}>Nenhum gasto recente</p>
@@ -377,7 +516,9 @@ export default function AddGastosGerais(): JSX.Element {
                     <td style={{ padding: 8 }}>{item.banco}</td>
                     <td style={{ padding: 8 }}>{item.categoria}</td>
                     <td style={{ padding: 8 }}>{item.descricao}</td>
-                    <td style={{ padding: 8, textAlign: "right" }}>R$ {item.valor.toFixed(2)}</td>
+                    <td style={{ padding: 8, textAlign: "right" }}>
+                      R$ {item.valor.toFixed(2)}
+                    </td>
                   </tr>
                 ))}
                 <tr>
@@ -386,7 +527,13 @@ export default function AddGastosGerais(): JSX.Element {
                   <td></td>
                   <td></td>
                   <td>Total:</td>
-                  <td style={{ padding: 8, textAlign: "right" }}>R$ {recentItems.map(item => item.valor).reduce((acc, currentVal) => acc + currentVal, 0).toFixed(2)}</td>
+                  <td style={{ padding: 8, textAlign: "right" }}>
+                    R${" "}
+                    {recentItems
+                      .map((item) => item.valor)
+                      .reduce((acc, currentVal) => acc + currentVal, 0)
+                      .toFixed(2)}
+                  </td>
                 </tr>
               </tbody>
             </table>
