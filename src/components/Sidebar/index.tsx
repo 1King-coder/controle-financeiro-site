@@ -13,6 +13,7 @@ import { BiTransfer } from "react-icons/bi";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { GiPayMoney } from "react-icons/gi";
 import { TbPigMoney } from "react-icons/tb";
+import { FaUserCircle } from "react-icons/fa";
 
 export default function SideBar(): JSX.Element {
   const menuItemStyles: MenuItemStyles = {
@@ -62,6 +63,7 @@ export default function SideBar(): JSX.Element {
           <MenuItem component={<Link to="/depositos/add" />} suffix={<TbPigMoney size={24} />}>Depósitos</MenuItem>
           <MenuItem component={<Link to="/transferencias/add" />} suffix={<BiTransfer size={24} />}>Transferências</MenuItem>
         </SubMenu> 
+        <MenuItem icon={<FaUserCircle size={24}/>} component={<Link to="/perfil" />}>Meu Perfil</MenuItem>
       </Menu>
       
 

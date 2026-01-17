@@ -20,6 +20,7 @@ import { useAuth } from "../../services/useAuth";
 import { Link } from "react-router-dom";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
+import { StyledStaticDatePicker } from "../Depositos/styled";
 
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(id_user: Number): Promise<GastoGeral[]> {
@@ -258,7 +259,22 @@ export function GastosGerais(): JSX.Element {
               <div style={{ margin: "auto"}}>
                 <SubTitle2>Selecione o mês</SubTitle2>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <MonthCalendar value={selectedMonthDate} onChange={(newValue) => setSelectedMonthDate(newValue)}/>
+                  <StyledStaticDatePicker 
+                                    value={selectedMonthDate} 
+                                    onChange={(newValue:any) => setSelectedMonthDate(newValue)} 
+                                    views={['year', 'month']}
+                                    disableFuture={true}
+                                    slotProps= {
+                                      {
+                                        actionBar: {
+                                          actions: []
+                                        },
+                                        toolbar: {
+                                          hidden: true
+                                        }
+                                      }
+                                    }
+                    />
                 </LocalizationProvider>
               </div>
                   {

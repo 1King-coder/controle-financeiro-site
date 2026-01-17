@@ -130,7 +130,7 @@ class GetBancosDataFuncions {
   }
 }
 
-export default function AddBancos() {
+export default function EnviaPorPlanilha() {
   const { user } = useAuth();  
   const [fileUploaded, setFileUploaded] = React.useState<boolean>(false);
   const [entradasSaidasData, setEntradasSaidasData] = React.useState<any[]>([]);

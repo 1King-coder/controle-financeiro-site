@@ -109,6 +109,12 @@ export default function Login() {
           <Link to='/cadastro' style={{color: "blue", textDecoration: "underline"}}>
           aqui
           </Link>
+          <br/>
+          <Link to='/recuperar-senha-email' style={{color: "blue", textDecoration: "underline"}}>
+          Esqueceu sua senha?
+          </Link>
+
+          
         </form>
         
       </div>

@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import * as colors from "../../config/colors";
+import { StaticDatePicker } from "@mui/x-date-pickers";
 
 export const Title = styled.h1`
   color: ${colors.secondaryColor};
@@ -67,4 +68,8 @@ export const DataGridBox = styled.div`
     font-weight: bold;
     font-size: 16px;
   }
+`
+
+export const StyledStaticDatePicker = styled(StaticDatePicker)`
+
 `

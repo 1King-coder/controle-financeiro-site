@@ -73,7 +73,7 @@ export default function Header(): JSX.Element {
             <HoverEffect>
               <IoLogOut onClick={handleLogout} size={24} color={colors.secondaryColor}/>
             </HoverEffect> 
-            <Link to="user-page"> 
+            <Link to="perfil"> 
               <UsernameP>{user.username}</UsernameP>
             </Link>
           </BoxSide>

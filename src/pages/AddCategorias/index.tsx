@@ -23,7 +23,7 @@ export default function AddCategorias() {
       
     }
     getCategorias();
-  }, [])
+  }, [user]);
 
   function handleAdicionaCategoria () {
     const inputNomeCategoria = document.getElementById("nome-categoria") as HTMLInputElement;

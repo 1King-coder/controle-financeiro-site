@@ -18,7 +18,11 @@ import EditTransferencia from "../pages/EditTransferencia";
 import AddUsuario from "../pages/AddUsuario";
 import Login from "../pages/Login";
 import EnviaPorPlanilha from "../pages/EnviaPorPlanilha";
+import UserPage from "../pages/UserPage";
+import PoliPriv from "../pages/PoliPriv";
 import { ProtectedRoute } from "../components/AuthProvider";
+import RecuperaSenha from "../pages/RecuperaSenha";
+import RecuperaSenhaEmail from "../pages/RecuperaSenhaEmail";
 
 export default function Routes(): JSX.Element {
 
@@ -26,7 +30,10 @@ export default function Routes(): JSX.Element {
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/login" component={Login} />
+        <Route exact path="/recuperar-senha-email" component={RecuperaSenhaEmail} />
+        <Route exact path="/recuperar-senha/:id/:token" component={RecuperaSenha} />
         <Route exact path="/cadastro" component={AddUsuario} />
+        <Route exact path="/politica-de-privacidade" component={PoliPriv} />
         
         {/* Protected Routes */}
         <Route exact path="/bancos" component={(props: any) => (
@@ -104,6 +111,11 @@ export default function Routes(): JSX.Element {
         <Route exact path="/envia-por-planilha" component={(props: any) => (
           <ProtectedRoute>
             <EnviaPorPlanilha {...props} />
+          </ProtectedRoute>
+        )} />
+        <Route exact path="/perfil" component={(props: any) => (
+          <ProtectedRoute>
+            <UserPage {...props} />
           </ProtectedRoute>
         )} />
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Title, TimeIntervalOptionsDiv, SubTitle1, DataGridBox, SubTitle2} from "./styled";
+import { Title, TimeIntervalOptionsDiv, SubTitle1, DataGridBox, SubTitle2, StyledStaticDatePicker} from "./styled";
 import axios from "../../services/axios";
 import { GastoGeral } from "../../types/GastoGeral";
 import { Card, CardTitle, OptionBtn } from "../../styles/GlobalStyles";
@@ -7,7 +7,7 @@ import { dayOfTheWeek, months } from "../../config/dates";
 import * as colors from "../../config/colors";
 import { Banco } from "../../types/Banco";
 import { Categoria } from "../../types/Categoria";
-import {  LocalizationProvider, MonthCalendar } from "@mui/x-date-pickers";
+import {  DatePicker, LocalizationProvider, MonthCalendar, StaticDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import WeekPicker from "../../components/WeekPicker";
@@ -253,9 +253,24 @@ export function Depositos(): JSX.Element {
             <div style={{display:"flex", flexDirection: "row", flexWrap: "wrap", height: "100%", justifyContent: "center"}}>
               <SubTitle1>Você selecionou o mês de {months[selectedMonthDate.toDate().getMonth()]} de {new Date().getFullYear()}</SubTitle1>
               <div style={{ margin: "auto"}}>
-                <SubTitle2>Selecione o mês</SubTitle2>
+                <SubTitle2>Selecione o mês e o ano</SubTitle2>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <MonthCalendar value={selectedMonthDate} onChange={(newValue) => setSelectedMonthDate(newValue)}/>
+                  <StyledStaticDatePicker 
+                  value={selectedMonthDate} 
+                  onChange={(newValue:any) => setSelectedMonthDate(newValue)} 
+                  views={['year', 'month']}
+                  disableFuture={true}
+                  slotProps= {
+                    {
+                      actionBar: {
+                        actions: []
+                      },
+                      toolbar: {
+                        hidden: true
+                      }
+                    }
+                  }
+                  />
                 </LocalizationProvider>
               </div>
                   {
