@@ -116,9 +116,7 @@ export default function AddGastosGerais(): JSX.Element {
           "";
         return {
           id: g.id,
-          data: new Date(
-            g.data_de_competencia ?? g.created_at,
-          ).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }),
+          data: g.data_de_competencia,
           banco: bancoNome,
           categoria: categoriaNome,
           descricao: g.descricao || "",

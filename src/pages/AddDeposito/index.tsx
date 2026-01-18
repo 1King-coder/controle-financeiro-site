@@ -98,9 +98,7 @@ export default function AddDeposito(): JSX.Element {
           "";
         return {
           id: d.id,
-          data: new Date(d.data_de_competencia).toLocaleDateString("pt-BR", {
-            timeZone: "America/Sao_Paulo",
-          }),
+          data: d.data_de_competencia,
           banco: bancoNome,
           categoria: categoriaNome,
           descricao: d.descricao || "",

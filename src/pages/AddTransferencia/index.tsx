@@ -113,9 +113,7 @@ export default function AddTransferencia(): JSX.Element {
             "";
           return {
             id: t.id,
-            data: new Date(t.data_de_competencia).toLocaleDateString("pt-BR", {
-              timeZone: "America/Sao_Paulo",
-            }),
+            data: t.data_de_competencia,
             origem,
             destino,
             intermediario,
