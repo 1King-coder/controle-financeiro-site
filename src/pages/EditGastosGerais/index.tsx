@@ -7,7 +7,15 @@ import { Categoria } from "../../types/Categoria";
 import { useParams, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../services/useAuth";
-import { EditContainer, FormContainer, FormRow, FormField, ButtonContainer, StyledButton } from "./styled";
+import {
+  EditContainer,
+  FormContainer,
+  FormRow,
+  FormField,
+  ButtonContainer,
+  StyledButton,
+} from "./styled";
+import { fixDate } from "../../config/dates";
 
 type Params = { id: string };
 
@@ -37,7 +45,9 @@ export default function EditGastosGerais(): JSX.Element {
         setBancos(bRes.data);
         setCategorias(cRes.data);
       } catch (error: any) {
-        toast.error(error?.response?.data?.detail || "Erro ao carregar bancos/categorias");
+        toast.error(
+          error?.response?.data?.detail || "Erro ao carregar bancos/categorias",
+        );
       }
     }
 
@@ -51,7 +61,6 @@ export default function EditGastosGerais(): JSX.Element {
         setValor(String(g.valor ?? ""));
 
         setDataCompetencia(g.data_de_competencia.split("T")[0]);
-        
       } catch (error: any) {
         toast.error(error?.response?.data?.detail || "Erro ao carregar gasto");
       } finally {
@@ -79,11 +88,11 @@ export default function EditGastosGerais(): JSX.Element {
         history.push("/gastos-gerais");
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.detail || "Erro ao atualizar gasto");
+      toast.error(error?.response?.data?.message || "Erro ao atualizar gasto");
     }
   }
 
-  if (isLoading) return (<div>Carregando...</div>);
+  if (isLoading) return <div>Carregando...</div>;
 
   return (
     <EditContainer>
@@ -92,19 +101,31 @@ export default function EditGastosGerais(): JSX.Element {
         <FormRow>
           <FormField>
             <Label htmlFor="banco" value="Banco" />
-            <Select id="banco" value={idBanco} onChange={(e) => setIdBanco(Number(e.target.value))}>
+            <Select
+              id="banco"
+              value={idBanco}
+              onChange={(e) => setIdBanco(Number(e.target.value))}
+            >
               <option value="">Selecione...</option>
               {bancos.map((b) => (
-                <option key={b.id} value={b.id}>{b.nome}</option>
+                <option key={b.id} value={b.id}>
+                  {b.nome}
+                </option>
               ))}
             </Select>
           </FormField>
           <FormField>
             <Label htmlFor="categoria" value="Categoria" />
-            <Select id="categoria" value={idCategoria} onChange={(e) => setIdCategoria(Number(e.target.value))}>
+            <Select
+              id="categoria"
+              value={idCategoria}
+              onChange={(e) => setIdCategoria(Number(e.target.value))}
+            >
               <option value="">Selecione...</option>
               {categorias.map((c) => (
-                <option key={c.id} value={c.id}>{c.nome}</option>
+                <option key={c.id} value={c.id}>
+                  {c.nome}
+                </option>
               ))}
             </Select>
           </FormField>
@@ -112,24 +133,44 @@ export default function EditGastosGerais(): JSX.Element {
         <FormRow>
           <FormField style={{ flex: 2 }}>
             <Label htmlFor="descricao" value="Descrição" />
-            <TextInput id="descricao" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+            <TextInput
+              id="descricao"
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
+            />
           </FormField>
           <FormField>
             <Label htmlFor="valor" value="Valor (R$)" />
-            <TextInput id="valor" type="number" step="0.01" min="0" value={valor} onChange={(e) => setValor(e.target.value)} />
+            <TextInput
+              id="valor"
+              type="number"
+              step="0.01"
+              min="0"
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+            />
           </FormField>
           <FormField>
             <Label htmlFor="data" value="Data de competência" />
-            <TextInput id="data" type="date" value={dataCompetencia} onChange={(e) => setDataCompetencia(e.target.value)} />
+            <TextInput
+              id="data"
+              type="date"
+              value={dataCompetencia}
+              onChange={(e) => setDataCompetencia(e.target.value)}
+            />
           </FormField>
         </FormRow>
         <ButtonContainer>
           <StyledButton type="submit">Salvar</StyledButton>
-          <StyledButton type="button" className="secondary" onClick={() => history.goBack()}>Cancelar</StyledButton>
+          <StyledButton
+            type="button"
+            className="secondary"
+            onClick={() => history.goBack()}
+          >
+            Cancelar
+          </StyledButton>
         </ButtonContainer>
       </FormContainer>
     </EditContainer>
   );
 }
-
-
