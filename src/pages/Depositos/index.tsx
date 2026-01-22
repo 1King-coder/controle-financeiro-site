@@ -8,7 +8,6 @@ import {
   StyledStaticDatePicker,
 } from "./styled";
 import axios from "../../services/axios";
-import { GastoGeral } from "../../types/GastoGeral";
 import { Card, CardTitle, OptionBtn } from "../../styles/GlobalStyles";
 import { dayOfTheWeek, months } from "../../config/dates";
 import * as colors from "../../config/colors";
@@ -212,13 +211,13 @@ export function Depositos(): JSX.Element {
         const dateSplited = fixDate(deposito.data_de_competencia)
           .toLocaleDateString("pt-br", { timeZone: "America/Sao_Paulo" })
           .split("/");
-        const dataGasto = new Date(
+        const dataDeposito = new Date(
           Number(dateSplited[2]),
           Number(dateSplited[1]) - 1,
           Number(dateSplited[0]),
         );
 
-        listdepositosByWeekDay[dataGasto.getDay()].push(deposito);
+        listdepositosByWeekDay[dataDeposito.getDay()].push(deposito);
       });
       setdepositosByWeekDay(listdepositosByWeekDay);
     });
@@ -246,13 +245,13 @@ export function Depositos(): JSX.Element {
         const dateSplited = fixDate(deposito.data_de_competencia)
           .toLocaleDateString("pt-br", { timeZone: "America/Sao_Paulo" })
           .split("/");
-        const dataGasto = new Date(
+        const dataDeposito = new Date(
           Number(dateSplited[2]),
           Number(dateSplited[1]) - 1,
           Number(dateSplited[0]),
         );
 
-        listdepositosByActualWeekDay[dataGasto.getDay()].push(deposito);
+        listdepositosByActualWeekDay[dataDeposito.getDay()].push(deposito);
       });
       setdepositosByActualWeekDay(listdepositosByActualWeekDay);
     });
@@ -261,10 +260,10 @@ export function Depositos(): JSX.Element {
   const handleDeleteDeposito = async (itemUrl: string) => {
     const res = await axios.delete(itemUrl);
     if (res.status === 200) {
-      toast.success("Gasto deletado com sucesso");
+      toast.success("Depósito deletado com sucesso");
       window.location.reload();
     } else {
-      toast.error("Erro ao deletar gasto");
+      toast.error("Erro ao deletar depósito");
     }
   };
 
@@ -522,60 +521,63 @@ export function Depositos(): JSX.Element {
                 label: string;
               };
 
-              const groupedByCategoriaGastos: { [key: number]: number } =
+              const groupedByCategoriaDepositos: { [key: number]: number } =
                 depositosByMonth.reduce(
                   (
-                    groupedByCategoriaGastos: { [key: string]: number },
+                    groupedByCategoriaDepositos: { [key: string]: number },
                     item: any,
                   ) => {
                     if (
-                      !groupedByCategoriaGastos.hasOwnProperty(
+                      !groupedByCategoriaDepositos.hasOwnProperty(
                         item.categoria.id,
                       )
                     ) {
-                      groupedByCategoriaGastos[item.categoria.id] = 0;
+                      groupedByCategoriaDepositos[item.categoria.id] = 0;
                     }
 
-                    groupedByCategoriaGastos[item.categoria.id] += item.valor;
-                    return groupedByCategoriaGastos;
+                    groupedByCategoriaDepositos[item.categoria.id] +=
+                      item.valor;
+                    return groupedByCategoriaDepositos;
                   },
                   {},
                 );
 
-              const groupedByBancoGastos: { [key: number]: number } =
+              const groupedByBancoDepositos: { [key: number]: number } =
                 depositosByMonth.reduce(
                   (
-                    groupedByBancoGastos: { [key: string]: number },
+                    groupedByBancoDepositos: { [key: string]: number },
                     item: any,
                   ) => {
-                    if (!groupedByBancoGastos.hasOwnProperty(item.banco.id)) {
-                      groupedByBancoGastos[item.banco.id] = 0;
+                    if (
+                      !groupedByBancoDepositos.hasOwnProperty(item.banco.id)
+                    ) {
+                      groupedByBancoDepositos[item.banco.id] = 0;
                     }
 
-                    groupedByBancoGastos[item.banco.id] += item.valor;
-                    return groupedByBancoGastos;
+                    groupedByBancoDepositos[item.banco.id] += item.valor;
+                    return groupedByBancoDepositos;
                   },
                   {},
                 );
 
               const pieChartGroupedByCategoriaData: PieChartData[] =
-                Object.keys(groupedByCategoriaGastos).map(
+                Object.keys(groupedByCategoriaDepositos).map(
                   (categoria: string) => ({
                     id: Number(categoria),
-                    value: groupedByCategoriaGastos[Number(categoria)],
+                    value: groupedByCategoriaDepositos[Number(categoria)],
                     label: categorias[Number(categoria)],
                   }),
                 );
 
               const pieChartGroupedByBancoData: PieChartData[] = Object.keys(
-                groupedByBancoGastos,
+                groupedByBancoDepositos,
               ).map((Bancos: string) => ({
                 id: Number(Bancos),
-                value: groupedByBancoGastos[Number(Bancos)],
+                value: groupedByBancoDepositos[Number(Bancos)],
                 label: bancos[Number(Bancos)],
               }));
 
-              const totalGastos = depositosByMonth.reduce(
+              const totalDepositos = depositosByMonth.reduce(
                 (total, item) => total + item.valor,
                 0,
               );
@@ -612,7 +614,7 @@ export function Depositos(): JSX.Element {
                   </DataGridBox>
                   <Card>
                     <CardTitle>
-                      Total de gastos do mês de{" "}
+                      Total de Depósitos do mês de{" "}
                       {months[selectedMonthDate.toDate().getMonth()]}
                     </CardTitle>
                     <p
@@ -624,7 +626,7 @@ export function Depositos(): JSX.Element {
                         textAlign: "center",
                       }}
                     >
-                      R$ {totalGastos.toFixed(2)}
+                      R$ {totalDepositos.toFixed(2)}
                     </p>
                   </Card>
                   <div
@@ -635,7 +637,7 @@ export function Depositos(): JSX.Element {
                     }}
                   >
                     <PieChart
-                      title="Gastos por categoria"
+                      title="Depósitos por categoria"
                       series={[
                         {
                           arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
@@ -658,7 +660,7 @@ export function Depositos(): JSX.Element {
                     />
 
                     <PieChart
-                      title="Gastos por banco"
+                      title="Depósitos por banco"
                       series={[
                         {
                           arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
