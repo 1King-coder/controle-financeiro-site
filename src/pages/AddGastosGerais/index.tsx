@@ -169,6 +169,7 @@ export default function AddGastosGerais(): JSX.Element {
       if (res.status === 201) {
         resetForm();
         setPendingItems([]);
+        toast.success("Lista de gastos enviada");
         fetchRecent();
       }
     } catch (err) {
