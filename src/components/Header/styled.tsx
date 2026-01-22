@@ -14,7 +14,7 @@ export const Nav = styled.nav`
   align-items: center;
   justify-content: center;
   position: relative;
-  height: 10%;
+  height: fit-content;
 `;
 
 export const Box = styled.div`
