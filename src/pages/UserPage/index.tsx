@@ -15,6 +15,7 @@ import {
   InfoText,
   Section,
 } from "./styled";
+import history from "../../services/history";
 
 export default function UserPage(): JSX.Element {
   const { user, setUser } = useAuth();
@@ -24,6 +25,7 @@ export default function UserPage(): JSX.Element {
   const [sobrenome, setSobrenome] = React.useState<string>("");
   const [username, setUsername] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
+  const [stripeId, setStripeId] = React.useState<string>("");
 
   // Password Change State
   const [currentPassword, setCurrentPassword] = React.useState<string>("");
@@ -33,7 +35,46 @@ export default function UserPage(): JSX.Element {
   // Loading State
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [isSavingProfile, setIsSavingProfile] = React.useState<boolean>(false);
-  const [isSavingPassword, setIsSavingPassword] = React.useState<boolean>(false);
+  const [isSavingPassword, setIsSavingPassword] =
+    React.useState<boolean>(false);
+
+  const [subscriptionPortalUrl, setSubscriptionPortalUrl] =
+    React.useState<string>("");
+  const [monthlyCheckoutUrl, setMonthlyCheckoutUrl] =
+    React.useState<string>("");
+  const [annualCheckoutUrl, setAnnualCheckoutUrl] = React.useState<string>("");
+  const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
+  const [userToDelete, setUserToDelete] = React.useState<number | null>(null);
+
+  function handleDeleteUser(id_user: number) {
+    setUserToDelete(id_user);
+    setShowDeleteModal(true);
+  }
+
+  function cancelDelete() {
+    setShowDeleteModal(false);
+    setUserToDelete(null);
+  }
+
+  function confirmDelete() {
+    if (userToDelete) {
+      axios
+        .delete(`/usuarios/${userToDelete}`)
+        .then(() => {
+          toast.success("Conta deletada com sucesso.");
+          setShowDeleteModal(false);
+          setUser(null);
+          setUserToDelete(null);
+          history.replace("/login");
+        })
+        .catch((error) => {
+          toast.error(
+            "Erro ao deletar conta: " + error.response?.data?.message ||
+              error.message,
+          );
+        });
+    }
+  }
 
   React.useEffect(() => {
     async function fetchUserData() {
@@ -44,17 +85,73 @@ export default function UserPage(): JSX.Element {
         setSobrenome(userData.sobrenome || "");
         setUsername(userData.username || "");
         setEmail(userData.email || "");
+        setStripeId(userData.StripeCustomerId || "");
       } catch (error: any) {
-        toast.error(error?.response?.data?.detail || "Erro ao carregar dados do usuário");
+        toast.error(
+          error?.response?.data?.detail || "Erro ao carregar dados do usuário",
+        );
       } finally {
         setIsLoading(false);
+      }
+    }
+
+    async function fetchSubscriptionPortal() {
+      try {
+        const res = await axios.post(`/usuarios/generate-subscription-portal`, {
+          customerId: stripeId,
+        });
+        const { url } = res.data;
+        setSubscriptionPortalUrl(url);
+      } catch (error: any) {
+        console.log("Erro ao criar sessão do portal de assinatura:", error);
+      }
+    }
+
+    async function fetchMonthlyCheckoutSession() {
+      try {
+        const res = await axios.post(
+          `/usuarios/generate-monthly-checkout-session`,
+          {
+            userId: user?.id,
+            email: user?.email,
+          },
+        );
+        const { url } = res.data;
+        setMonthlyCheckoutUrl(url);
+      } catch (error: any) {
+        console.log("Erro ao criar sessão de checkout:", error);
+      }
+    }
+
+    async function fetchAnnualCheckoutSession() {
+      try {
+        const res = await axios.post(
+          `/usuarios/generate-annual-checkout-session`,
+          {
+            userId: user?.id,
+            email: user?.email,
+          },
+        );
+        const { url } = res.data;
+        setAnnualCheckoutUrl(url);
+      } catch (error: any) {
+        console.log("Erro ao criar sessão de checkout:", error);
       }
     }
 
     if (user?.id) {
       fetchUserData();
     }
-  }, [user]);
+
+    if (user?.hasSubscription && stripeId) {
+      fetchSubscriptionPortal();
+    }
+
+    if (!user?.hasSubscription && user?.id) {
+      fetchMonthlyCheckoutSession();
+      fetchAnnualCheckoutSession();
+    }
+  }, [user, stripeId]);
 
   async function handleProfileSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -99,7 +196,7 @@ export default function UserPage(): JSX.Element {
         }));
       }
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
       toast.error(error.response.data.message || "Erro ao atualizar perfil");
     } finally {
       setIsSavingProfile(false);
@@ -171,9 +268,7 @@ export default function UserPage(): JSX.Element {
 
       <Section>
         <SectionTitle>Informações do Perfil</SectionTitle>
-        <InfoText>
-          Atualize suas informações pessoais e de contato.
-        </InfoText>
+        <InfoText>Atualize suas informações pessoais e de contato.</InfoText>
         <FormContainer onSubmit={handleProfileSubmit}>
           <FormRow>
             <FormField>
@@ -196,6 +291,30 @@ export default function UserPage(): JSX.Element {
                 onChange={(e) => setSobrenome(e.target.value)}
                 placeholder="Digite seu sobrenome"
               />
+            </FormField>
+            <FormField>
+              <Label htmlFor="subscription" value="Plano Atual" />
+              <TextInput
+                id="subscription"
+                type="text"
+                value={user?.hasSubscription ? "Premium" : "Gratuito"}
+                disabled
+              />
+              <StyledButton
+                type="button"
+                style={{ width: "14.1rem", marginTop: "10px" }}
+                onClick={() => {
+                  if (user?.hasSubscription && subscriptionPortalUrl) {
+                    window.open(subscriptionPortalUrl, "_blank");
+                  } else {
+                    window.open(monthlyCheckoutUrl);
+                  }
+                }}
+              >
+                {user?.hasSubscription
+                  ? "Gerenciar assinatura"
+                  : "Assinar Premium"}
+              </StyledButton>
             </FormField>
           </FormRow>
           <FormRow>
@@ -221,6 +340,7 @@ export default function UserPage(): JSX.Element {
                 placeholder="Digite seu email"
               />
             </FormField>
+            <FormField></FormField>
           </FormRow>
           <ButtonContainer>
             <StyledButton type="submit" disabled={isSavingProfile}>
@@ -233,7 +353,8 @@ export default function UserPage(): JSX.Element {
       <Section>
         <SectionTitle>Alterar Senha</SectionTitle>
         <InfoText>
-          Para alterar sua senha, você precisa informar a senha atual e a nova senha.
+          Para alterar sua senha, você precisa informar a senha atual e a nova
+          senha.
         </InfoText>
         <FormContainer onSubmit={handlePasswordSubmit}>
           <FormField>
@@ -289,6 +410,88 @@ export default function UserPage(): JSX.Element {
           </ButtonContainer>
         </FormContainer>
       </Section>
+      <Section>
+        <SectionTitle>Cancelar Conta</SectionTitle>
+        <InfoText>
+          Se você deseja cancelar sua conta, clique no botão abaixo. Esta ação é
+          irreversível e todos os seus dados serão permanentemente excluídos.
+        </InfoText>
+        <ButtonContainer>
+          <StyledButton
+            className="danger"
+            onClick={() => handleDeleteUser(user!.id)}
+          >
+            Cancelar Conta
+          </StyledButton>
+        </ButtonContainer>
+      </Section>
+      {showDeleteModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "30px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              maxWidth: "400px",
+            }}
+          >
+            <h2 style={{ marginBottom: "20px", color: "black" }}>
+              Confirmar Exclusão
+            </h2>
+            <p style={{ marginBottom: "30px", color: "black" }}>
+              Tem certeza que deseja excluir esta conta? Esta ação não pode ser
+              desfeita.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button
+                onClick={cancelDelete}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                  backgroundColor: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "4px",
+                  border: "none",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </UserPageContainer>
   );
 }

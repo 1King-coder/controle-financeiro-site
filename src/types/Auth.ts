@@ -4,6 +4,7 @@ export type UsuarioAuth = {
   username: string;
   email: string;
   id: number;
+  hasSubscription: boolean;
   isAuthenticated: boolean;
 };
 

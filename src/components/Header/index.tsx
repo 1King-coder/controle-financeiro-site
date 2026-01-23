@@ -6,6 +6,7 @@ import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { GiMoneyStack } from "react-icons/gi";
 import { BsArrowReturnLeft, BsBank2 } from "react-icons/bs";
 import { BiTransfer } from "react-icons/bi";
+import { FaCartPlus } from "react-icons/fa";
 import {
   Nav,
   Box,
@@ -18,8 +19,9 @@ import {
   DropdownMenu,
   DropdownItemWrapper,
   DropdownItemLink,
+  DropdownBuyItemLink,
 } from "./styled";
-import { Link } from "react-router-dom";
+import { Link, Redirect, Router } from "react-router-dom";
 import * as colors from "../../config/colors";
 import { IoPersonCircle } from "react-icons/io5";
 import { IoLogOut } from "react-icons/io5";
@@ -30,15 +32,41 @@ import { relative } from "path";
 import { Button } from "flowbite-react";
 import { BsFillFileEarmarkSpreadsheetFill } from "react-icons/bs";
 import { FaUserPlus } from "react-icons/fa";
+import axios from "../../services/axios";
 
 export default function Header(): JSX.Element {
   const { user, logout } = useAuth();
+  const [monthlyCheckoutUrl, setMonthlyCheckoutUrl] =
+    React.useState<string>("");
+  const [anualCheckoutUrl, setAnualCheckoutUrl] = React.useState<string>("");
 
   const handleLogout = () => {
     logout();
     toast.success("Logout realizado com sucesso");
     history.replace("/login");
   };
+
+  React.useEffect(() => {
+    if (user && user.isAuthenticated && !user.hasSubscription) {
+      axios
+        .post("/usuarios/generate-monthly-checkout-session", {
+          userId: user?.id,
+          email: user?.email,
+        })
+        .then((res: { data: { url: string } }) => {
+          setMonthlyCheckoutUrl(res.data.url);
+        });
+
+      axios
+        .post("/usuarios/generate-annual-checkout-session", {
+          userId: user?.id,
+          email: user?.email,
+        })
+        .then((res: { data: { url: string } }) => {
+          setAnualCheckoutUrl(res.data.url);
+        });
+    }
+  }, [user]);
 
   return (
     <Nav>
@@ -144,6 +172,42 @@ export default function Header(): JSX.Element {
               </DropdownItemWrapper>
             </DropdownMenu>
           </DropdownContainer>
+          {!user.hasSubscription ? (
+            <DropdownContainer>
+              <Box>
+                <div>
+                  <FaCartPlus size={24} color={colors.secondaryColor} />
+                </div>
+              </Box>
+              <Tooltip>Escolher plano</Tooltip>
+              <DropdownMenu>
+                <DropdownItemWrapper>
+                  <DropdownBuyItemLink
+                    href={monthlyCheckoutUrl}
+                    rel="noopener noreferrer"
+                  >
+                    Plano Mensal
+                  </DropdownBuyItemLink>
+                </DropdownItemWrapper>
+                <DropdownItemWrapper>
+                  <DropdownBuyItemLink
+                    href={anualCheckoutUrl}
+                    rel="noopener noreferrer"
+                  >
+                    Plano Anual
+                  </DropdownBuyItemLink>
+                </DropdownItemWrapper>
+              </DropdownMenu>
+            </DropdownContainer>
+          ) : // <a href={checkoutUrl} rel="noopener noreferrer">
+          //   <Box>
+          //     <div>
+          //       <FaCartPlus size={24} color={colors.secondaryColor} />
+          //     </div>
+          //     <Tooltip>Comprar ferramenta</Tooltip>
+          //   </Box>
+          // </a>
+          null}
 
           <BoxSide style={{ cursor: "pointer" }}>
             <HoverEffect>

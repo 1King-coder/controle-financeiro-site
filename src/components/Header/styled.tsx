@@ -205,3 +205,33 @@ export const DropdownItemLink = styled(Link)`
     transform: scale(1.1);
   }
 `;
+export const DropdownBuyItemLink = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  color: ${secondaryColor};
+  text-decoration: none;
+  font-family: monospace;
+  font-weight: bold;
+  border-radius: 14px;
+  background: ${primaryColor};
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  transition: transform 160ms ease-out, box-shadow 160ms ease-out,
+    background-color 160ms ease-out, color 160ms ease-out;
+
+  :active {
+    transform: translateY(0px) scale(0.99);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+  }
+
+  svg {
+    flex-shrink: 0;
+    transition: transform 160ms ease-out;
+  }
+
+  :hover svg {
+    transform: scale(1.1);
+  }
+`;

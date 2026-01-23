@@ -68,6 +68,7 @@ export default function Login() {
             id: resUser.id,
             username: resUser.username,
             email: resUser.email,
+            hasSubscription: resUser.StripeSubscriptionActive,
             isAuthenticated: resUser.isAuthenticated,
           };
 
@@ -97,6 +98,7 @@ export default function Login() {
             id: resUser.id,
             username: resUser.username,
             email: resUser.email,
+            hasSubscription: resUser.StripeSubscriptionActive,
             isAuthenticated: true,
           };
 

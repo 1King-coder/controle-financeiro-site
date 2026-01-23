@@ -96,10 +96,10 @@ export default function AddUsuario() {
           id: resUser.id,
           username: resUser.username,
           email: resUser.email,
+          hasSubscription: resUser.StripeSubscriptionActive,
           isAuthenticated: true,
         };
         setUser(loggedUser);
-        console.log(loggedUser);
         history.replace("/");
       });
   }

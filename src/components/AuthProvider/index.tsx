@@ -4,6 +4,7 @@ import { UsuarioAuth } from "../../types/Auth";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../services/useAuth";
 import { googleLogout } from "@react-oauth/google";
+import axiosInstance from "../../services/axios";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -44,7 +45,8 @@ const loadUserFromStorage = (): UsuarioAuth | null => {
         user.id &&
         user.username &&
         user.email !== undefined &&
-        user.isAuthenticated !== undefined
+        user.isAuthenticated !== undefined &&
+        user.hasSubscription !== undefined
       ) {
         return user;
       }
@@ -98,6 +100,26 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const validateSession = async () => {
       if (user) {
         const isValid = await checkSessionValidity();
+        const userFromDB: {
+          data: {
+            id: string;
+            username: string;
+            StripeSubscriptionActive: boolean;
+          };
+        } = await axiosInstance.get(`/usuarios/${user.id}`);
+        if (userFromDB.data.StripeSubscriptionActive !== user.hasSubscription) {
+          setUser({
+            ...user,
+            hasSubscription: userFromDB.data.StripeSubscriptionActive,
+          });
+          localStorage.setItem(
+            USER_STORAGE_KEY,
+            JSON.stringify({
+              ...user,
+              hasSubscription: userFromDB.data.StripeSubscriptionActive,
+            }),
+          );
+        }
         if (!isValid) {
           setUser(null);
           localStorage.removeItem(USER_STORAGE_KEY);
@@ -107,7 +129,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     };
 
     validateSession();
-  }, []);
+  }, [setUser, user]);
 
   // Function to logout user
   const logout = () => {

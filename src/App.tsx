@@ -7,11 +7,13 @@ import Header from "./components/Header";
 import { ToastContainer } from "react-toastify";
 import SideBar from "./components/Sidebar";
 import AuthProvider from "./components/AuthProvider";
+import AdScript from "./components/AdScript";
 
 function App(): JSX.Element {
   return (
     <Router history={history}>
       <AuthProvider>
+        <AdScript />
         <Header />
         <div className="AppWrapper">
           <SideBar />
