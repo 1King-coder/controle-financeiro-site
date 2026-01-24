@@ -83,6 +83,25 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
+export const OnlySubscribersRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+}) => {
+  const { user } = useAuth();
+  const history = useHistory();
+
+  if (!user || !user.isAuthenticated) {
+    history.replace("/login");
+    return null;
+  }
+
+  if (!user.hasSubscription) {
+    history.replace("/assinatura");
+    return null;
+  }
+
+  return <>{children}</>;
+};
+
 export default function AuthProvider({ children }: AuthProviderProps) {
   // Initialize state with user from localStorage
   const [user, setUser] = useState<UsuarioAuth | null>(() =>

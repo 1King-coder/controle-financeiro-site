@@ -204,6 +204,25 @@ export default function Home(): JSX.Element {
                 />
               </Btn>
             </ScrollableDivBtns>
+            {!user!.hasSubscription ? (
+              <Box>
+                <SubTitle1>Escolha um Plano</SubTitle1>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                  }}
+                >
+                  <StyledButton onClick={() => window.open(monthlyCheckoutUrl)}>
+                    <span>Plano Mensal</span>
+                  </StyledButton>
+                  <StyledButton onClick={() => window.open(annualCheckoutUrl)}>
+                    <span>Plano Anual</span>
+                  </StyledButton>
+                </div>
+              </Box>
+            ) : null}
             <Box>
               <Link to={`/bancos`}>
                 <SubTitle1 style={{ marginBottom: 10, marginTop: 0 }}>
@@ -393,25 +412,6 @@ export default function Home(): JSX.Element {
                 </>
               )}
             </Box>
-            {!user!.hasSubscription ? (
-              <Box>
-                <SubTitle1>Escolha um Plano</SubTitle1>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                  }}
-                >
-                  <StyledButton onClick={() => window.open(monthlyCheckoutUrl)}>
-                    <span>Plano Mensal</span>
-                  </StyledButton>
-                  <StyledButton onClick={() => window.open(annualCheckoutUrl)}>
-                    <span>Plano Anual</span>
-                  </StyledButton>
-                </div>
-              </Box>
-            ) : null}
           </>
         )}
       </Grid>
