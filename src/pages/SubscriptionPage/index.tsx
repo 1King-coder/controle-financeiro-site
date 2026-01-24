@@ -38,6 +38,14 @@ export default function SubscriptionPage(): JSX.Element {
         <p>
           Desbloqueie todo o potencial do sistema de controle financeiro com
           recursos premium que ajudam você a gerenciar melhor suas finanças.
+          Veja como a ferramenta funciona:{" "}
+          <a
+            href="https://www.youtube.com/playlist?list=PLR5jS4ueIBrkjYIxGmH6kH5BJVj4WDkoV"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Tutorial
+          </a>
         </p>
       </InfoSection>
 

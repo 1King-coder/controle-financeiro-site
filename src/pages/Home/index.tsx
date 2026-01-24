@@ -21,6 +21,7 @@ import { GiMoneyStack } from "react-icons/gi";
 import { BiTransfer } from "react-icons/bi";
 import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
 import { GastoGeral } from "../../types/GastoGeral";
+import { FaCirclePlay } from "react-icons/fa6";
 
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(id_user: Number): Promise<GastoGeral[]> {
@@ -198,6 +199,20 @@ export default function Home(): JSX.Element {
               <Btn onClick={() => history.push("/transferencias/add")}>
                 <span>Adicionar Transferência</span>
                 <BiTransfer
+                  size={18}
+                  color={secondaryColor}
+                  style={{ margin: "0 0 0 10px" }}
+                />
+              </Btn>
+              <Btn
+                onClick={() =>
+                  window.open(
+                    "https://www.youtube.com/playlist?list=PLR5jS4ueIBrkjYIxGmH6kH5BJVj4WDkoV",
+                  )
+                }
+              >
+                <span>Veja como a ferramenta funciona</span>
+                <FaCirclePlay
                   size={18}
                   color={secondaryColor}
                   style={{ margin: "0 0 0 10px" }}
