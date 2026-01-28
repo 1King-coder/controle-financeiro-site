@@ -15,6 +15,17 @@ export const Nav = styled.nav`
   justify-content: center;
   position: relative;
   height: fit-content;
+  gap: 10px;
+
+  @media (max-width: 768px) {
+    padding: 12px;
+    justify-content: space-around;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+    gap: 5px;
+  }
 `;
 
 export const Box = styled.div`
@@ -38,6 +49,14 @@ export const Box = styled.div`
   :active {
     transform: scale(1);
   }
+
+  @media (max-width: 768px) {
+    margin: 0 5px;
+
+    div:hover {
+      margin: 0 6px;
+    }
+  }
 `;
 
 export const Tooltip = styled.span`
@@ -48,6 +67,22 @@ export const Tooltip = styled.span`
   background-color: ${secondaryColor};
   color: white;
   padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    bottom: -30px;
+  }
+
+  @media (max-width: 480px) {
+    display: none;
+  }
+
   border-radius: 6px;
   font-size: 12px;
   font-family: monospace;

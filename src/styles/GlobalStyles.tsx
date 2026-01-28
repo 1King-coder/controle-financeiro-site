@@ -1,6 +1,17 @@
 import styled, { createGlobalStyle } from "styled-components";
-import { backgroundColor, successColor, warningColor, dangerColor, primaryColor, secondaryColor, tertiaryColor, selectedBGColor, selectedFontColor, CardTitleColor } from "../config/colors";
-import 'react-toastify/dist/ReactToastify.css';
+import {
+  backgroundColor,
+  successColor,
+  warningColor,
+  dangerColor,
+  primaryColor,
+  secondaryColor,
+  tertiaryColor,
+  selectedBGColor,
+  selectedFontColor,
+  CardTitleColor,
+} from "../config/colors";
+import "react-toastify/dist/ReactToastify.css";
 import { Button, ButtonGroup } from "flowbite-react";
 
 export default createGlobalStyle`
@@ -12,28 +23,74 @@ export default createGlobalStyle`
   }
 
   body {
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     background: white;
-    
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html, body, #root {
     height: 100%;
-    
+    display: flex;
+    flex-direction: column;
   }
 
   .AppWrapper {
     display: flex;
-    flex-direction:ltr;
-    height: 100%;
+    flex-direction: row;
+    flex: 1;
+    overflow: auto;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
   }
 
   button {
     cursor: pointer;
+    font-size: 1rem;
+    
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+    }
   }
 
   a {
     text-decoration: none;
+  }
+
+  /* Responsive table styles */
+  table {
+    @media (max-width: 768px) {
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Responsive font sizes */
+  h1 {
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  h2 {
+    @media (max-width: 768px) {
+      font-size: 1.25rem;
+    }
+  }
+
+  h3 {
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+    }
+  }
+
+  p {
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+    }
   }
 
   body .Toastify .Toastify__toast-container .Toastify__toast--success {
@@ -57,12 +114,22 @@ export default createGlobalStyle`
     font-size: 2rem;
     font-weight: bold;
     padding: 10px;
+
+    @media (max-width: 768px) {
+      font-size: 1.25rem;
+      padding: 8px;
+    }
   }
 
   .saldo-por-categoria-table-row {
     background: ${tertiaryColor};
     font-size: 1.5rem;
     padding: 10px;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      padding: 8px;
+    }
   }
 
   .gastos-gerais-popover-content {
@@ -72,6 +139,11 @@ export default createGlobalStyle`
     background-color: ${tertiaryColor}; 
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
     border-radius: 20px;
+
+    @media (max-width: 768px) {
+      padding: 8px;
+      border-radius: 12px;
+    }
   }
 
   .gastos-gerais-popover-title-div {
@@ -83,9 +155,12 @@ export default createGlobalStyle`
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
     border-radius: 20px;
     margin-bottom: 10px;
-  }
 
-  .gastos-gerais-popover-title {
+    @media (max-width: 768px) {
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+  
     color: ${secondaryColor};
     text-align: center; 
     font-size: 14px; 
@@ -149,29 +224,27 @@ export default createGlobalStyle`
     
   }
 
-`
+`;
 
 export const StyledButtonGroup = styled(ButtonGroup)`
   display: flex;
   flex-direction: row;
   justify-content: center;
-
-`
+`;
 
 export const StyledButton = styled(Button)`
   padding: 1.5rem;
   font-size: 2rem;
-  background: ${props => props.selected ? selectedBGColor : primaryColor};
-  color: ${props => props.selected ? selectedFontColor : "#fff"};
-  font-weight: ${props => props.selected ? "bold" : "normal"};
+  background: ${(props) => (props.selected ? selectedBGColor : primaryColor)};
+  color: ${(props) => (props.selected ? selectedFontColor : "#fff")};
+  font-weight: ${(props) => (props.selected ? "bold" : "normal")};
   margin: 5px;
   border-radius: 1rem;
   :hover {
     opacity: 0.7;
     color: ${secondaryColor};
   }
-`
-
+`;
 
 export const Container = styled.section`
   width: 90%;
@@ -183,36 +256,39 @@ export const Container = styled.section`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  display:flex;
-`
+`;
 
 export const ScrollableDiv = styled.div`
   overflow-x: scroll;
   display: flex;
   height: 50%;
   width: 50%;
-  padding: 10px
-`
+  padding: 10px;
+`;
 export const ScrollableDivY = styled.div`
   overflow-y: scroll;
   display: grid;
   height: 10%;
   width: 100%;
-  padding: 10px
-`
+  padding: 10px;
+`;
 
-export const OptionBtn = styled.button<{id: number, selected?: boolean, key: number}>`
+export const OptionBtn = styled.button<{
+  id: number;
+  selected?: boolean;
+  key: number;
+}>`
   width: 150px;
   height: 50px;
-  background: ${props => props.selected ? selectedBGColor : primaryColor};
-  color: ${props => props.selected ? selectedFontColor : "#fff"};
+  background: ${(props) => (props.selected ? selectedBGColor : primaryColor)};
+  color: ${(props) => (props.selected ? selectedFontColor : "#fff")};
   font-size: 16px;
-  font-weight: ${props => props.selected ? "bold" : "normal"};
+  font-weight: ${(props) => (props.selected ? "bold" : "normal")};
   border: none;
   border-radius: 4px;
   margin: 0 5px 0 5px;
   padding: 10px;
-`
+`;
 
 export const Card = styled.div`
   width: 45%;
@@ -230,8 +306,7 @@ export const Card = styled.div`
   button {
     margin-top: auto;
   }
-  
-`
+`;
 
 export const FullLineCard = styled.div`
   width: 98%;
@@ -243,8 +318,7 @@ export const FullLineCard = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  
-`
+`;
 
 export const CardTitle = styled.h1`
   color: ${secondaryColor};
@@ -258,9 +332,7 @@ export const CardTitle = styled.h1`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   filter: brightness(110%);
-
-  
-`
+`;
 
 export const FullLineCardTitle = styled.h1`
   color: ${secondaryColor};
@@ -274,9 +346,7 @@ export const FullLineCardTitle = styled.h1`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   filter: brightness(110%);
-
-  
-`
+`;
 
 export const Title = styled.h1`
   color: ${secondaryColor};
@@ -287,7 +357,7 @@ export const Title = styled.h1`
   background-color: ${primaryColor};
   padding: 10px;
   width: 100%;
-`
+`;
 
 export const SubTitle1 = styled.h2`
   color: ${secondaryColor};
@@ -299,7 +369,7 @@ export const SubTitle1 = styled.h2`
   padding: 10px;
   width: 100%;
   margin-top: 3rem;
-`
+`;
 
 export const SubTitle2 = styled.h3`
   color: ${secondaryColor};
@@ -311,4 +381,4 @@ export const SubTitle2 = styled.h3`
   padding: 10px;
   width: 100%;
   margin-top: 0.1rem;
-`
+`;

@@ -65,10 +65,3 @@ export const OrderedList = styled.ol`
   margin-bottom: 15px;
   line-height: 1.6;
 `;
-
-export const DateText = styled.p`
-  color: rgb(100, 100, 100);
-  font-size: 14px;
-  font-style: italic;
-  margin-top: 30px;
-`;

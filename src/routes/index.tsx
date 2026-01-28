@@ -27,6 +27,7 @@ import {
 } from "../components/AuthProvider";
 import RecuperaSenha from "../pages/RecuperaSenha";
 import RecuperaSenhaEmail from "../pages/RecuperaSenhaEmail";
+import TermosDeUso from "../pages/TermosDeUso";
 
 export default function Routes(): JSX.Element {
   return (
@@ -45,6 +46,7 @@ export default function Routes(): JSX.Element {
       />
       <Route exact path="/cadastro" component={AddUsuario} />
       <Route exact path="/politica-de-privacidade" component={PoliPriv} />
+      <Route exact path="/termos-de-uso" component={TermosDeUso} />
 
       {/* Protected Routes */}
       <Route

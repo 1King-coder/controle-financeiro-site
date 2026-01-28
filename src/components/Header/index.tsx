@@ -36,9 +36,6 @@ import axios from "../../services/axios";
 
 export default function Header(): JSX.Element {
   const { user, logout } = useAuth();
-  const [monthlyCheckoutUrl, setMonthlyCheckoutUrl] =
-    React.useState<string>("");
-  const [anualCheckoutUrl, setAnualCheckoutUrl] = React.useState<string>("");
 
   const handleLogout = () => {
     logout();
@@ -46,7 +43,7 @@ export default function Header(): JSX.Element {
     history.replace("/login");
   };
 
-  React.useEffect(() => {
+  function handleMonthlyCheckout() {
     if (user && user.isAuthenticated && !user.hasSubscription) {
       axios
         .post("/usuarios/generate-monthly-checkout-session", {
@@ -54,19 +51,23 @@ export default function Header(): JSX.Element {
           email: user?.email,
         })
         .then((res: { data: { url: string } }) => {
-          setMonthlyCheckoutUrl(res.data.url);
+          window.open(res.data.url);
         });
+    }
+  }
 
+  function handleAnnualCheckout() {
+    if (user && user.isAuthenticated && !user.hasSubscription) {
       axios
         .post("/usuarios/generate-annual-checkout-session", {
           userId: user?.id,
           email: user?.email,
         })
         .then((res: { data: { url: string } }) => {
-          setAnualCheckoutUrl(res.data.url);
+          window.open(res.data.url);
         });
     }
-  }, [user]);
+  }
 
   return (
     <Nav>
@@ -182,18 +183,12 @@ export default function Header(): JSX.Element {
               <Tooltip>Escolher plano</Tooltip>
               <DropdownMenu>
                 <DropdownItemWrapper>
-                  <DropdownBuyItemLink
-                    href={monthlyCheckoutUrl}
-                    rel="noopener noreferrer"
-                  >
+                  <DropdownBuyItemLink onClick={() => handleMonthlyCheckout()}>
                     Plano Mensal
                   </DropdownBuyItemLink>
                 </DropdownItemWrapper>
                 <DropdownItemWrapper>
-                  <DropdownBuyItemLink
-                    href={anualCheckoutUrl}
-                    rel="noopener noreferrer"
-                  >
+                  <DropdownBuyItemLink onClick={() => handleAnnualCheckout()}>
                     Plano Anual
                   </DropdownBuyItemLink>
                 </DropdownItemWrapper>

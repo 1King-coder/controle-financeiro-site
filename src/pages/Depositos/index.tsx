@@ -32,6 +32,7 @@ import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
 import { fixDate } from "../../config/dates";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 class GetDepositosFunctions {
   static async getDepositos(id_user: Number): Promise<Deposito[]> {
@@ -137,6 +138,11 @@ export function Depositos(): JSX.Element {
   const [depositosByWeekDay, setdepositosByWeekDay] = React.useState(
     Array<Deposito[]>([]),
   );
+  const [depositoToDelete, setDepositoToDelete]: [number | null, any] =
+    React.useState(null);
+  const [showConfirmDialog, setShowConfirmDialog]: [boolean, any] =
+    React.useState(false);
+  const [isDeleting, setIsDeleting]: [boolean, any] = React.useState(false);
   const [bancos, setBancos]: [any, any] = React.useState([]);
   const [categorias, setCategorias]: [any, any] = React.useState([]);
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(
@@ -152,27 +158,30 @@ export function Depositos(): JSX.Element {
   React.useEffect(() => {
     async function getBancos() {
       const bancosNameById: { [key: number]: string } = {};
+      axios
+        .get(`/bancos/usuario/${user!.id}?includeDeleted=true`)
+        .then((response) => {
+          const data: Banco[] = response.data;
 
-      axios.get(`/bancos/usuario/${user!.id}`).then((response) => {
-        const data: Banco[] = response.data;
-
-        data.forEach((banco: Banco) => {
-          bancosNameById[banco.id] = banco.nome;
+          data.forEach((banco: Banco) => {
+            bancosNameById[banco.id] = banco.nome;
+          });
+          setBancos(bancosNameById);
         });
-        setBancos(bancosNameById);
-      });
     }
 
     async function getCategorias() {
       const categoriasNameById: { [key: number]: string } = {};
-      axios.get(`/categorias/usuario/${user!.id}`).then((response) => {
-        const data: Categoria[] = response.data;
+      axios
+        .get(`/categorias/usuario/${user!.id}?includeDeleted=true`)
+        .then((response) => {
+          const data: Categoria[] = response.data;
 
-        data.forEach((categoria: Categoria) => {
-          categoriasNameById[categoria.id] = categoria.nome;
+          data.forEach((categoria: Categoria) => {
+            categoriasNameById[categoria.id] = categoria.nome;
+          });
+          setCategorias(categoriasNameById);
         });
-        setCategorias(categoriasNameById);
-      });
     }
 
     Promise.all([getBancos(), getCategorias()]).then((res) => {
@@ -257,13 +266,17 @@ export function Depositos(): JSX.Element {
     });
   }, [user]);
 
-  const handleDeleteDeposito = async (itemUrl: string) => {
-    const res = await axios.delete(itemUrl);
+  const handleDeleteDeposito = async () => {
+    setIsDeleting(true);
+    const res = await axios.delete(`depositos/${depositoToDelete}/`);
     if (res.status === 200) {
       toast.success("Depósito deletado com sucesso");
+      setShowConfirmDialog(false);
+      setIsDeleting(false);
       window.location.reload();
     } else {
       toast.error("Erro ao deletar depósito");
+      setIsDeleting(false);
     }
   };
 
@@ -445,14 +458,26 @@ export function Depositos(): JSX.Element {
                   }),
                   opcoes: (
                     <div style={{ display: "flex", gap: "1rem" }}>
-                      <Link to={`depositos/edit/${deposito.id}/`}>
+                      <Link
+                        to={`depositos/edit/${deposito.id}/`}
+                        style={{
+                          pointerEvents: deposito.ativo ? "auto" : "none",
+                          opacity: deposito.ativo ? 1 : 0.5,
+                          cursor: deposito.ativo ? "pointer" : "not-allowed",
+                        }}
+                      >
                         <FaEdit size={24} color={colors.secondaryColor} />
                       </Link>
                       <span
-                        onClick={() =>
-                          handleDeleteDeposito(`depositos/${deposito.id}/`)
-                        }
-                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setDepositoToDelete(deposito.id);
+                          setShowConfirmDialog(true);
+                        }}
+                        style={{
+                          pointerEvents: deposito.ativo ? "auto" : "none",
+                          opacity: deposito.ativo ? 1 : 0.5,
+                          cursor: deposito.ativo ? "pointer" : "not-allowed",
+                        }}
                       >
                         <MdDelete size={24} color={colors.dangerColor} />
                       </span>
@@ -687,6 +712,14 @@ export function Depositos(): JSX.Element {
             })()}
           </div>
         ) : null}
+        <ConfirmDialog
+          isOpen={showConfirmDialog}
+          title="Confirmação de exclusão"
+          message="Tem certeza que deseja excluir este depósito? Esta ação não pode ser desfeita."
+          onConfirm={() => handleDeleteDeposito()}
+          onCancel={() => setShowConfirmDialog(false)}
+          isLoading={isDeleting}
+        />
       </div>
     </div>
   );

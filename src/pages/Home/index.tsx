@@ -1,13 +1,15 @@
 import React from "react";
 import { Box, Title, Grid, ScrollableDivBtns, Btn } from "./styled";
 import {
-  Container,
   OptionBtn,
   ScrollableDiv,
   ScrollableDivY,
   StyledButton,
   StyledButtonGroup,
 } from "../../styles/GlobalStyles";
+
+import { Container, Card } from "./styled";
+
 import { useAuth } from "../../services/useAuth";
 import { primaryColor, secondaryColor } from "../../config/colors";
 import { Link } from "react-router-dom";
@@ -22,6 +24,8 @@ import { BiTransfer } from "react-icons/bi";
 import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
 import { GastoGeral } from "../../types/GastoGeral";
 import { FaCirclePlay } from "react-icons/fa6";
+import { GrDirections } from "react-icons/gr";
+import { BsBank2 } from "react-icons/bs";
 
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(id_user: Number): Promise<GastoGeral[]> {
@@ -74,9 +78,32 @@ export default function Home(): JSX.Element {
   const [gastosByMonth, setGastosByMonth]: [GastoGeral[], any] = React.useState(
     [],
   );
-  const [monthlyCheckoutUrl, setMonthlyCheckoutUrl] =
-    React.useState<string>("");
-  const [annualCheckoutUrl, setAnnualCheckoutUrl] = React.useState<string>("");
+
+  function handleMonthlyCheckout() {
+    if (user && user.isAuthenticated && !user.hasSubscription) {
+      axios
+        .post("/usuarios/generate-monthly-checkout-session", {
+          userId: user?.id,
+          email: user?.email,
+        })
+        .then((res: { data: { url: string } }) => {
+          window.open(res.data.url);
+        });
+    }
+  }
+
+  function handleAnnualCheckout() {
+    if (user && user.isAuthenticated && !user.hasSubscription) {
+      axios
+        .post("/usuarios/generate-annual-checkout-session", {
+          userId: user?.id,
+          email: user?.email,
+        })
+        .then((res: { data: { url: string } }) => {
+          window.open(res.data.url);
+        });
+    }
+  }
 
   const { user } = useAuth();
 
@@ -118,45 +145,9 @@ export default function Home(): JSX.Element {
         setCategoriasByNameId(categoriasNameById);
       });
     }
-    async function fetchMonthlyCheckoutSession() {
-      try {
-        const res = await axios.post(
-          `/usuarios/generate-monthly-checkout-session`,
-          {
-            userId: user?.id,
-            email: user?.email,
-          },
-        );
-        const { url } = res.data;
-        setMonthlyCheckoutUrl(url);
-      } catch (error: any) {
-        console.log("Erro ao criar sessão de checkout:", error);
-      }
-    }
-
-    async function fetchAnnualCheckoutSession() {
-      try {
-        const res = await axios.post(
-          `/usuarios/generate-annual-checkout-session`,
-          {
-            userId: user?.id,
-            email: user?.email,
-          },
-        );
-        const { url } = res.data;
-        setAnnualCheckoutUrl(url);
-      } catch (error: any) {
-        console.log("Erro ao criar sessão de checkout:", error);
-      }
-    }
 
     if (user?.isAuthenticated) {
       Promise.all([getBancos(), getCategorias()]).then((res) => {});
-    }
-
-    if (user?.isAuthenticated && !user?.hasSubscription) {
-      fetchMonthlyCheckoutSession();
-      fetchAnnualCheckoutSession();
     }
   }, [user]);
 
@@ -229,12 +220,16 @@ export default function Home(): JSX.Element {
                     gap: "10px",
                   }}
                 >
-                  <StyledButton onClick={() => window.open(monthlyCheckoutUrl)}>
-                    <span>Plano Mensal</span>
-                  </StyledButton>
-                  <StyledButton onClick={() => window.open(annualCheckoutUrl)}>
-                    <span>Plano Anual</span>
-                  </StyledButton>
+                  <Btn onClick={() => handleMonthlyCheckout()}>
+                    <span style={{ fontSize: "2rem", color: secondaryColor }}>
+                      Plano Mensal
+                    </span>
+                  </Btn>
+                  <Btn onClick={() => handleAnnualCheckout()}>
+                    <span style={{ fontSize: "2rem", color: secondaryColor }}>
+                      Plano Anual
+                    </span>
+                  </Btn>
                 </div>
               </Box>
             ) : null}
@@ -279,12 +274,19 @@ export default function Home(): JSX.Element {
                   <></>
                 )}
               </div>
-              <StyledButton
-                style={{ fontSize: 20 }}
-                onClick={() => history.push("/bancos/add")}
-              >
-                Adicionar novo Banco
-              </StyledButton>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <Btn
+                  style={{ fontSize: 20 }}
+                  onClick={() => history.push("/bancos/add")}
+                >
+                  <span>Adicionar novo Banco</span>
+                  <BsBank2
+                    size={24}
+                    color={secondaryColor}
+                    style={{ margin: "0 0 0 10px" }}
+                  />
+                </Btn>
+              </div>
             </Box>
             <Box>
               <Link to="/categorias">
@@ -334,15 +336,17 @@ export default function Home(): JSX.Element {
                   <></>
                 )}
               </div>
-              <StyledButton
-                style={{ fontSize: 20, height: "75px" }}
-                onClick={() => history.push("/categorias/add")}
-              >
-                Adicionar nova Categoria
-              </StyledButton>
+              <Btn onClick={() => history.push("/categorias/add")}>
+                <span>Adicionar nova Categoria</span>
+                <GrDirections
+                  size={24}
+                  color={secondaryColor}
+                  style={{ margin: "0 0 0 10px" }}
+                />
+              </Btn>
             </Box>
             <Box>
-              <SubTitle1>Gastos por categoria no mês</SubTitle1>
+              <Title>Gastos por categoria no mês</Title>
               {gastosByMonth.length > 0 &&
               bancos.length > 0 &&
               categorias.length > 0 ? (
@@ -383,8 +387,13 @@ export default function Home(): JSX.Element {
                       }),
                     );
 
+                  const totalGastosMes = gastosByMonth.reduce(
+                    (acc, curr) => acc + curr.valor,
+                    0,
+                  );
+
                   return (
-                    <>
+                    <div style={{ height: "10rem" }}>
                       <PieChart
                         title="Gastos por categoria"
                         series={[
@@ -410,7 +419,19 @@ export default function Home(): JSX.Element {
                           },
                         }}
                       />
-                    </>
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginTop: "0.1rem",
+                          marginBottom: "1rem",
+                          fontSize: "1.25rem",
+                        }}
+                      >
+                        <strong>Total: R$ {totalGastosMes.toFixed(2)}</strong>
+                      </span>
+                    </div>
                   );
                 })()
               ) : (

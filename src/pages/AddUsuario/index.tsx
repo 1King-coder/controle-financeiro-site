@@ -15,6 +15,7 @@ import { jwtDecode } from "jwt-decode";
 export default function AddUsuario() {
   const { user, setUser } = useAuth();
   const [googleSubId, setGoogleSubId] = useState("");
+  const [hasAgreed, setHasAgreed] = useState(false);
   const hState = history.location.state as {
     googleJwtToken?: string;
   } | null;
@@ -181,7 +182,33 @@ export default function AddUsuario() {
             />
           </InputBox>
           <InputBox>
-            <Button onClick={handleRegister}>
+            <label
+              htmlFor="agreeTerms"
+              style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}
+            >
+              <input
+                id="agreeTerms"
+                type="checkbox"
+                checked={hasAgreed}
+                onChange={(event) => setHasAgreed(event.target.checked)}
+                style={{ marginTop: "4px" }}
+              />
+              <span style={{ fontSize: "0.9rem" }}>
+                Li e concordo com os{" "}
+                <Link to="/termos-de-uso" target="_blank">
+                  Termos de uso
+                </Link>{" "}
+                e a{" "}
+                <Link to="/politica-de-privacidade" target="_blank">
+                  Política de Privacidade
+                </Link>
+                .
+              </span>
+            </label>
+          </InputBox>
+
+          <InputBox>
+            <Button onClick={handleRegister} disabled={!hasAgreed}>
               <span>Registrar</span>
             </Button>
           </InputBox>

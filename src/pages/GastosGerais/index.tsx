@@ -28,6 +28,7 @@ import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
 import { StyledStaticDatePicker } from "../Depositos/styled";
 import { fixDate } from "../../config/dates";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(id_user: Number): Promise<GastoGeral[]> {
@@ -136,6 +137,11 @@ export function GastosGerais(): JSX.Element {
   const [gastosByWeekDay, setgastosByWeekDay] = React.useState(
     Array<GastoGeral[]>([]),
   );
+  const [gastoToDelete, setGastoToDelete]: [number | null, any] =
+    React.useState(null);
+  const [showConfirmDialog, setShowConfirmDialog]: [boolean, any] =
+    React.useState(false);
+  const [isDeleting, setIsDeleting]: [boolean, any] = React.useState(false);
   const [bancos, setBancos]: [any, any] = React.useState([]);
   const [categorias, setCategorias]: [any, any] = React.useState([]);
   const [startWeekDayDate, setStartWeekDayDate]: [Dayjs, any] = React.useState(
@@ -153,26 +159,30 @@ export function GastosGerais(): JSX.Element {
     async function getBancos() {
       const bancosNameById: { [key: number]: string } = {};
 
-      axios.get(`/bancos/usuario/${user!.id}`).then((response) => {
-        const data: Banco[] = response.data;
+      axios
+        .get(`/bancos/usuario/${user!.id}?includeDeleted=true`)
+        .then((response) => {
+          const data: Banco[] = response.data;
 
-        data.forEach((banco: Banco) => {
-          bancosNameById[banco.id] = banco.nome;
+          data.forEach((banco: Banco) => {
+            bancosNameById[banco.id] = banco.nome;
+          });
+          setBancos(bancosNameById);
         });
-        setBancos(bancosNameById);
-      });
     }
 
     async function getCategorias() {
       const categoriasNameById: { [key: number]: string } = {};
-      axios.get(`/categorias/usuario/${user!.id}`).then((response) => {
-        const data: Categoria[] = response.data;
+      axios
+        .get(`/categorias/usuario/${user!.id}?includeDeleted=true`)
+        .then((response) => {
+          const data: Categoria[] = response.data;
 
-        data.forEach((categoria: Categoria) => {
-          categoriasNameById[categoria.id] = categoria.nome;
+          data.forEach((categoria: Categoria) => {
+            categoriasNameById[categoria.id] = categoria.nome;
+          });
+          setCategorias(categoriasNameById);
         });
-        setCategorias(categoriasNameById);
-      });
     }
 
     Promise.all([getBancos(), getCategorias()]).then((res) => {
@@ -224,13 +234,17 @@ export function GastosGerais(): JSX.Element {
     });
   }, [startWeekDayDate, user]);
 
-  const handleDeleteGasto = async (itemUrl: string) => {
-    const res = await axios.delete(itemUrl);
+  const handleDeleteGasto = async () => {
+    setIsDeleting(true);
+    const res = await axios.delete(`gastos/${gastoToDelete}/`);
     if (res.status === 200) {
       toast.success("Gasto deletado com sucesso");
+      setShowConfirmDialog(false);
+      setIsDeleting(false);
       window.location.reload();
     } else {
       toast.error("Erro ao deletar gasto");
+      setIsDeleting(false);
     }
   };
 
@@ -447,12 +461,26 @@ export function GastosGerais(): JSX.Element {
                   }),
                   opcoes: (
                     <div style={{ display: "flex", gap: "1rem" }}>
-                      <Link to={`gastos/edit/${gasto.id}/`}>
+                      <Link
+                        to={`gastos/edit/${gasto.id}/`}
+                        style={{
+                          pointerEvents: gasto.ativo ? "auto" : "none",
+                          opacity: gasto.ativo ? 1 : 0.5,
+                          cursor: gasto.ativo ? "pointer" : "not-allowed",
+                        }}
+                      >
                         <FaEdit size={24} color={colors.secondaryColor} />
                       </Link>
                       <span
-                        onClick={() => handleDeleteGasto(`gastos/${gasto.id}/`)}
-                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setGastoToDelete(gasto.id);
+                          setShowConfirmDialog(true);
+                        }}
+                        style={{
+                          pointerEvents: gasto.ativo ? "auto" : "none",
+                          opacity: gasto.ativo ? 1 : 0.5,
+                          cursor: gasto.ativo ? "pointer" : "not-allowed",
+                        }}
                       >
                         <MdDelete size={24} color={colors.dangerColor} />
                       </span>
@@ -685,6 +713,14 @@ export function GastosGerais(): JSX.Element {
           </div>
         ) : null}
       </div>
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        title="Confirmação de exclusão"
+        message={`Tem certeza que deseja excluir este gasto? Esta ação não pode ser desfeita.`}
+        onConfirm={() => handleDeleteGasto()}
+        onCancel={() => setShowConfirmDialog(false)}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

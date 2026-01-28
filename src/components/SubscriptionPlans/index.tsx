@@ -34,56 +34,92 @@ export default function SubscriptionPlans({
   const [error, setError] = React.useState<string>("");
   const [isRedirecting, setIsRedirecting] = React.useState<boolean>(false);
 
+  // React.useEffect(() => {
+  //   async function fetchCheckoutSessions() {
+  //     try {
+  //       setIsLoading(true);
+  //       setError("");
+
+  //       // Fetch Monthly Checkout Session
+  //       const monthlyRes = await axios.post(
+  //         `/usuarios/generate-monthly-checkout-session`,
+  //         {
+  //           userId: user?.id,
+  //           email: user?.email,
+  //         },
+  //       );
+  //       setMonthlyCheckoutUrl(monthlyRes.data.url);
+
+  //       // Fetch Annual Checkout Session
+  //       const annualRes = await axios.post(
+  //         `/usuarios/generate-annual-checkout-session`,
+  //         {
+  //           userId: user?.id,
+  //           email: user?.email,
+  //         },
+  //       );
+  //       setAnnualCheckoutUrl(annualRes.data.url);
+  //     } catch (error: any) {
+  //       console.error("Erro ao carregar sessões de checkout:", error);
+  //       setError(
+  //         error?.response?.data?.message ||
+  //           "Erro ao carregar planos de assinatura",
+  //       );
+  //       toast.error("Erro ao carregar planos de assinatura");
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+
+  //   if (user?.id && !user?.hasSubscription) {
+  //     fetchCheckoutSessions();
+  //   }
+  // }, [user]);
+
   React.useEffect(() => {
-    async function fetchCheckoutSessions() {
-      try {
-        setIsLoading(true);
-        setError("");
-
-        // Fetch Monthly Checkout Session
-        const monthlyRes = await axios.post(
-          `/usuarios/generate-monthly-checkout-session`,
-          {
-            userId: user?.id,
-            email: user?.email,
-          },
-        );
-        setMonthlyCheckoutUrl(monthlyRes.data.url);
-
-        // Fetch Annual Checkout Session
-        const annualRes = await axios.post(
-          `/usuarios/generate-annual-checkout-session`,
-          {
-            userId: user?.id,
-            email: user?.email,
-          },
-        );
-        setAnnualCheckoutUrl(annualRes.data.url);
-      } catch (error: any) {
-        console.error("Erro ao carregar sessões de checkout:", error);
-        setError(
-          error?.response?.data?.message ||
-            "Erro ao carregar planos de assinatura",
-        );
-        toast.error("Erro ao carregar planos de assinatura");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    if (user?.id && !user?.hasSubscription) {
-      fetchCheckoutSessions();
+    if (user?.id) {
+      setIsLoading(false);
     }
   }, [user]);
 
-  const handleSelectPlan = (checkoutUrl: string) => {
-    if (!checkoutUrl) {
-      toast.error("URL de checkout não disponível");
-      return;
+  const handleSelectPlan = (selectedPlan: "M" | "A") => {
+    let checkoutUrl = "";
+
+    if (selectedPlan === "M") {
+      axios
+        .post(`/usuarios/generate-monthly-checkout-session`, {
+          userId: user?.id,
+          email: user?.email,
+        })
+        .then((res: { data: { url: string } }) => {
+          checkoutUrl = res.data.url;
+          setIsRedirecting(true);
+          window.open(checkoutUrl);
+        })
+        .catch(() => {
+          toast.error("Erro ao redirecionar para o checkout do plano mensal");
+        })
+        .finally(() => {
+          setIsRedirecting(false);
+        });
+    } else if (selectedPlan === "A") {
+      axios
+        .post(`/usuarios/generate-annual-checkout-session`, {
+          userId: user?.id,
+          email: user?.email,
+        })
+        .then((res: { data: { url: string } }) => {
+          checkoutUrl = res.data.url;
+          setIsRedirecting(true);
+          window.open(checkoutUrl);
+        })
+        .catch(() => {
+          toast.error("Erro ao redirecionar para o checkout do plano anual");
+        })
+        .finally(() => {
+          setIsRedirecting(false);
+        });
     }
-    setIsRedirecting(true);
-    window.location.href = checkoutUrl;
-    onSubscriptionClick?.();
   };
 
   if (isLoading) {
@@ -147,8 +183,8 @@ export default function SubscriptionPlans({
           </FeaturesList>
 
           <SelectButton
-            onClick={() => handleSelectPlan(monthlyCheckoutUrl)}
-            disabled={isRedirecting || !monthlyCheckoutUrl}
+            onClick={() => handleSelectPlan("M")}
+            disabled={isRedirecting}
           >
             {isRedirecting ? "Redirecionando..." : "Assinar Agora"}
           </SelectButton>
@@ -192,8 +228,8 @@ export default function SubscriptionPlans({
           </FeaturesList>
 
           <SelectButton
-            onClick={() => handleSelectPlan(annualCheckoutUrl)}
-            disabled={isRedirecting || !annualCheckoutUrl}
+            onClick={() => handleSelectPlan("A")}
+            disabled={isRedirecting}
             isPrimary
           >
             {isRedirecting ? "Redirecionando..." : "Assinar Agora"}

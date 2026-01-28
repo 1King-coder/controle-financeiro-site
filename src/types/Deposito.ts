@@ -8,5 +8,6 @@ export type Deposito = {
   descricao: string;
   data_de_competencia: string;
   valor: number;
+  ativo: boolean;
   created_at: string;
-}
+};

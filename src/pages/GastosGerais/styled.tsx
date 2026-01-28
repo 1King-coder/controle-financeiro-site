@@ -11,7 +11,7 @@ export const Title = styled.h1`
   background-color: ${colors.primaryColor};
   padding: 10px;
   width: 100%;
-`
+`;
 
 export const SubTitle1 = styled.h2`
   color: ${colors.secondaryColor};
@@ -23,7 +23,7 @@ export const SubTitle1 = styled.h2`
   padding: 10px;
   width: 100%;
   margin-top: 3rem;
-`
+`;
 
 export const SubTitle2 = styled.h3`
   color: ${colors.secondaryColor};
@@ -35,10 +35,10 @@ export const SubTitle2 = styled.h3`
   padding: 10px;
   width: 100%;
   margin-top: 0.1rem;
-`
+`;
 
 export const WeekDayGastosDiv = styled.div`
-  display: inline-block;  
+  display: inline-block;
   width: 10rem;
   height: 15rem;
   overflow-y: scroll;
@@ -49,7 +49,7 @@ export const WeekDayGastosDiv = styled.div`
   padding: 10px;
   -ms-overflow-style: none;
   scrollbar-width: none;
-`
+`;
 
 export const TimeIntervalOptionsDiv = styled.div`
   display: flex;
@@ -57,15 +57,15 @@ export const TimeIntervalOptionsDiv = styled.div`
   width: 100%;
   padding: 10px;
   justify-content: center;
-`
+`;
 
 export const DataGridBox = styled.div`
   margin: 10px auto;
-  
+
   .datagrid-headers {
     background-color: ${colors.primaryColor};
     color: ${colors.secondaryColor};
     font-weight: bold;
     font-size: 16px;
   }
-`
+`;

@@ -8,6 +8,7 @@ export const SubscriptionPageContainer = styled.div`
   background: #fff;
   border-radius: 1rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  height: fit-content;
 `;
 
 export const InfoSection = styled.section`

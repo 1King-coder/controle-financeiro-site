@@ -11,6 +11,7 @@ import { MdDelete } from "react-icons/md";
 import axios from "../../services/axios";
 import { toast } from "react-toastify";
 import { fixDate } from "../../config/dates";
+import ConfirmDialog from "../ConfirmDialog";
 
 type Props = {
   bancos: { [key: number]: string };
@@ -21,24 +22,34 @@ type Props = {
 };
 
 export function WeekDayPopoverCard(props: Props): JSX.Element {
+  const [itemToDelete, setItemToDelete]: [number | null, any] =
+    React.useState(null);
+  const [showConfirmDialog, setShowConfirmDialog]: [boolean, any] =
+    React.useState(false);
+  const [isDeleting, setIsDeleting]: [boolean, any] = React.useState(false);
   const total: number = props.itemInWeekDay
     .map((item: GastoGeral | Deposito) => item.valor)
     .reduce((acc: number, i: number) => acc + i, 0);
 
-  const handleDelete = async (itemUrl: string) => {
-    const res = await axios.delete(itemUrl);
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const res = await axios.delete(`${props.itemUrlPath}/${itemToDelete}/`);
     if (res.status === 200) {
       toast.success(
         props.itemUrlPath === "gastos-gerais"
           ? "Gasto deletado com sucesso"
           : "Depósito deletado com sucesso",
       );
+      setShowConfirmDialog(false);
+      setIsDeleting(false);
+      window.location.reload();
     } else {
       toast.error(
         props.itemUrlPath === "gastos-gerais"
           ? "Erro ao deletar gasto"
           : "Erro ao deletar depósito",
       );
+      setIsDeleting(false);
     }
   };
 
@@ -113,23 +124,25 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
                         alignItems: "center",
                         display: "flex",
                         marginRight: "10px",
+                        pointerEvents: item.ativo ? "auto" : "none",
+                        opacity: item.ativo ? 1 : 0.5,
+                        cursor: item.ativo ? "pointer" : "not-allowed",
                       }}
                     >
                       <FaEdit size={20} color={colors.secondaryColor} />
                     </Link>
                     <span
-                      onClick={() =>
-                        handleDelete(
-                          props.itemUrlPath === "gastos-gerais"
-                            ? `/gastos/${item.id}`
-                            : `/depositos/${item.id}`,
-                        )
-                      }
+                      onClick={() => {
+                        setItemToDelete(item.id);
+                        setShowConfirmDialog(true);
+                      }}
                       style={{
                         justifyContent: "center",
                         alignItems: "center",
                         display: "flex",
-                        cursor: "pointer",
+                        pointerEvents: item.ativo ? "auto" : "none",
+                        opacity: item.ativo ? 1 : 0.5,
+                        cursor: item.ativo ? "pointer" : "not-allowed",
                       }}
                     >
                       <MdDelete size={20} color={colors.dangerColor} />
@@ -147,6 +160,16 @@ export function WeekDayPopoverCard(props: Props): JSX.Element {
           </>
         );
       })}
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        title="Confirmação de exclusão"
+        message={`Tem certeza que deseja excluir este ${
+          props.itemUrlPath === "gastos-gerais" ? "gasto" : "depósito"
+        }? Esta ação não pode ser desfeita.`}
+        onConfirm={() => handleDelete()}
+        onCancel={() => setShowConfirmDialog(false)}
+        isLoading={isDeleting}
+      />
     </WeekDayGastosDiv>
   );
 }

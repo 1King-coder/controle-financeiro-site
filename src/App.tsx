@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify";
 import SideBar from "./components/Sidebar";
 import AuthProvider from "./components/AuthProvider";
 import AdScript from "./components/AdScript";
+import Footer from "./components/Footer";
 
 function App(): JSX.Element {
   return (
@@ -16,11 +17,11 @@ function App(): JSX.Element {
         <AdScript />
         <Header />
         <div className="AppWrapper">
-          <SideBar />
           <GlobalStyles />
           <ToastContainer autoClose={3000} className={"toast-container"} />
           <Routes />
         </div>
+        <Footer />
       </AuthProvider>
     </Router>
   );
