@@ -31,15 +31,13 @@ export default createGlobalStyle`
   }
 
   html, body, #root {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    min-height: 100%;
   }
 
   .AppWrapper {
     display: flex;
     flex-direction: row;
-    flex: 1;
+    min-height: calc(100vh - 60px); /* Adjust based on header height */
     overflow: auto;
 
     @media (max-width: 768px) {
