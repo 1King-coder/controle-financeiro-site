@@ -17,7 +17,7 @@ export default function Login() {
   // Redirect if user is already authenticated
   useEffect(() => {
     if (user && user.isAuthenticated) {
-      history.replace("/home");
+      history.replace("/");
     }
   }, [user]);
 
@@ -70,6 +70,10 @@ export default function Login() {
             email: resUser.email,
             hasSubscription: resUser.StripeSubscriptionActive,
             isAuthenticated: resUser.isAuthenticated,
+            accessToken: resUser.accessToken,
+            refreshToken: resUser.refreshToken,
+            expiresIn: resUser.expiresIn,
+            tokenType: resUser.tokenType,
           };
 
           setUser(loggedUser);
@@ -78,11 +82,7 @@ export default function Login() {
         }
       })
       .catch((error) => {
-        if (error.status === 403) {
-          toast.warning(error.response.data.message);
-        } else {
-          toast.error("Erro ao fazer login");
-        }
+        toast.warning(error.response.data.message);
       });
   }
 
@@ -100,6 +100,10 @@ export default function Login() {
             email: resUser.email,
             hasSubscription: resUser.StripeSubscriptionActive,
             isAuthenticated: true,
+            accessToken: resUser.accessToken,
+            refreshToken: resUser.refreshToken,
+            expiresIn: resUser.expiresIn,
+            tokenType: resUser.tokenType,
           };
 
           setUser(loggedUser);
@@ -109,9 +113,7 @@ export default function Login() {
         }
       })
       .catch((error) => {
-        if (error.status === 403) {
-          toast.warning(error.response.data.message);
-        }
+        toast.warning(error.response.data.message);
 
         if (error.response?.status === 404) {
           history.replace("/cadastro", { googleJwtToken: jwtToken });

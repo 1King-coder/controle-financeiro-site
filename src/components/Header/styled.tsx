@@ -255,6 +255,7 @@ export const DropdownBuyItemLink = styled.a`
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
   transition: transform 160ms ease-out, box-shadow 160ms ease-out,
     background-color 160ms ease-out, color 160ms ease-out;
+  cursor: pointer;
 
   :active {
     transform: translateY(0px) scale(0.99);

@@ -99,6 +99,10 @@ export default function AddUsuario() {
           email: resUser.email,
           hasSubscription: resUser.StripeSubscriptionActive,
           isAuthenticated: true,
+          accessToken: resUser.accessToken,
+          refreshToken: resUser.refreshToken,
+          expiresIn: resUser.expiresIn,
+          tokenType: resUser.tokenType,
         };
         setUser(loggedUser);
         history.replace("/");

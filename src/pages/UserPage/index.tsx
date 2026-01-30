@@ -234,8 +234,9 @@ export default function UserPage(): JSX.Element {
       }
 
       const payload = {
-        current_password: currentPassword,
-        new_password: newPassword,
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+        refreshToken: user!.refreshToken,
       };
 
       const res = await axios.put(`/usuarios/${user!.id}/password`, payload);

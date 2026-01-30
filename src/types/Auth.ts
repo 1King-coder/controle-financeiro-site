@@ -6,6 +6,10 @@ export type UsuarioAuth = {
   id: number;
   hasSubscription: boolean;
   isAuthenticated: boolean;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: string;
 };
 
 export interface AuthContextType {

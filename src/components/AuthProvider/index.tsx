@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 import { useAuth } from "../../services/useAuth";
 import { googleLogout } from "@react-oauth/google";
 import axiosInstance from "../../services/axios";
+import { toast } from "react-toastify";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -46,7 +47,11 @@ const loadUserFromStorage = (): UsuarioAuth | null => {
         user.username &&
         user.email !== undefined &&
         user.isAuthenticated !== undefined &&
-        user.hasSubscription !== undefined
+        user.hasSubscription !== undefined &&
+        user.accessToken &&
+        user.refreshToken &&
+        user.expiresIn !== undefined &&
+        user.tokenType
       ) {
         return user;
       }
@@ -119,13 +124,25 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const validateSession = async () => {
       if (user) {
         const isValid = await checkSessionValidity();
+
+        if (!isValid) {
+          setUser(null);
+          localStorage.removeItem(USER_STORAGE_KEY);
+          setIsLoading(false);
+          return;
+        }
+
         const userFromDB: {
           data: {
             id: string;
             username: string;
             StripeSubscriptionActive: boolean;
           };
-        } = await axiosInstance.get(`/usuarios/${user.id}`);
+        } = await axiosInstance.get(`/usuarios/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+          },
+        });
         if (userFromDB.data.StripeSubscriptionActive !== user.hasSubscription) {
           setUser({
             ...user,
@@ -134,43 +151,87 @@ export default function AuthProvider({ children }: AuthProviderProps) {
           localStorage.setItem(
             USER_STORAGE_KEY,
             JSON.stringify({
-              ...user,
-              hasSubscription: userFromDB.data.StripeSubscriptionActive,
+              user,
             }),
           );
-        }
-        if (!isValid) {
-          setUser(null);
-          localStorage.removeItem(USER_STORAGE_KEY);
         }
       }
       setIsLoading(false);
     };
 
-    validateSession();
+    validateSession().then(() => {});
   }, [setUser, user]);
 
-  // Function to logout user
-  const logout = () => {
-    setUser(null);
-    // Clear any other auth-related data
-    localStorage.removeItem(USER_STORAGE_KEY);
-    googleLogout();
-  };
-
-  // Function to check if user session is still valid
   const checkSessionValidity = async (): Promise<boolean> => {
     if (!user) return false;
 
     try {
-      // You can add an API call here to verify the session is still valid
-      // For now, we'll just check if the user data exists and is authenticated
-      return user.isAuthenticated === true;
+      let result = true;
+      try {
+        const response = await axiosInstance.get("/usuarios/validate-token", {
+          headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+          },
+        });
+
+        if (response.status === 200) {
+          result = true;
+        }
+      } catch (error: any) {
+        if (error.response.status === 400) {
+          toast.error("Usuário não autenticado");
+          result = false;
+        }
+
+        if (error.response.status === 401) {
+          try {
+            const refreshResponse = await axiosInstance.post(
+              "/usuarios/refresh-token",
+              {
+                refreshToken: user.refreshToken,
+              },
+            );
+            const { accessToken, refreshToken, expiresIn, tokenType } =
+              refreshResponse.data;
+
+            setUser({
+              ...user,
+              accessToken,
+              refreshToken,
+              expiresIn,
+              tokenType,
+            });
+
+            result = true;
+          } catch (error) {
+            toast.error("Sessão expirada. Faça login novamente.");
+            result = false;
+          }
+        }
+      }
+
+      return result;
     } catch (error) {
       console.error("Error checking session validity:", error);
       return false;
     }
   };
+
+  // Function to logout user
+  const logout = () => {
+    // Clear any other auth-related data
+    axiosInstance
+      .post("/usuarios/logout", { refreshToken: user!.refreshToken })
+      .catch((error) => {
+        console.error("Error during logout:", error);
+      });
+    setUser(null);
+
+    localStorage.removeItem(USER_STORAGE_KEY);
+    googleLogout();
+  };
+
+  // Function to check if user session is still valid
 
   // Show loading while checking session
   if (isLoading) {
