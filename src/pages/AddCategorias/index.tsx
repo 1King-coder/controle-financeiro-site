@@ -11,56 +11,63 @@ import { useAuth } from "../../services/useAuth";
 
 export default function AddCategorias() {
   const [categorias, setCategorias]: [Categoria[], any] = React.useState([]);
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   React.useEffect(() => {
     async function getCategorias() {
-
       axios.get("/categorias/usuario/" + user!.id).then((response) => {
-        
         setCategorias(response.data);
       });
-      
     }
     getCategorias();
   }, [user]);
 
-  function handleAdicionaCategoria () {
-    const inputNomeCategoria = document.getElementById("nome-categoria") as HTMLInputElement;
+  function handleAdicionaCategoria() {
+    const inputNomeCategoria = document.getElementById(
+      "nome-categoria",
+    ) as HTMLInputElement;
     //@ts-ignore
     const nomeCategoria = inputNomeCategoria?.value;
 
-    nomeCategoria === "" ? toast.warn("Preencha o nome da categoria") : axios.post("/categorias/novo", {
-      nome: nomeCategoria,
-      id_user: user!.id
-    }).then(async (response) => {
-      if (response.status === 201) {
-        toast.success("Categoria adicionada com sucesso");
-        inputNomeCategoria.value = "";
-        const res = await axios.get("/categorias/usuario/" + user!.id);
-        setCategorias(res.data);
-      } 
-    }).catch((error) => {
-      toast.error(error.response.data.detail);
-    });
+    nomeCategoria === ""
+      ? toast.warn("Preencha o nome da categoria")
+      : axios
+          .post("/categorias/novo?id_user=" + user!.id, {
+            nome: nomeCategoria,
+            id_user: user!.id,
+          })
+          .then(async (response) => {
+            if (response.status === 201) {
+              toast.success("Categoria adicionada com sucesso");
+              inputNomeCategoria.value = "";
+              const res = await axios.get("/categorias/usuario/" + user!.id);
+              setCategorias(res.data);
+            }
+          })
+          .catch((error) => {
+            toast.error(error.response.data.detail);
+          });
   }
 
   return (
     <GeneralBox>
       <Title>Adicionar Categorias</Title>
-      <div style={{
-        display: "flex",
-        flexDirection: "row",
-        margin: "1rem auto",
-      }}>
-
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          margin: "1rem auto",
+        }}
+      >
         <form>
           <InputBox>
-            <Label htmlFor="nome-categoria" value="Nome da categoria"/>
-            <TextInput id="nome-categoria" placeholder="Nome da categoria"/>
+            <Label htmlFor="nome-categoria" value="Nome da categoria" />
+            <TextInput id="nome-categoria" placeholder="Nome da categoria" />
           </InputBox>
           <InputBox>
-            <Button onClick={handleAdicionaCategoria}><span>Adicionar</span></Button>
+            <Button onClick={handleAdicionaCategoria}>
+              <span>Adicionar</span>
+            </Button>
           </InputBox>
         </form>
         <DataGridBox>
@@ -68,27 +75,32 @@ export default function AddCategorias() {
           <DataGrid
             rows={categorias}
             columns={[
-              { field: "id", headerName: "ID", width: 70, headerClassName: "datagrid-headers" },
-              { field: "nome", headerName: "Nome", width: 130, headerClassName: "datagrid-headers" },
-            ]}
-            slots={{footer: () => <div />}}
-            sx={
               {
-                boxShadow: 4,
-                border: 2,
-                borderColor: colors.primaryColor,
-                height: "30rem",
-                width: '12rem',
-                backgroundColor: colors.tertiaryColor,
-                fontSize: 16,
-              }
-            }
+                field: "id",
+                headerName: "ID",
+                width: 70,
+                headerClassName: "datagrid-headers",
+              },
+              {
+                field: "nome",
+                headerName: "Nome",
+                width: 130,
+                headerClassName: "datagrid-headers",
+              },
+            ]}
+            slots={{ footer: () => <div /> }}
+            sx={{
+              boxShadow: 4,
+              border: 2,
+              borderColor: colors.primaryColor,
+              height: "30rem",
+              width: "12rem",
+              backgroundColor: colors.tertiaryColor,
+              fontSize: 16,
+            }}
           />
         </DataGridBox>
       </div>
-      
-
-      
     </GeneralBox>
   );
 }

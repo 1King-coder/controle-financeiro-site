@@ -157,16 +157,17 @@ function checkSpreadSheetFileModel(workbook: WorkBook): boolean {
 class GetCategoriasDataFuncions {
   static async getSaldosCategoriasPorBanco(
     id_categoria: number,
+    id_user: number,
   ): Promise<SaldoCategoriaPorBanco[]> {
     const response = await axios.get(
-      "saldos-por-categoria/categoria/" + id_categoria,
+      `saldos-por-categoria/categoria/${id_categoria}?id_user=${id_user}`,
     );
 
     return response.data;
   }
 
   static async getCategorias(id_user: Number): Promise<Categoria[]> {
-    const response = await axios.get("/categorias/usuario/" + id_user);
+    const response = await axios.get(`/categorias/usuario/${id_user}`);
 
     return response.data;
   }
@@ -175,8 +176,11 @@ class GetCategoriasDataFuncions {
 class GetBancosDataFuncions {
   static async getSaldosBancosPorCategoria(
     id_banco: number,
+    id_user: number,
   ): Promise<SaldoBancoPorCategoria[]> {
-    const response = await axios.get("/saldos-por-categoria/banco/" + id_banco);
+    const response = await axios.get(
+      `saldos-por-categoria/banco/${id_banco}?id_user=${id_user}`,
+    );
 
     return response.data;
   }
@@ -436,7 +440,7 @@ export default function EnviaPorPlanilha() {
     }
     try {
       const res = await axios.post(
-        "/transferencias/novo/lista",
+        "/transferencias/novo/lista?id_user=" + user!.id,
         transferenciasPayload,
       );
       if (res.status === 201 || res.status === 200) {
@@ -492,7 +496,7 @@ export default function EnviaPorPlanilha() {
     try {
       if (depositosPayload.length > 0) {
         const resDepositos = await axios.post(
-          "/depositos/novo/lista",
+          "/depositos/novo/lista?id_user=" + user!.id,
           depositosPayload,
         );
         if (resDepositos.status === 201 || resDepositos.status === 200) {
@@ -500,7 +504,10 @@ export default function EnviaPorPlanilha() {
         }
       }
       if (gastosPayload.length > 0) {
-        const resGastos = await axios.post("/gastos/novo/lista", gastosPayload);
+        const resGastos = await axios.post(
+          "/gastos/novo/lista?id_user=" + user!.id,
+          gastosPayload,
+        );
         if (resGastos.status === 201 || resGastos.status === 200) {
           toast.success("Gastos enviados com sucesso!");
         }

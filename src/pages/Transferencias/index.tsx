@@ -112,7 +112,9 @@ export default function Transferencias() {
     React.useState({ id: 1, nome: "" });
   const { user } = useAuth();
   const [transferenciasUrlPath, setTransferenciasUrlPath]: [string, any] =
-    React.useState("/transferencias/entre-bancos/" + user!.id);
+    React.useState(
+      "/transferencias/entre-bancos/" + user!.id + "?id_user=" + user!.id,
+    );
 
   React.useEffect(() => {
     async function getBancos() {
@@ -153,9 +155,13 @@ export default function Transferencias() {
 
   React.useEffect(() => {
     if (optionSelectedId === 1) {
-      setTransferenciasUrlPath("/transferencias/entre-bancos/" + user!.id);
+      setTransferenciasUrlPath(
+        "/transferencias/entre-bancos/" + user!.id + "?id_user=" + user!.id,
+      );
     } else {
-      setTransferenciasUrlPath("/transferencias/entre-categorias/" + user!.id);
+      setTransferenciasUrlPath(
+        "/transferencias/entre-categorias/" + user!.id + "?id_user=" + user!.id,
+      );
     }
   }, [optionSelectedId, user]);
   const handleDeleteTranf = async (url: string) => {
@@ -206,7 +212,9 @@ export default function Transferencias() {
                 <span
                   onClick={() =>
                     handleDeleteTranf(
-                      `transferencias/${tipoTransf}/${transferencia.id}`,
+                      `transferencias/${tipoTransf}/${
+                        transferencia.id
+                      }?id_user=${user!.id}`,
                     )
                   }
                   style={{ cursor: "pointer" }}

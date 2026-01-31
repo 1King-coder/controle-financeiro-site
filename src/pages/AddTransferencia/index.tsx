@@ -8,6 +8,7 @@ import { Categoria } from "../../types/Categoria";
 import { toast } from "react-toastify";
 import { useAuth } from "../../services/useAuth";
 import { fixDate } from "../../config/dates";
+import { CurrencyInput } from "../../components/CurrencyInput";
 
 export default function AddTransferencia(): JSX.Element {
   const { user } = useAuth();
@@ -81,8 +82,8 @@ export default function AddTransferencia(): JSX.Element {
 
       const url =
         tipo === "entre-bancos"
-          ? `/transferencias/entre-bancos/${user!.id}`
-          : `/transferencias/entre-categorias/${user!.id}`;
+          ? `/transferencias/entre-bancos/${user!.id}?id_user=${user!.id}`
+          : `/transferencias/entre-categorias/${user!.id}?id_user=${user!.id}`;
 
       const res = await axios.get(url);
       const data = res.data as any[];
@@ -196,7 +197,7 @@ export default function AddTransferencia(): JSX.Element {
           data_de_competencia: dataCompetencia,
         };
         const res = await axios.post(
-          "/transferencias/entre-bancos/novo",
+          "/transferencias/entre-bancos/novo?id_user=" + user!.id,
           payload,
         );
         if (res.status === 201 || res.status === 200) {
@@ -222,7 +223,7 @@ export default function AddTransferencia(): JSX.Element {
           data_de_competencia: dataCompetencia,
         };
         const res = await axios.post(
-          "/transferencias/entre-categorias/novo",
+          "/transferencias/entre-categorias/novo?id_user=" + user!.id,
           payload,
         );
         if (res.status === 201 || res.status === 200) {
@@ -265,12 +266,9 @@ export default function AddTransferencia(): JSX.Element {
           </InputBox>
           <InputBox>
             <Label htmlFor="valor" value="Valor (R$)" />
-            <TextInput
+            <CurrencyInput
               id="valor"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0,00"
+              placeholder="R$ 0,00"
               value={valor}
               onChange={(e) => setValor(e.target.value)}
             />

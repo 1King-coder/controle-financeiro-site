@@ -16,6 +16,7 @@ import {
   StyledButton,
 } from "./styled";
 import { fixDate } from "../../config/dates";
+import { CurrencyInput } from "../../components/CurrencyInput";
 
 type Params = { id: string };
 
@@ -53,7 +54,7 @@ export default function EditGastosGerais(): JSX.Element {
 
     async function fetchItem() {
       try {
-        const res = await axios.get(`/gastos/${id}`);
+        const res = await axios.get(`/gastos/${id}?id_user=${user!.id}`);
         const g = res.data;
         setIdBanco(g.banco?.id || g.id_banco);
         setIdCategoria(g.categoria?.id || g.id_categoria);
@@ -82,7 +83,7 @@ export default function EditGastosGerais(): JSX.Element {
         valor: Number(valor),
         data_de_competencia: dataCompetencia,
       };
-      const res = await axios.put(`/gastos/${id}`, payload);
+      const res = await axios.put(`/gastos/${id}?id_user=${user!.id}`, payload);
       if (res.status === 200) {
         toast.success("Gasto atualizado");
         history.push("/gastos-gerais");
@@ -141,11 +142,9 @@ export default function EditGastosGerais(): JSX.Element {
           </FormField>
           <FormField>
             <Label htmlFor="valor" value="Valor (R$)" />
-            <TextInput
+            <CurrencyInput
               id="valor"
-              type="number"
-              step="0.01"
-              min="0"
+              placeholder="R$ 0,00"
               value={valor}
               onChange={(e) => setValor(e.target.value)}
             />

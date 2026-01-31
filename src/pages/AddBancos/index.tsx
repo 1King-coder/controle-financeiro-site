@@ -13,55 +13,61 @@ export default function AddBancos() {
   const [bancos, setBancos]: [Banco[], any] = React.useState([]);
   const { user } = useAuth();
 
-
   React.useEffect(() => {
     async function getBancos() {
-
       axios.get(`/bancos/usuario/${user!.id}`).then((response) => {
-        
         setBancos(response.data);
       });
-      
     }
     getBancos();
-  }, [])
+  }, []);
 
-  function handleAdicionaBanco () {
-    const inputNomeBanco = document.getElementById("nome-banco") as HTMLInputElement;
+  function handleAdicionaBanco() {
+    const inputNomeBanco = document.getElementById(
+      "nome-banco",
+    ) as HTMLInputElement;
     //@ts-ignore
     const nomeBanco = inputNomeBanco?.value;
-    
-    nomeBanco === "" ? toast.warn("Preencha o nome do banco") : axios.post("/bancos/novo",{
-      nome: nomeBanco,
-      id_user: user!.id
-    }).then(async (response) => {
-      if (response.status === 201) {
-        toast.success("Banco adicionado com sucesso");
-        inputNomeBanco.value = "";
-        const resBancos = await axios.get(`/bancos/usuario/${user!.id}`);
-        setBancos(resBancos.data);
-      } 
-    }).catch((error) => {
-      toast.error(error.response.data.detail);
-    });
+
+    nomeBanco === ""
+      ? toast.warn("Preencha o nome do banco")
+      : axios
+          .post("/bancos/novo?id_user=" + user!.id, {
+            nome: nomeBanco,
+            id_user: user!.id,
+          })
+          .then(async (response) => {
+            if (response.status === 201) {
+              toast.success("Banco adicionado com sucesso");
+              inputNomeBanco.value = "";
+              const resBancos = await axios.get(`/bancos/usuario/${user!.id}`);
+              setBancos(resBancos.data);
+            }
+          })
+          .catch((error) => {
+            toast.error(error.response.data.detail);
+          });
   }
 
   return (
     <GeneralBox>
       <Title>Adicionar Bancos</Title>
-      <div style={{
-        display: "flex",
-        flexDirection: "row",
-        margin: "1rem auto",
-      }}>
-
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          margin: "1rem auto",
+        }}
+      >
         <form>
           <InputBox>
-            <Label htmlFor="nome-banco" value="Nome do banco"/>
-            <TextInput id="nome-banco" placeholder="Nome do banco"/>
+            <Label htmlFor="nome-banco" value="Nome do banco" />
+            <TextInput id="nome-banco" placeholder="Nome do banco" />
           </InputBox>
           <InputBox>
-            <Button onClick={handleAdicionaBanco}><span>Adicionar</span></Button>
+            <Button onClick={handleAdicionaBanco}>
+              <span>Adicionar</span>
+            </Button>
           </InputBox>
         </form>
         <DataGridBox>
@@ -69,27 +75,32 @@ export default function AddBancos() {
           <DataGrid
             rows={bancos}
             columns={[
-              { field: "id", headerName: "ID", width: 70, headerClassName: "datagrid-headers" },
-              { field: "nome", headerName: "Nome", width: 130, headerClassName: "datagrid-headers" },
-            ]}
-            slots={{footer: () => <div />}}
-            sx={
               {
-                boxShadow: 4,
-                border: 2,
-                borderColor: colors.primaryColor,
-                height: "30rem",
-                width: '12rem',
-                backgroundColor: colors.tertiaryColor,
-                fontSize: 16,
-              }
-            }
+                field: "id",
+                headerName: "ID",
+                width: 70,
+                headerClassName: "datagrid-headers",
+              },
+              {
+                field: "nome",
+                headerName: "Nome",
+                width: 130,
+                headerClassName: "datagrid-headers",
+              },
+            ]}
+            slots={{ footer: () => <div /> }}
+            sx={{
+              boxShadow: 4,
+              border: 2,
+              borderColor: colors.primaryColor,
+              height: "30rem",
+              width: "12rem",
+              backgroundColor: colors.tertiaryColor,
+              fontSize: 16,
+            }}
           />
         </DataGridBox>
       </div>
-      
-
-      
     </GeneralBox>
   );
 }

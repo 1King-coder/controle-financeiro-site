@@ -30,8 +30,11 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 class GetBancosDataFuncions {
   static async getSaldosBancosPorCategoria(
     id_banco: number,
+    id_user: number,
   ): Promise<SaldoBancoPorCategoria[]> {
-    const response = await axios.get(`/saldos-por-categoria/banco/${id_banco}`);
+    const response = await axios.get(
+      `/saldos-por-categoria/banco/${id_banco}?id_user=${id_user}`,
+    );
 
     return response.data;
   }
@@ -71,6 +74,7 @@ export default function Bancos(): JSX.Element {
         setBancos(data);
         GetBancosDataFuncions.getSaldosBancosPorCategoria(
           optionSelectedId,
+          user!.id,
         ).then((data: SaldoBancoPorCategoria[]) => {
           if (data.length === 0) {
             toast.warning("Este Banco não possui saldo em nenhuma categoria.");
@@ -134,7 +138,7 @@ export default function Bancos(): JSX.Element {
   function confirmDelete() {
     if (bancoToDelete) {
       axios
-        .delete(`/bancos/${bancoToDelete}`)
+        .delete(`/bancos/${bancoToDelete}?id_user=${user!.id}`)
         .then(() => {
           const updatedBancos = bancos.filter(
             (banco: Banco) => banco.id !== bancoToDelete,

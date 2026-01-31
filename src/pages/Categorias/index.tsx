@@ -19,16 +19,17 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 class GetCategoriasDataFuncions {
   static async getSaldosCategoriasPorBanco(
     id_categoria: number,
+    id_user: number,
   ): Promise<SaldoCategoriaPorBanco[]> {
     const response = await axios.get(
-      `saldos-por-categoria/categoria/${id_categoria}`,
+      `saldos-por-categoria/categoria/${id_categoria}?id_user=${id_user}`,
     );
 
     return response.data;
   }
 
-  static async getCategorias(id_user: Number): Promise<Categoria[]> {
-    const response = await axios.get("/categorias/usuario/" + id_user);
+  static async getCategorias(id_user: number): Promise<Categoria[]> {
+    const response = await axios.get(`/categorias/usuario/${id_user}`);
 
     return response.data;
   }
@@ -65,6 +66,7 @@ export default function Categorias(): JSX.Element {
           setCategorias(data);
           GetCategoriasDataFuncions.getSaldosCategoriasPorBanco(
             optionSelectedId,
+            user!.id,
           ).then((data: SaldoCategoriaPorBanco[]) => {
             const dados = [["Banco", "Saldo"]];
             if (data.length === 0) {
@@ -100,7 +102,7 @@ export default function Categorias(): JSX.Element {
   function confirmDelete() {
     if (categoriaToDelete) {
       axios
-        .delete(`/categorias/${categoriaToDelete}`)
+        .delete(`/categorias/${categoriaToDelete}?id_user=${user!.id}`)
         .then(() => {
           const updatedCategorias = categorias.filter(
             (categoria: Categoria) => categoria.id !== categoriaToDelete,

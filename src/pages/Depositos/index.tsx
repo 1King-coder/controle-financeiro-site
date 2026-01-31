@@ -268,7 +268,9 @@ export function Depositos(): JSX.Element {
 
   const handleDeleteDeposito = async () => {
     setIsDeleting(true);
-    const res = await axios.delete(`depositos/${depositoToDelete}/`);
+    const res = await axios.delete(
+      `depositos/${depositoToDelete}?id_user=${user!.id}`,
+    );
     if (res.status === 200) {
       toast.success("Depósito deletado com sucesso");
       setShowConfirmDialog(false);

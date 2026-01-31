@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { useAuth } from "../../services/useAuth";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { fixDate } from "../../config/dates";
+import { CurrencyInput } from "../../components/CurrencyInput";
 
 export default function AddGastosGerais(): JSX.Element {
   const [bancos, setBancos]: [Banco[], any] = React.useState([]);
@@ -164,7 +165,10 @@ export default function AddGastosGerais(): JSX.Element {
           data_de_competencia: gasto.data_de_competencia,
         };
       });
-      const res = await axios.post("/gastos/novo/lista", payload);
+      const res = await axios.post(
+        "/gastos/novo/lista?id_user=" + user!.id,
+        payload,
+      );
 
       if (res.status === 201) {
         resetForm();
@@ -173,7 +177,7 @@ export default function AddGastosGerais(): JSX.Element {
         fetchRecent();
       }
     } catch (err) {
-      toast.error("Erro inesperado ao salvar a lista");
+      toast.error("Erro ao enviar lista de gastos");
     }
   }
 
@@ -228,12 +232,9 @@ export default function AddGastosGerais(): JSX.Element {
               </InputBox>
               <InputBox>
                 <Label htmlFor="valor" value="Valor (R$)" />
-                <TextInput
+                <CurrencyInput
                   id="valor"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0,00"
+                  placeholder="R$ 0,00"
                   value={valor}
                   onChange={(e) => setValor(e.target.value)}
                 />
@@ -292,7 +293,10 @@ export default function AddGastosGerais(): JSX.Element {
                         valor: valorNumber,
                         data_de_competencia: dataCompetencia,
                       };
-                      const res = await axios.post("/gastos/novo", payload);
+                      const res = await axios.post(
+                        "/gastos/novo?id_user=" + user!.id,
+                        payload,
+                      );
                       if (res.status === 201 || res.status === 200) {
                         toast.success("Gasto enviado");
                         fetchRecent();

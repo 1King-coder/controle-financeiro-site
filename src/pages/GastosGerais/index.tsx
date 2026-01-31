@@ -236,7 +236,9 @@ export function GastosGerais(): JSX.Element {
 
   const handleDeleteGasto = async () => {
     setIsDeleting(true);
-    const res = await axios.delete(`gastos/${gastoToDelete}/`);
+    const res = await axios.delete(
+      `gastos/${gastoToDelete}?id_user=${user!.id}`,
+    );
     if (res.status === 200) {
       toast.success("Gasto deletado com sucesso");
       setShowConfirmDialog(false);
