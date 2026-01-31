@@ -33,6 +33,7 @@ import { Button } from "flowbite-react";
 import { BsFillFileEarmarkSpreadsheetFill } from "react-icons/bs";
 import { FaUserPlus } from "react-icons/fa";
 import axios from "../../services/axios";
+import { IoIosCalculator } from "react-icons/io";
 
 export default function Header(): JSX.Element {
   const { user, logout } = useAuth();
@@ -130,6 +131,15 @@ export default function Header(): JSX.Element {
                 />
               </div>
               <Tooltip>Importar Planilha</Tooltip>
+            </Box>
+          </Link>
+
+          <Link to="/calc-planejamento">
+            <Box>
+              <div>
+                <IoIosCalculator size={24} color={colors.secondaryColor} />
+              </div>
+              <Tooltip>Calculadora de Planejamento</Tooltip>
             </Box>
           </Link>
 

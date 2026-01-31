@@ -28,6 +28,7 @@ import {
 import RecuperaSenha from "../pages/RecuperaSenha";
 import RecuperaSenhaEmail from "../pages/RecuperaSenhaEmail";
 import TermosDeUso from "../pages/TermosDeUso";
+import CalcPlanejamento from "../pages/CalcPlanejamento";
 
 export default function Routes(): JSX.Element {
   return (
@@ -202,6 +203,15 @@ export default function Routes(): JSX.Element {
           <ProtectedRoute>
             <SubscriptionPage {...props} />
           </ProtectedRoute>
+        )}
+      />
+      <Route
+        exact
+        path="/calc-planejamento"
+        component={(props: any) => (
+          <OnlySubscribersRoute>
+            <CalcPlanejamento {...props} />
+          </OnlySubscribersRoute>
         )}
       />
 
