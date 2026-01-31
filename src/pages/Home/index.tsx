@@ -1,5 +1,35 @@
 import React from "react";
-import { Box, Title, Grid, ScrollableDivBtns, Btn } from "./styled";
+import {
+  Box,
+  Title,
+  Grid,
+  ScrollableDivBtns,
+  Btn,
+  HeroSection,
+  HeroTitle,
+  HeroSubtitle,
+  FeaturesGrid,
+  FeatureCard,
+  CTAButtonsContainer,
+  PrimaryButton,
+  SecondaryButton,
+  UnauthorizedGrid,
+  DataSection,
+  DataCard,
+  CardHeader,
+  CardTitle,
+  ItemsList,
+  ListItem,
+  EmptyMessage,
+  ActionButton,
+  ChartContainer,
+  ChartHeader,
+  ToggleButton,
+  ChartContent,
+  TotalDisplay,
+  ButtonsRow,
+  AuthenticatedGrid,
+} from "./styled";
 import {
   OptionBtn,
   ScrollableDiv,
@@ -18,14 +48,15 @@ import { SubTitle1 } from "../GastosGerais/styled";
 import { Banco } from "../../types/Banco";
 import { Categoria } from "../../types/Categoria";
 import history from "../../services/history";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
+import { FaMoneyBillTransfer, FaCirclePlay, FaChartPie } from "react-icons/fa6";
 import { GiMoneyStack } from "react-icons/gi";
-import { BiTransfer } from "react-icons/bi";
+import { BiTransfer, BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
 import { GastoGeral } from "../../types/GastoGeral";
-import { FaCirclePlay } from "react-icons/fa6";
 import { GrDirections } from "react-icons/gr";
 import { BsBank2 } from "react-icons/bs";
+import { GiPieChart } from "react-icons/gi";
+import { IoIosCalculator } from "react-icons/io";
 
 class GetGastosGeraisDataFuncions {
   static async getGastosGerais(id_user: Number): Promise<GastoGeral[]> {
@@ -78,6 +109,7 @@ export default function Home(): JSX.Element {
   const [gastosByMonth, setGastosByMonth]: [GastoGeral[], any] = React.useState(
     [],
   );
+  const [chartOpen, setChartOpen]: [boolean, any] = React.useState(false);
 
   function handleMonthlyCheckout() {
     if (user && user.isAuthenticated && !user.hasSubscription) {
@@ -156,21 +188,56 @@ export default function Home(): JSX.Element {
       <Title>Home</Title>
       <Grid>
         {!user?.isAuthenticated ? (
-          <>
-            <Link to="/login">
-              <StyledButton>
-                <span style={{ color: secondaryColor }}>Entrar</span>
-              </StyledButton>
-            </Link>
-            <Link to="/cadastro">
-              <StyledButton>
-                <span style={{ color: secondaryColor }}>Cadastrar-se</span>
-              </StyledButton>
-            </Link>
-          </>
+          <UnauthorizedGrid>
+            <HeroSection>
+              <HeroTitle>Controle Financeiro</HeroTitle>
+              <HeroSubtitle>
+                Gerencie seu dinheiro com facilidade.
+                <br />
+                Saiba onde seu dinheiro está e visualize seus extratos de forma
+                detalhada e tome decisões financeiras melhores.
+              </HeroSubtitle>
+            </HeroSection>
+
+            <FeaturesGrid>
+              <FeatureCard>
+                <FaMoneyBillTransfer size={40} />
+                <h3>Controle Total</h3>
+                <p>Acompanhe todos os seus gastos e receitas em um só lugar</p>
+              </FeatureCard>
+              <FeatureCard>
+                <GiPieChart size={40} />
+                <h3>Relatórios Visuais</h3>
+                <p>
+                  Veja gráficos e análises detalhadas dos seus gastos por
+                  categoria
+                </p>
+              </FeatureCard>
+              <FeatureCard>
+                <GiMoneyStack size={40} />
+                <h3>Categorias Personalizadas</h3>
+                <p>Organize seus gastos da forma que faz sentido para você</p>
+              </FeatureCard>
+              <FeatureCard>
+                <IoIosCalculator size={40} />
+                <h3>Calculadora</h3>
+                <p>Planeje suas finanças com facilidade e precisão</p>
+                <br /> (Apenas assinantes)
+              </FeatureCard>
+            </FeaturesGrid>
+
+            <CTAButtonsContainer>
+              <Link to="/cadastro">
+                <PrimaryButton>Começar Agora</PrimaryButton>
+              </Link>
+              <Link to="/login">
+                <SecondaryButton>Já tem conta? Entrar</SecondaryButton>
+              </Link>
+            </CTAButtonsContainer>
+          </UnauthorizedGrid>
         ) : (
-          <>
-            <ScrollableDivBtns>
+          <AuthenticatedGrid>
+            <ButtonsRow>
               <Btn onClick={() => history.push("/gastos-gerais/add")}>
                 <span>Adicionar Gasto</span>
                 <FaMoneyBillTransfer
@@ -202,14 +269,15 @@ export default function Home(): JSX.Element {
                   )
                 }
               >
-                <span>Veja como a ferramenta funciona</span>
+                <span>Tutorial</span>
                 <FaCirclePlay
                   size={18}
                   color={secondaryColor}
                   style={{ margin: "0 0 0 10px" }}
                 />
               </Btn>
-            </ScrollableDivBtns>
+            </ButtonsRow>
+
             {!user!.hasSubscription ? (
               <Box>
                 <SubTitle1>Escolha um Plano</SubTitle1>
@@ -233,222 +301,190 @@ export default function Home(): JSX.Element {
                 </div>
               </Box>
             ) : null}
-            <Box>
-              <Link to={`/bancos`}>
-                <SubTitle1 style={{ marginBottom: 10, marginTop: 0 }}>
-                  Bancos
-                </SubTitle1>
-              </Link>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  overflowY: "scroll",
-                  height: "60%",
-                  border: "2px solid black",
-                }}
-              >
+
+            <DataSection>
+              <DataCard>
+                <CardHeader>
+                  <CardTitle>Bancos</CardTitle>
+                </CardHeader>
                 {bancos.length > 0 ? (
-                  bancos
-                    .sort((a: Banco, b: Banco) => (a.saldo < b.saldo ? 1 : -1))
-                    .map((banco: Banco) => {
-                      return (
-                        <>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              width: 250,
-                              margin: 8,
-                              border: "1px solid black",
-                              padding: 10,
-                            }}
-                          >
-                            <span>{banco.nome}:</span>
-                            <span>{`R$${banco.saldo.toFixed(2)}`}</span>
-                          </div>
-                        </>
-                      );
-                    })
+                  <>
+                    <ItemsList>
+                      {bancos
+                        .sort((a: Banco, b: Banco) =>
+                          a.saldo < b.saldo ? 1 : -1,
+                        )
+                        .map((banco: Banco) => (
+                          <ListItem key={banco.id}>
+                            <span>{banco.nome}</span>
+                            <span>R$ {banco.saldo.toFixed(2)}</span>
+                          </ListItem>
+                        ))}
+                    </ItemsList>
+                    <ActionButton onClick={() => history.push("/bancos/add")}>
+                      <BsBank2 size={16} />
+                      Novo Banco
+                    </ActionButton>
+                  </>
                 ) : (
-                  <></>
+                  <>
+                    <EmptyMessage>Nenhum banco cadastrado</EmptyMessage>
+                    <ActionButton onClick={() => history.push("/bancos/add")}>
+                      <BsBank2 size={16} />
+                      Adicionar Banco
+                    </ActionButton>
+                  </>
                 )}
-              </div>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <Btn
-                  style={{ fontSize: 20 }}
-                  onClick={() => history.push("/bancos/add")}
-                >
-                  <span>Adicionar novo Banco</span>
-                  <BsBank2
-                    size={24}
-                    color={secondaryColor}
-                    style={{ margin: "0 0 0 10px" }}
-                  />
-                </Btn>
-              </div>
-            </Box>
-            <Box>
-              <Link to="/categorias">
-                <SubTitle1 style={{ marginBottom: 10, marginTop: 0 }}>
-                  Categorias
-                </SubTitle1>
-              </Link>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  overflowY: "scroll",
-                  height: "60%",
-                  border: "2px solid black",
-                }}
-              >
+              </DataCard>
+
+              <DataCard>
+                <CardHeader>
+                  <CardTitle>Categorias</CardTitle>
+                </CardHeader>
                 {categorias.length > 0 ? (
-                  categorias
-                    .sort((a: Categoria, b: Categoria) =>
-                      a.saldo < b.saldo ? 1 : -1,
-                    )
-                    .map((categoria: Categoria) => {
-                      return (
-                        <>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              width: 250,
-                              margin: 8,
-                              border: "1px solid black",
-                              padding: 10,
-                            }}
-                          >
-                            <span>{categoria.nome}:</span>
-                            <span
-                              style={{
-                                position: "-webkit-sticky",
-                                left: "50%",
-                              }}
-                            >{`R$${categoria.saldo.toFixed(2)}`}</span>
-                          </div>
-                        </>
-                      );
-                    })
+                  <>
+                    <ItemsList>
+                      {categorias
+                        .sort((a: Categoria, b: Categoria) =>
+                          a.saldo < b.saldo ? 1 : -1,
+                        )
+                        .map((categoria: Categoria) => (
+                          <ListItem key={categoria.id}>
+                            <span>{categoria.nome}</span>
+                            <span>R$ {categoria.saldo.toFixed(2)}</span>
+                          </ListItem>
+                        ))}
+                    </ItemsList>
+                    <ActionButton
+                      onClick={() => history.push("/categorias/add")}
+                    >
+                      <GrDirections size={16} />
+                      Nova Categoria
+                    </ActionButton>
+                  </>
                 ) : (
-                  <></>
+                  <>
+                    <EmptyMessage>Nenhuma categoria cadastrada</EmptyMessage>
+                    <ActionButton
+                      onClick={() => history.push("/categorias/add")}
+                    >
+                      <GrDirections size={16} />
+                      Adicionar Categoria
+                    </ActionButton>
+                  </>
                 )}
-              </div>
-              <Btn onClick={() => history.push("/categorias/add")}>
-                <span>Adicionar nova Categoria</span>
-                <GrDirections
-                  size={24}
-                  color={secondaryColor}
-                  style={{ margin: "0 0 0 10px" }}
-                />
-              </Btn>
-            </Box>
-            <Box>
-              <Title>Gastos por categoria no mês</Title>
-              {gastosByMonth.length > 0 &&
-              bancos.length > 0 &&
-              categorias.length > 0 ? (
-                (() => {
-                  type PieChartData = {
-                    id: number;
-                    value: number;
-                    label: string;
-                  };
+              </DataCard>
+            </DataSection>
 
-                  const groupedByCategoriaGastos: { [key: number]: number } =
-                    gastosByMonth.reduce(
-                      (
-                        groupedByCategoriaGastos: { [key: string]: number },
-                        item: any,
-                      ) => {
-                        if (
-                          !groupedByCategoriaGastos.hasOwnProperty(
-                            item.categoria.id,
-                          )
-                        ) {
-                          groupedByCategoriaGastos[item.categoria.id] = 0;
-                        }
+            <ChartContainer>
+              <ChartHeader>
+                <h3>Gastos por Categoria - Este Mês</h3>
+                <ToggleButton
+                  onClick={() => setChartOpen(!chartOpen)}
+                  title={chartOpen ? "Fechar gráfico" : "Abrir gráfico"}
+                >
+                  {chartOpen ? (
+                    <BiChevronUp size={20} />
+                  ) : (
+                    <BiChevronDown size={20} />
+                  )}
+                </ToggleButton>
+              </ChartHeader>
+              <ChartContent isOpen={chartOpen}>
+                {gastosByMonth.length > 0 &&
+                bancos.length > 0 &&
+                categorias.length > 0 ? (
+                  (() => {
+                    type PieChartData = {
+                      id: number;
+                      value: number;
+                      label: string;
+                    };
 
-                        groupedByCategoriaGastos[item.categoria.id] +=
-                          item.valor;
-                        return groupedByCategoriaGastos;
-                      },
-                      {},
+                    const groupedByCategoriaGastos: { [key: number]: number } =
+                      gastosByMonth.reduce(
+                        (
+                          groupedByCategoriaGastos: { [key: string]: number },
+                          item: any,
+                        ) => {
+                          if (
+                            !groupedByCategoriaGastos.hasOwnProperty(
+                              item.categoria.id,
+                            )
+                          ) {
+                            groupedByCategoriaGastos[item.categoria.id] = 0;
+                          }
+
+                          groupedByCategoriaGastos[item.categoria.id] +=
+                            item.valor;
+                          return groupedByCategoriaGastos;
+                        },
+                        {},
+                      );
+
+                    const pieChartGroupedByCategoriaData: PieChartData[] =
+                      Object.keys(groupedByCategoriaGastos).map(
+                        (categoria: string) => ({
+                          id: Number(categoria),
+                          value: groupedByCategoriaGastos[Number(categoria)],
+                          label: categoriasByNameId[Number(categoria)],
+                        }),
+                      );
+
+                    const totalGastosMes = gastosByMonth.reduce(
+                      (acc, curr) => acc + curr.valor,
+                      0,
                     );
 
-                  const pieChartGroupedByCategoriaData: PieChartData[] =
-                    Object.keys(groupedByCategoriaGastos).map(
-                      (categoria: string) => ({
-                        id: Number(categoria),
-                        value: groupedByCategoriaGastos[Number(categoria)],
-                        label: categoriasByNameId[Number(categoria)],
-                      }),
+                    return (
+                      <>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            width: "100%",
+                            overflowX: "auto",
+                          }}
+                        >
+                          <PieChart
+                            title="Gastos por categoria"
+                            series={[
+                              {
+                                arcLabel: (item) =>
+                                  `R$ ${item.value.toFixed(2)}`,
+                                arcLabelMinAngle: 30,
+                                data: pieChartGroupedByCategoriaData,
+                                innerRadius: 40,
+                                color: "#fff",
+                                highlightScope: {
+                                  fade: "global",
+                                  highlight: "item",
+                                },
+                              },
+                            ]}
+                            width={500}
+                            height={250}
+                            sx={{
+                              [`& .${pieArcLabelClasses.root}`]: {
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                color: "#fff",
+                              },
+                            }}
+                          />
+                        </div>
+                        <TotalDisplay>
+                          <strong>Total: R$ {totalGastosMes.toFixed(2)}</strong>
+                        </TotalDisplay>
+                      </>
                     );
-
-                  const totalGastosMes = gastosByMonth.reduce(
-                    (acc, curr) => acc + curr.valor,
-                    0,
-                  );
-
-                  return (
-                    <div style={{ height: "10rem" }}>
-                      <PieChart
-                        title="Gastos por categoria"
-                        series={[
-                          {
-                            arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
-                            arcLabelMinAngle: 30,
-                            data: pieChartGroupedByCategoriaData,
-                            innerRadius: 40,
-                            color: "#fff",
-                            highlightScope: {
-                              fade: "global",
-                              highlight: "item",
-                            },
-                          },
-                        ]}
-                        width={500}
-                        height={250}
-                        sx={{
-                          [`& .${pieArcLabelClasses.root}`]: {
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            color: "#fff",
-                          },
-                        }}
-                      />
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginTop: "0.1rem",
-                          marginBottom: "1rem",
-                          fontSize: "1.25rem",
-                        }}
-                      >
-                        <strong>Total: R$ {totalGastosMes.toFixed(2)}</strong>
-                      </span>
-                    </div>
-                  );
-                })()
-              ) : (
-                <>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      height: "100%",
-                    }}
-                  >
-                    <h3>Não houve gastos neste mês</h3>
-                  </div>
-                </>
-              )}
-            </Box>
-          </>
+                  })()
+                ) : (
+                  <EmptyMessage>Não houve gastos neste mês</EmptyMessage>
+                )}
+              </ChartContent>
+            </ChartContainer>
+          </AuthenticatedGrid>
         )}
       </Grid>
     </Container>

@@ -6,6 +6,13 @@ import {
   DataGridBox,
   SubTitle2,
   StyledStaticDatePicker,
+  ChartContainer,
+  ChartHeader,
+  ToggleButton,
+  ChartContent,
+  ChartsWrapper,
+  TotalDisplay,
+  ResponsiveContainer,
 } from "./styled";
 import axios from "../../services/axios";
 import { Card, CardTitle, OptionBtn } from "../../styles/GlobalStyles";
@@ -30,6 +37,7 @@ import { useAuth } from "../../services/useAuth";
 import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { toast } from "react-toastify";
 import { fixDate } from "../../config/dates";
 import ConfirmDialog from "../../components/ConfirmDialog";
@@ -153,6 +161,7 @@ export function Depositos(): JSX.Element {
   const [depositosByMonth, setdepositosByMonth]: [Deposito[], any] =
     React.useState([]);
   const [isLoding, setIsLoading]: [boolean, any] = React.useState(true);
+  const [chartsOpen, setChartsOpen]: [boolean, any] = React.useState(false);
   const { user } = useAuth();
 
   React.useEffect(() => {
@@ -285,17 +294,7 @@ export function Depositos(): JSX.Element {
   return isLoding ? (
     <div>Loading</div>
   ) : (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "fit-content",
-        height: "fit-content",
-        justifyContent: "center",
-        margin: "0 auto",
-        backgroundColor: "white",
-      }}
-    >
+    <ResponsiveContainer>
       <Title>Depósitos</Title>
       <TimeIntervalOptionsDiv>
         <OptionBtn
@@ -656,59 +655,100 @@ export function Depositos(): JSX.Element {
                       R$ {totalDepositos.toFixed(2)}
                     </p>
                   </Card>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      margin: "10px auto",
-                    }}
-                  >
-                    <PieChart
-                      title="Depósitos por categoria"
-                      series={[
-                        {
-                          arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
-                          arcLabelMinAngle: 30,
-                          data: pieChartGroupedByCategoriaData,
-                          innerRadius: 90,
-                          color: "#fff",
-                          highlightScope: { fade: "global", highlight: "item" },
-                        },
-                      ]}
-                      width={800}
-                      height={500}
-                      sx={{
-                        [`& .${pieArcLabelClasses.root}`]: {
-                          fontSize: "16px",
-                          fontWeight: "bold",
-                          color: "#fff",
-                        },
-                      }}
-                    />
+                  <ChartContainer>
+                    <ChartHeader>
+                      <h3>Gráficos de Depósitos</h3>
+                      <ToggleButton
+                        onClick={() => setChartsOpen(!chartsOpen)}
+                        title={
+                          chartsOpen ? "Fechar gráficos" : "Abrir gráficos"
+                        }
+                      >
+                        {chartsOpen ? (
+                          <BiChevronUp size={20} />
+                        ) : (
+                          <BiChevronDown size={20} />
+                        )}
+                      </ToggleButton>
+                    </ChartHeader>
+                    <ChartContent isOpen={chartsOpen}>
+                      <ChartsWrapper>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <SubTitle2>Depósitos por Categoria</SubTitle2>
+                          <PieChart
+                            title="Depósitos por categoria"
+                            series={[
+                              {
+                                arcLabel: (item) =>
+                                  `R$ ${item.value.toFixed(2)}`,
+                                arcLabelMinAngle: 30,
+                                data: pieChartGroupedByCategoriaData,
+                                innerRadius: 90,
+                                color: "#fff",
+                                highlightScope: {
+                                  fade: "global",
+                                  highlight: "item",
+                                },
+                              },
+                            ]}
+                            width={500}
+                            height={400}
+                            sx={{
+                              [`& .${pieArcLabelClasses.root}`]: {
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                                color: "#fff",
+                              },
+                            }}
+                          />
+                        </div>
 
-                    <PieChart
-                      title="Depósitos por banco"
-                      series={[
-                        {
-                          arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
-                          data: pieChartGroupedByBancoData,
-                          innerRadius: 90,
-                          color: "#fff",
-                          highlightScope: { fade: "global", highlight: "item" },
-                          arcLabelMinAngle: 30,
-                        },
-                      ]}
-                      width={800}
-                      height={500}
-                      sx={{
-                        [`& .${pieArcLabelClasses.root}`]: {
-                          fontSize: "16px",
-                          fontWeight: "bold",
-                          color: "#fff",
-                        },
-                      }}
-                    />
-                  </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <SubTitle2>Depósitos por Banco</SubTitle2>
+                          <PieChart
+                            title="Depósitos por banco"
+                            series={[
+                              {
+                                arcLabel: (item) =>
+                                  `R$ ${item.value.toFixed(2)}`,
+                                data: pieChartGroupedByBancoData,
+                                innerRadius: 90,
+                                color: "#fff",
+                                highlightScope: {
+                                  fade: "global",
+                                  highlight: "item",
+                                },
+                                arcLabelMinAngle: 30,
+                              },
+                            ]}
+                            width={500}
+                            height={400}
+                            sx={{
+                              [`& .${pieArcLabelClasses.root}`]: {
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                                color: "#fff",
+                              },
+                            }}
+                          />
+                        </div>
+                      </ChartsWrapper>
+                    </ChartContent>
+                  </ChartContainer>
                 </>
               );
             })()}
@@ -723,6 +763,6 @@ export function Depositos(): JSX.Element {
           isLoading={isDeleting}
         />
       </div>
-    </div>
+    </ResponsiveContainer>
   );
 }

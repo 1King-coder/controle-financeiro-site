@@ -72,9 +72,9 @@ export default function Routes(): JSX.Element {
         exact
         path="/gastos-gerais"
         component={(props: any) => (
-          <OnlySubscribersRoute>
+          <ProtectedRoute>
             <GastosGerais {...props} />
-          </OnlySubscribersRoute>
+          </ProtectedRoute>
         )}
       />
       <Route
@@ -146,9 +146,9 @@ export default function Routes(): JSX.Element {
         exact
         path="/depositos/edit/:id"
         component={(props: any) => (
-          <ProtectedRoute>
+          <OnlySubscribersRoute>
             <EditDeposito {...props} />
-          </ProtectedRoute>
+          </OnlySubscribersRoute>
         )}
       />
       <Route

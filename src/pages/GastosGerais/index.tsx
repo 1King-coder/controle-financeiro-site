@@ -5,6 +5,13 @@ import {
   SubTitle1,
   DataGridBox,
   SubTitle2,
+  ChartContainer,
+  ChartHeader,
+  ToggleButton,
+  ChartContent,
+  ChartsWrapper,
+  TotalDisplay,
+  ResponsiveContainer,
 } from "./styled";
 import axios from "../../services/axios";
 import { GastoGeral } from "../../types/GastoGeral";
@@ -25,6 +32,7 @@ import { pieArcLabelClasses, PieChart } from "@mui/x-charts";
 import { useAuth } from "../../services/useAuth";
 import { Link } from "react-router-dom";
 import { MdDelete } from "react-icons/md";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { toast } from "react-toastify";
 import { StyledStaticDatePicker } from "../Depositos/styled";
 import { fixDate } from "../../config/dates";
@@ -153,6 +161,7 @@ export function GastosGerais(): JSX.Element {
     [],
   );
   const [isLoading, setIsLoading]: [boolean, any] = React.useState(true);
+  const [chartsOpen, setChartsOpen]: [boolean, any] = React.useState(false);
   const { user } = useAuth();
 
   React.useEffect(() => {
@@ -288,17 +297,7 @@ export function GastosGerais(): JSX.Element {
   return isLoading ? (
     <div>Loading</div>
   ) : (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "fit-content",
-        height: "fit-content",
-        justifyContent: "center",
-        margin: "0 auto",
-        backgroundColor: "white",
-      }}
-    >
+    <ResponsiveContainer>
       <Title>Gastos Gerais</Title>
       <TimeIntervalOptionsDiv>
         <OptionBtn
@@ -656,59 +655,100 @@ export function GastosGerais(): JSX.Element {
                       R$ {totalGastos.toFixed(2)}
                     </p>
                   </Card>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      margin: "10px auto",
-                    }}
-                  >
-                    <PieChart
-                      title="Gastos por categoria"
-                      series={[
-                        {
-                          arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
-                          arcLabelMinAngle: 30,
-                          data: pieChartGroupedByCategoriaData,
-                          innerRadius: 90,
-                          color: "#fff",
-                          highlightScope: { fade: "global", highlight: "item" },
-                        },
-                      ]}
-                      width={800}
-                      height={500}
-                      sx={{
-                        [`& .${pieArcLabelClasses.root}`]: {
-                          fontSize: "16px",
-                          fontWeight: "bold",
-                          color: "#fff",
-                        },
-                      }}
-                    />
+                  <ChartContainer>
+                    <ChartHeader>
+                      <h3>Gráficos de Gastos</h3>
+                      <ToggleButton
+                        onClick={() => setChartsOpen(!chartsOpen)}
+                        title={
+                          chartsOpen ? "Fechar gráficos" : "Abrir gráficos"
+                        }
+                      >
+                        {chartsOpen ? (
+                          <BiChevronUp size={20} />
+                        ) : (
+                          <BiChevronDown size={20} />
+                        )}
+                      </ToggleButton>
+                    </ChartHeader>
+                    <ChartContent isOpen={chartsOpen}>
+                      <ChartsWrapper>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <SubTitle2>Gastos por Categoria</SubTitle2>
+                          <PieChart
+                            title="Gastos por categoria"
+                            series={[
+                              {
+                                arcLabel: (item) =>
+                                  `R$ ${item.value.toFixed(2)}`,
+                                arcLabelMinAngle: 30,
+                                data: pieChartGroupedByCategoriaData,
+                                innerRadius: 90,
+                                color: "#fff",
+                                highlightScope: {
+                                  fade: "global",
+                                  highlight: "item",
+                                },
+                              },
+                            ]}
+                            width={500}
+                            height={400}
+                            sx={{
+                              [`& .${pieArcLabelClasses.root}`]: {
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                                color: "#fff",
+                              },
+                            }}
+                          />
+                        </div>
 
-                    <PieChart
-                      title="Gastos por banco"
-                      series={[
-                        {
-                          arcLabel: (item) => `R$ ${item.value.toFixed(2)}`,
-                          data: pieChartGroupedByBancoData,
-                          innerRadius: 90,
-                          color: "#fff",
-                          highlightScope: { fade: "global", highlight: "item" },
-                          arcLabelMinAngle: 30,
-                        },
-                      ]}
-                      width={800}
-                      height={500}
-                      sx={{
-                        [`& .${pieArcLabelClasses.root}`]: {
-                          fontSize: "16px",
-                          fontWeight: "bold",
-                          color: "#fff",
-                        },
-                      }}
-                    />
-                  </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <SubTitle2>Gastos por Banco</SubTitle2>
+                          <PieChart
+                            title="Gastos por banco"
+                            series={[
+                              {
+                                arcLabel: (item) =>
+                                  `R$ ${item.value.toFixed(2)}`,
+                                data: pieChartGroupedByBancoData,
+                                innerRadius: 90,
+                                color: "#fff",
+                                highlightScope: {
+                                  fade: "global",
+                                  highlight: "item",
+                                },
+                                arcLabelMinAngle: 30,
+                              },
+                            ]}
+                            width={500}
+                            height={400}
+                            sx={{
+                              [`& .${pieArcLabelClasses.root}`]: {
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                                color: "#fff",
+                              },
+                            }}
+                          />
+                        </div>
+                      </ChartsWrapper>
+                    </ChartContent>
+                  </ChartContainer>
                 </>
               );
             })()}
@@ -723,6 +763,6 @@ export function GastosGerais(): JSX.Element {
         onCancel={() => setShowConfirmDialog(false)}
         isLoading={isDeleting}
       />
-    </div>
+    </ResponsiveContainer>
   );
 }
