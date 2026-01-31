@@ -25,6 +25,48 @@ export const Nav = styled.nav`
   @media (max-width: 480px) {
     padding: 10px;
     gap: 5px;
+    flex-wrap: nowrap;
+  }
+`;
+
+export const NavContainer = styled.div<{ isOpen: boolean }>`
+  display: contents;
+
+  @media (max-width: 480px) {
+    display: ${(props) => (props.isOpen ? "flex" : "none")};
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: ${primaryColor};
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    border-bottom: 2px solid ${successColor};
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+export const HamburgerButton = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  color: ${secondaryColor};
+  font-size: 28px;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: auto;
+  transition: transform 200ms ease-out;
+
+  &:active {
+    transform: scale(0.9);
+  }
+
+  @media (max-width: 480px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
@@ -35,6 +77,7 @@ export const Box = styled.div`
   margin: 0 10px;
   flex-direction: column;
   position: relative;
+  flex-shrink: 0;
 
   div:hover {
     cursor: pointer;
@@ -56,6 +99,13 @@ export const Box = styled.div`
     div:hover {
       margin: 0 6px;
     }
+  }
+
+  @media (max-width: 480px) {
+    margin: 10px auto;
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 10px;
   }
 `;
 
@@ -120,6 +170,15 @@ export const BoxSide = styled.div`
   top: 50%;
   transform: translateY(-50%);
   margin: 0 10px;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    position: static;
+    transform: none;
+    right: auto;
+    top: auto;
+    margin-left: auto;
+  }
 `;
 
 export const BoxSideRight = styled.div`
@@ -131,6 +190,15 @@ export const BoxSideRight = styled.div`
   top: 50%;
   transform: translateY(-50%);
   margin: 0 10px;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    position: static;
+    transform: none;
+    left: auto;
+    top: auto;
+    order: -1;
+  }
 `;
 
 export const UsernameP = styled.p`
@@ -141,6 +209,11 @@ export const UsernameP = styled.p`
   border-radius: 20px;
   font-family: monospace;
   font-weight: bold;
+  white-space: nowrap;
+
+  @media (max-width: 480px) {
+    display: none;
+  }
 `;
 
 export const HoverEffect = styled.div`
@@ -160,6 +233,12 @@ export const HoverEffect = styled.div`
 export const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    width: 100%;
+    display: block;
+  }
 `;
 
 export const DropdownMenu = styled.div`

@@ -20,6 +20,8 @@ import {
   DropdownItemWrapper,
   DropdownItemLink,
   DropdownBuyItemLink,
+  NavContainer,
+  HamburgerButton,
 } from "./styled";
 import { Link, Redirect, Router } from "react-router-dom";
 import * as colors from "../../config/colors";
@@ -37,6 +39,7 @@ import { IoIosCalculator } from "react-icons/io";
 
 export default function Header(): JSX.Element {
   const { user, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const handleLogout = () => {
     logout();
@@ -70,8 +73,20 @@ export default function Header(): JSX.Element {
     }
   }
 
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
   return (
     <Nav>
+      <BoxSideRight style={{ cursor: "pointer" }}>
+        <div>
+          <BsArrowReturnLeft
+            onClick={() => history.goBack()}
+            size={24}
+            color={colors.secondaryColor}
+          />
+        </div>
+      </BoxSideRight>
+
       <Link to="/">
         <Box>
           <div>
@@ -82,137 +97,143 @@ export default function Header(): JSX.Element {
       </Link>
       {user?.isAuthenticated ? (
         <>
-          <Link to="/bancos">
-            <Box>
-              <div>
-                <BsBank2 size={24} color={colors.secondaryColor} />
-              </div>
-              <Tooltip>Bancos</Tooltip>
-            </Box>
-          </Link>
-          <Link to="/categorias">
-            <Box>
-              <div>
-                <GrDirections size={24} color={colors.secondaryColor} />
-              </div>
-              <Tooltip>Categorias</Tooltip>
-            </Box>
-          </Link>
-          <Link to="/gastos-gerais">
-            <Box>
-              <div>
-                <FaMoneyBillTransfer size={24} color={colors.secondaryColor} />
-              </div>
-              <Tooltip>Gastos Gerais</Tooltip>
-            </Box>
-          </Link>
-          <Link to="/depositos">
-            <Box>
-              <div>
-                <GiMoneyStack size={24} color={colors.secondaryColor} />
-              </div>
-              <Tooltip>Depósitos</Tooltip>
-            </Box>
-          </Link>
-          <Link to="/transferencias">
-            <Box>
-              <div>
-                <BiTransfer size={24} color={colors.secondaryColor} />
-              </div>
-              <Tooltip>Transferências</Tooltip>
-            </Box>
-          </Link>
-          <Link to="/envia-por-planilha">
-            <Box>
-              <div>
-                <BsFillFileEarmarkSpreadsheetFill
-                  size={24}
-                  color={colors.secondaryColor}
-                />
-              </div>
-              <Tooltip>Importar Planilha</Tooltip>
-            </Box>
-          </Link>
+          <NavContainer isOpen={mobileMenuOpen}>
+            <Link to="/bancos">
+              <Box onClick={closeMobileMenu}>
+                <div>
+                  <BsBank2 size={24} color={colors.secondaryColor} />
+                </div>
+                <Tooltip>Bancos</Tooltip>
+              </Box>
+            </Link>
+            <Link to="/categorias">
+              <Box onClick={closeMobileMenu}>
+                <div>
+                  <GrDirections size={24} color={colors.secondaryColor} />
+                </div>
+                <Tooltip>Categorias</Tooltip>
+              </Box>
+            </Link>
+            <Link to="/gastos-gerais">
+              <Box onClick={closeMobileMenu}>
+                <div>
+                  <FaMoneyBillTransfer
+                    size={24}
+                    color={colors.secondaryColor}
+                  />
+                </div>
+                <Tooltip>Gastos Gerais</Tooltip>
+              </Box>
+            </Link>
+            <Link to="/depositos">
+              <Box onClick={closeMobileMenu}>
+                <div>
+                  <GiMoneyStack size={24} color={colors.secondaryColor} />
+                </div>
+                <Tooltip>Depósitos</Tooltip>
+              </Box>
+            </Link>
+            <Link to="/transferencias">
+              <Box onClick={closeMobileMenu}>
+                <div>
+                  <BiTransfer size={24} color={colors.secondaryColor} />
+                </div>
+                <Tooltip>Transferências</Tooltip>
+              </Box>
+            </Link>
+            <Link to="/envia-por-planilha">
+              <Box onClick={closeMobileMenu}>
+                <div>
+                  <BsFillFileEarmarkSpreadsheetFill
+                    size={24}
+                    color={colors.secondaryColor}
+                  />
+                </div>
+                <Tooltip>Importar Planilha</Tooltip>
+              </Box>
+            </Link>
 
-          <Link to="/calc-planejamento">
-            <Box>
-              <div>
-                <IoIosCalculator size={24} color={colors.secondaryColor} />
-              </div>
-              <Tooltip>Calculadora de Planejamento</Tooltip>
-            </Box>
-          </Link>
+            <Link to="/calc-planejamento">
+              <Box onClick={closeMobileMenu}>
+                <div>
+                  <IoIosCalculator size={24} color={colors.secondaryColor} />
+                </div>
+                <Tooltip>Calculadora de Planejamento</Tooltip>
+              </Box>
+            </Link>
 
-          <DropdownContainer>
-            <Box>
-              <div>
-                <FaPlus size={24} color={colors.secondaryColor} />
-              </div>
-            </Box>
-            <Tooltip>Adicionar</Tooltip>
-            <DropdownMenu>
-              <DropdownItemWrapper>
-                <DropdownItemLink to="/bancos/add">
-                  <BsBank2 size={18} />
-                  Adicionar Banco
-                </DropdownItemLink>
-              </DropdownItemWrapper>
-              <DropdownItemWrapper>
-                <DropdownItemLink to="/categorias/add">
-                  <GrDirections size={18} />
-                  Adicionar Categoria
-                </DropdownItemLink>
-              </DropdownItemWrapper>
-              <DropdownItemWrapper>
-                <DropdownItemLink to="/gastos-gerais/add">
-                  <FaMoneyBillTransfer size={18} />
-                  Adicionar Gasto
-                </DropdownItemLink>
-              </DropdownItemWrapper>
-              <DropdownItemWrapper>
-                <DropdownItemLink to="/depositos/add">
-                  <GiMoneyStack size={18} />
-                  Adicionar Depósito
-                </DropdownItemLink>
-              </DropdownItemWrapper>
-              <DropdownItemWrapper>
-                <DropdownItemLink to="/transferencias/add">
-                  <BiTransfer size={18} />
-                  Adicionar Transferência
-                </DropdownItemLink>
-              </DropdownItemWrapper>
-            </DropdownMenu>
-          </DropdownContainer>
-          {!user.hasSubscription ? (
             <DropdownContainer>
               <Box>
                 <div>
-                  <FaCartPlus size={24} color={colors.secondaryColor} />
+                  <FaPlus size={24} color={colors.secondaryColor} />
                 </div>
               </Box>
-              <Tooltip>Escolher plano</Tooltip>
+              <Tooltip>Adicionar</Tooltip>
               <DropdownMenu>
                 <DropdownItemWrapper>
-                  <DropdownBuyItemLink onClick={() => handleMonthlyCheckout()}>
-                    Plano Mensal
-                  </DropdownBuyItemLink>
+                  <DropdownItemLink to="/bancos/add">
+                    <BsBank2 size={18} />
+                    Adicionar Banco
+                  </DropdownItemLink>
                 </DropdownItemWrapper>
                 <DropdownItemWrapper>
-                  <DropdownBuyItemLink onClick={() => handleAnnualCheckout()}>
-                    Plano Anual
-                  </DropdownBuyItemLink>
+                  <DropdownItemLink to="/categorias/add">
+                    <GrDirections size={18} />
+                    Adicionar Categoria
+                  </DropdownItemLink>
+                </DropdownItemWrapper>
+                <DropdownItemWrapper>
+                  <DropdownItemLink to="/gastos-gerais/add">
+                    <FaMoneyBillTransfer size={18} />
+                    Adicionar Gasto
+                  </DropdownItemLink>
+                </DropdownItemWrapper>
+                <DropdownItemWrapper>
+                  <DropdownItemLink to="/depositos/add">
+                    <GiMoneyStack size={18} />
+                    Adicionar Depósito
+                  </DropdownItemLink>
+                </DropdownItemWrapper>
+                <DropdownItemWrapper>
+                  <DropdownItemLink to="/transferencias/add">
+                    <BiTransfer size={18} />
+                    Adicionar Transferência
+                  </DropdownItemLink>
                 </DropdownItemWrapper>
               </DropdownMenu>
             </DropdownContainer>
-          ) : // <a href={checkoutUrl} rel="noopener noreferrer">
-          //   <Box>
-          //     <div>
-          //       <FaCartPlus size={24} color={colors.secondaryColor} />
-          //     </div>
-          //     <Tooltip>Comprar ferramenta</Tooltip>
-          //   </Box>
-          // </a>
-          null}
+            {!user.hasSubscription ? (
+              <DropdownContainer>
+                <Box>
+                  <div>
+                    <FaCartPlus size={24} color={colors.secondaryColor} />
+                  </div>
+                </Box>
+                <Tooltip>Escolher plano</Tooltip>
+                <DropdownMenu>
+                  <DropdownItemWrapper>
+                    <DropdownBuyItemLink
+                      onClick={() => handleMonthlyCheckout()}
+                    >
+                      Plano Mensal
+                    </DropdownBuyItemLink>
+                  </DropdownItemWrapper>
+                  <DropdownItemWrapper>
+                    <DropdownBuyItemLink onClick={() => handleAnnualCheckout()}>
+                      Plano Anual
+                    </DropdownBuyItemLink>
+                  </DropdownItemWrapper>
+                </DropdownMenu>
+              </DropdownContainer>
+            ) : null}
+          </NavContainer>
+
+          <HamburgerButton
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            type="button"
+          >
+            <CiAlignLeft />
+          </HamburgerButton>
 
           <BoxSide style={{ cursor: "pointer" }}>
             <HoverEffect>

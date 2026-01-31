@@ -223,11 +223,11 @@ axiosInstance.interceptors.response.use(
       return Promise.resolve(originalRequest);
     }
 
-    // if (error.response.data.code === "INVALID_REFRESH_TOKEN") {
-    //   localStorage.removeItem(USER_STORAGE_KEY);
-    //   history.push("/login");
-    //   Promise.resolve(error.config);
-    // }
+    if (error.response.data.code === "INVALID_REFRESH_TOKEN") {
+      localStorage.removeItem(USER_STORAGE_KEY);
+      history.push("/login");
+      Promise.resolve(error.config);
+    }
 
     return Promise.reject(error);
   },
