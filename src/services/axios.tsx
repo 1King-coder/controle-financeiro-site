@@ -83,11 +83,12 @@ async function refreshUserToken() {
   if (storagedUser) {
     const user = JSON.parse(storagedUser);
     try {
-      const res = await axios.post(
+      const res = await axios.get(
         (process.env.REACT_APP_ENV === "DEV"
           ? process.env.REACT_APP_DEV_URL
-          : process.env.REACT_APP_PROD_URL) + "/usuarios/refresh-token",
-        { refreshToken: user.refreshToken },
+          : process.env.REACT_APP_PROD_URL) +
+          "/usuarios/refresh-token?refreshToken=" +
+          user.refreshToken,
         {
           headers: {
             "Content-Type": "application/json",
